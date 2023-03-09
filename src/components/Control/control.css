@@ -1,0 +1,12 @@
+#controls {
+  float: right;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  justify-content: space-around;
+}
+
+.control {
+  margin-top: 10px;
+  color: red;
+}
