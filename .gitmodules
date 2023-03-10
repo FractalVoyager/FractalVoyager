@@ -1,0 +1,4 @@
+[submodule "emception"]
+	path = "./src/emception"
+	url = https://github.com/jprendes/emception.git
+  branch = demo

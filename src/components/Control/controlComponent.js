@@ -2,6 +2,8 @@ import "./control.css";
 import { useRef, useState } from "react";
 import Viewer from "../Viewer/viewerComponent";
 import { Button, TextField } from "@mui/material";
+import { useCompileCode } from "../../helpers/emceptionHooks";
+import { useCompileStore } from "../../store/zustandTest.js";
 
 function Control({}) {
   const Xref = useRef(3840);
@@ -32,6 +34,10 @@ function Control({}) {
 
   const [showCords, setShowCords] = useState(false);
 
+  const [code, setCode] = useState(null);
+
+  useCompileCode(code);
+
   // const resetRef = useRef(null);
 
   // true is julia, false is orbit
@@ -48,9 +54,24 @@ function Control({}) {
     setBack((prev) => prev + 1);
   }
 
+  const ready = useCompileStore((state) => state.ready);
+  console.log(ready);
+
   return (
     <>
       <div id="controls">
+        {ready ? (
+          <Button
+            className="control"
+            variant="contained"
+            onClick={() => setCode(true)}
+          >
+            Compile & Run
+          </Button>
+        ) : (
+          ""
+        )}
+
         <Button variant="contained" onClick={handleBack} className="control">
           {" "}
           Back
