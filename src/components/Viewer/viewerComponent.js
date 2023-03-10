@@ -10,6 +10,8 @@ import { useEffect, useState } from "react";
 import useGenPixels from "../../helpers/genPixlesHook";
 import CordsBox from "../CordsBox/cordsBoxComponent";
 import { canvasToComplex } from "../../helpers/util";
+import { useCompileCode } from "../../helpers/emceptionHooks";
+import { useCompileStore } from "../../store/zustandTest.js";
 
 const Viewer = ({ xRes, yRes, back, dims, showCords }) => {
   const [displayCords, setDisplayCords] = useState({ re: null, im: null });
