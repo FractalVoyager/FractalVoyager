@@ -30,7 +30,7 @@ const useInitEmception = () => {
       console.log("useInitEmception");
       // maybe useMemo for htis
       const worker = new Worker(
-        "../emception/emception.worker.bundle.worker.js"
+        "./emception/emception.worker.bundle.worker.js"
       );
       emception = Comlink.wrap(worker);
       window.emception = emception;
