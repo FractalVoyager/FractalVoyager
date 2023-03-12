@@ -2,7 +2,7 @@ import "./control.css";
 import { useRef, useState } from "react";
 import Viewer from "../Viewer/viewerComponent";
 import { Button, TextField } from "@mui/material";
-import { useCompileCode } from "../../helpers/emceptionHooks";
+import { useCompileCode, useRunCode } from "../../helpers/emceptionHooks";
 import { useCompileStore } from "../../store/zustandTest.js";
 
 function Control({}) {
@@ -36,8 +36,6 @@ function Control({}) {
 
   const [code, setCode] = useState(null);
 
-  useCompileCode(code);
-
   // const resetRef = useRef(null);
 
   // true is julia, false is orbit
@@ -56,6 +54,10 @@ function Control({}) {
 
   const ready = useCompileStore((state) => state.ready);
   console.log(ready);
+  useCompileCode(code);
+  // want to run it right after compile and also whenever somehting changes ------ might need two functions for this
+  // but try to make just one hook
+  useRunCode();
 
   return (
     <>
