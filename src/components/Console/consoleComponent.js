@@ -11,37 +11,47 @@ want some useRefs (might be werid to have use Refs state dependent )
 // }
 
 import { Terminal } from "xterm";
-// import { FitAddon } from "xterm-addon-fit";
+import { FitAddon } from "xterm-addon-fit";
 
 import { useRef, useEffect, useState } from "react";
 import "./console.css";
 import "../../../node_modules/xterm/css/xterm.css";
-
+import { useTermStore } from "../../store/zustandTest";
 const Console = ({}) => {
-  const term = new Terminal({
-    rows: 5,
-    cols: 10,
-  });
+  const text = useTermStore((state) => state.text);
+  const [term, setTerm] = useState(null);
+
   const termRef = useRef(null);
+  console.log("rerender");
 
   // temp until I get rid of react.strict mode that is causing this to render twice
   const [inited, setInited] = useState(false);
 
+  useEffect(() => {
+    console.log("writing", text);
+    if (text) {
+      console.log(term);
+      term.writeln(text);
+    }
+  }, [text]);
+
   // open on itial render
   useEffect(() => {
     if (!inited) {
-      term.open(termRef.current);
+      const fitAddon = new FitAddon({});
+      const mterm = new Terminal({});
+      mterm.loadAddon(fitAddon);
+      mterm.open(termRef.current);
+      fitAddon.fit();
       setInited(true);
+      // term.resize(0);
+      console.log("xterm inited");
+      setTerm(mterm);
+      console.log(term);
     }
   }, []);
 
-  return (
-    <>
-      <div id="terminal">
-        <div ref={termRef}></div>
-      </div>
-    </>
-  );
+  // return <>{<div id="terminal" ref={termRef}></div>}</>;
 };
 
 export default Console;

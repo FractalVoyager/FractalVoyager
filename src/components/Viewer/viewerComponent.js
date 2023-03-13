@@ -423,27 +423,31 @@ const Viewer = ({
 
   return (
     <>
-      <Canvas
-        className="can"
-        draw={drawMand}
-        xRes={xRes}
-        yRes={yRes}
-        id="mandCan"
-      />
-      <Canvas
-        className="can"
-        xRes={xRes}
-        yRes={yRes}
-        draw={drawing && isDown ? drawRect : clearRect}
-        id="rectCan"
-        options={rectOpts}
-        mouseDown={(e) => mouseDown(e)}
-        mouseMove={(e) =>
-          isDown ? mouseMove(e) : showCords ? mouseMoveCalcCords(e) : null
-        }
-        mouseUp={(e) => mouseUp(e)}
-      />
-      <CordsBox display={showCords} cords={displayCords} />
+      <div id="viewer">
+        <div id="outer-cans">
+          <Canvas
+            className="can"
+            draw={drawMand}
+            xRes={xRes}
+            yRes={yRes}
+            id="mandCan"
+          />
+          <Canvas
+            className="can"
+            xRes={xRes}
+            yRes={yRes}
+            draw={drawing && isDown ? drawRect : clearRect}
+            id="rectCan"
+            options={rectOpts}
+            mouseDown={(e) => mouseDown(e)}
+            mouseMove={(e) =>
+              isDown ? mouseMove(e) : showCords ? mouseMoveCalcCords(e) : null
+            }
+            mouseUp={(e) => mouseUp(e)}
+          />
+        </div>
+        <CordsBox display={showCords} cords={displayCords} id="cords-box" />
+      </div>
     </>
   );
 };

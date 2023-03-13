@@ -9,9 +9,11 @@ function App() {
   useInitEmception();
   return (
     <>
-      <Control />
-      {/* <Viewer xRes={3840} yRes={2160} /> */}
-      {/* <Console /> */}
+      <div id="page-container">
+        <Control />
+        {/* <Viewer xRes={3840} yRes={2160} /> */}
+        {/* <Console /> */}
+      </div>
     </>
   );
 }
