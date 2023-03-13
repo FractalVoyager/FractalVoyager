@@ -118,8 +118,8 @@ extern "C" {
     {
       // double new_x = (((widthScale * x) + startX) - width / 2.) / (height / 2.) - .55;
       // double new_y = (((heightScale * y) + startY) - height / 2.) / (height / 2.);
-      double new_x = (((widthScale * x) + startX) - width / 2.) / (height / 2.) - .55;
-      double new_y = -(((heightScale * y) + startY) - height / 2.) / (height / 2.);
+      double new_x = (((widthScale * x) + startX) - width / 2.) / (height  /2.);
+      double new_y = -(((heightScale * y) + startY) - height /2.) / (height /2.);
 
 
       // double new_x = (x - width / 2.) / (height / 2.) - 0.55;

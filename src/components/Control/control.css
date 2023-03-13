@@ -7,6 +7,13 @@
 }
 
 .control {
-  margin-top: 10px;
-  color: red;
+  margin-bottom: 30px;
+}
+
+#script-form {
+  padding: 5px;
+}
+
+#viewer-form {
+  padding: 5px;
 }

@@ -242,7 +242,6 @@ const useCompileCode = (code) => {
     };
     console.log("in compile use effect");
     if (ready) {
-      console.log("in ready compile use effect");
       compileCode();
     }
   }, [code]);
