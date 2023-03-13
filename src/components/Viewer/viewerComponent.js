@@ -37,8 +37,20 @@ const Viewer = ({
   // should always start with 0
   const [hereBack, setHereBack] = useState(back);
 
+  console.log(
+    xRes,
+    yRes,
+    initXscale,
+    initYscale,
+    initStartX,
+    initStartY,
+    back,
+    showCords,
+    hereBack
+  );
+
   useEffect(() => {
-    // console.log("here");
+    console.log("here");
     if (back !== hereBack) {
       // we don't want to reset the previous stuff if it is a first drawn julia set with no zooms or a orbit
       if (
@@ -46,6 +58,7 @@ const Viewer = ({
         (paramsStack.at(paramsStack.length - 1).type === 1 &&
           genPixlesParams.type === 1)
       ) {
+        console.log("in if", prevMandCords);
         setPrevMandCords((prevMandCords) => prevMandCords.slice(0, -1));
       }
 
