@@ -93,6 +93,7 @@ extern "C" {
 
     ///// see if this works???? /////
     //ptr[0] = reinterpret_cast<const uint8_t *>(code.c_str());
+    // strcpy(ptr,c_str) c_str
     std::cout << "HEREERERE\n";
     for(int i =0; i < code.length(); i++) {
       ptr[i] = code.at(i);
