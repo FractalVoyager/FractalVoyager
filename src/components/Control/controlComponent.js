@@ -96,98 +96,105 @@ function Control({}) {
 
   return (
     <>
-      <div id="controls">
-        <Form id="script-form">
-          <Form.Group>
-            <Form.Control
-              as="textarea"
-              ref={inputRef}
-              type="text"
-              placeholder="Enter Script"
-              id="script-area"
-            ></Form.Control>
-            <Form.Control
-            // type="text"
-            ></Form.Control>
-          </Form.Group>
-          {ready ? (
-            <Button
-              variant="primary"
-              onClick={() => {
-                setScript(inputRef.current.value);
-              }}
-            >
-              Compile & Run
-            </Button>
-          ) : (
-            <Button
-              variant="primary"
-              disabled
-              onClick={() => {
-                setScript(inputRef.current.value);
-              }}
-            >
-              Compile & Run
-            </Button>
-          )}
-        </Form>
+      <div id="control-viewer">
+        <div id="controls">
+          <Form id="script-form">
+            <Form.Group>
+              <Form.Control
+                as="textarea"
+                ref={inputRef}
+                type="text"
+                placeholder="Enter Script"
+                id="script-area"
+              ></Form.Control>
+              <Form.Control
+              // type="text"
+              ></Form.Control>
+            </Form.Group>
+            {ready ? (
+              <Button
+                variant="primary"
+                onClick={() => {
+                  setScript(inputRef.current.value);
+                }}
+              >
+                Compile & Run
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                disabled
+                onClick={() => {
+                  setScript(inputRef.current.value);
+                }}
+              >
+                Compile & Run
+              </Button>
+            )}
+          </Form>
 
-        <Form id="viewer-form">
-          <Button variant="primary" onClick={handleBack}>
-            Back
-          </Button>
-          <Form.Group>
-            <Form.Control
-              ref={RealMinRef}
-              type="text"
-              placeholder="Real axis min value (default is -2)"
-            ></Form.Control>
-            <Form.Control
-              ref={RealMaxRef}
-              type="text"
-              placeholder="Real axis max value (default is 2)"
-            ></Form.Control>
-            <Form.Control
-              ref={CpxMinRef}
-              type="text"
-              placeholder="Complex axis min value (default is -2)"
-            ></Form.Control>
-            <Form.Control
-              ref={CpxMaxRef}
-              type="text"
-              placeholder="Complex axis max value (default is 2)"
-            ></Form.Control>
-            <Form.Control
-              ref={yResRef}
-              type="text"
-              placeholder="Y axis resolution (default is 2160px)"
-            ></Form.Control>
-            <Button variant="primary" onClick={handleReset}>
-              Reset
+          <Form id="viewer-form">
+            <Button variant="primary" onClick={handleBack}>
+              Back
             </Button>
-          </Form.Group>
-          <Button
-            variant="primary"
-            onClick={() => setShowCords((prev) => !prev)}
-          >
-            Show cpx
-          </Button>
-        </Form>
+            <Form.Group>
+              <Form.Control
+                ref={RealMinRef}
+                type="text"
+                placeholder="Real axis min value (default is -2)"
+              ></Form.Control>
+              <Form.Control
+                ref={RealMaxRef}
+                type="text"
+                placeholder="Real axis max value (default is 2)"
+              ></Form.Control>
+              <Form.Control
+                ref={CpxMinRef}
+                type="text"
+                placeholder="Complex axis min value (default is -2)"
+              ></Form.Control>
+              <Form.Control
+                ref={CpxMaxRef}
+                type="text"
+                placeholder="Complex axis max value (default is 2)"
+              ></Form.Control>
+              <Form.Control
+                ref={yResRef}
+                type="text"
+                placeholder="Y axis resolution (default is 2160px)"
+              ></Form.Control>
+              <Button variant="primary" onClick={handleReset}>
+                Reset
+              </Button>
+            </Form.Group>
+            <Button
+              variant="primary"
+              onClick={() => setShowCords((prev) => !prev)}
+            >
+              Show cpx
+            </Button>
+          </Form>
+        </div>
+        {/* the key is what triggers a re render type thing, we don't want back there, becuase then the whole thing will start over */}
+        <Viewer
+          key={
+            res.x ||
+            res.y ||
+            res.scaleX ||
+            res.scaleY ||
+            res.startX ||
+            res.startY
+          }
+          xRes={res.x}
+          yRes={res.y}
+          initXscale={res.scaleX}
+          initYscale={res.scaleY}
+          initStartX={res.startX}
+          initStartY={res.startY}
+          back={back}
+          showCords={showCords}
+        />
       </div>
-      {/* the key is what triggers a re render type thing, we don't want back there, becuase then the whole thing will start over */}
-      <Viewer
-        key={
-          res.x || res.y || res.scaleX || res.scaleY || res.startX || res.startY
-        }
-        xRes={res.x}
-        yRes={res.y}
-        initXscale={res.scaleX}
-        initYscale={res.scaleY}
-        initStartX={res.startX}
-        initStartY={res.startY}
-        back={back}
-        showCords={showCords}
-      />
     </>
   );
 }

@@ -1,4 +1,8 @@
 #terminal {
-  float: bottom;
-  padding: 10px;
+  /* flex-basis: 10%; */
+  /* flex-grow: 1;
+  padding: 10px; */
+  /* height: 100%; */
+  /* min-width: 10vh; */
+  /* max-height: 5%; */
 }

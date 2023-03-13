@@ -1,6 +1,7 @@
 import * as Comlink from "https://unpkg.com/comlink/dist/esm/comlink.mjs";
 import { useEffect, useRef } from "react";
 import { useCompileStore } from "../store/zustandTest.js";
+import { useTermStore } from "../store/zustandTest.js";
 //import * as SystemJS from "systemjs";
 // import SystemJS from "systemjs/dist/system.min.js";
 // import fs from "fs";
@@ -65,35 +66,18 @@ import { useCompileStore } from "../store/zustandTest.js";
 // }
 
 function doimport(str) {
-  // if (globalThis.URL.createObjectURL) {
   console.log("glbal this");
 
   const blob = new Blob([str], { type: "text/javascript" });
   const url = URL.createObjectURL(blob);
   console.log(url);
+  // neeed this to tell webpack to take this as a normal import() and not do anything speical with it
   const module = import(/* webpackIgnore: true */ url);
-  // const module = React.lazy(() => import(url));
+
   console.log(module);
   URL.revokeObjectURL(url); // GC objectURLs
 
-  // const blob = new Blob([str], { type: "text/javascript" });
-  // console.log(blob);
-  // const url = window.URL.createObjectURL(blob);
-  // console.log(url);
-  // // const module = load(url);
-  // // const module = window._lload(url);
-  // // const module = import(`${url}`);
-  // // const module = await import(url);
-  // const module = require(url);
-  // // const { module } = require(url);
-  // console.log(module);
-  // window.URL.revokeObjectURL(url); // GC objectURLs
   return module;
-  // }
-  console.log("not global this!!!!!!!!!!!!!!");
-
-  // const url = "data:text/javascript;base64," + btoa(moduleData);
-  // return import(url);
 }
 
 // maybe??? should really be ref - could set it up like gen Pixel hooks with two functions in one hook - could also make htis
@@ -105,7 +89,7 @@ var genPixles;
 // once emception is loaded we don't need to
 const useInitEmception = () => {
   const setReady = useCompileStore((state) => state.setReady);
-
+  const write = useTermStore((state) => state.write);
   useEffect(() => {
     const initEmception = async () => {
       console.log("useInitEmception");
@@ -123,10 +107,13 @@ const useInitEmception = () => {
       emception.onprocessstart = Comlink.proxy(console.log);
       // emception.onprocessstart = Comlink.proxy(addToConsole);
 
+      write("Loading emception...");
+
       console.log("Loading emception...");
       await emception.init();
       setReady();
       console.log("emceitpion loaded");
+      write("emceitpion loaded");
     };
 
     initEmception();

@@ -13,6 +13,11 @@ const useCompileStore = create((set) => ({
   setReady: () => set({ ready: true }),
 }));
 
-export { useDimStore, useCompileStore };
+const useTermStore = create((set) => ({
+  text: null,
+  write: (newText) => set({ text: newText }),
+}));
+
+export { useDimStore, useCompileStore, useTermStore };
 
 //const useClickStore = create((set))

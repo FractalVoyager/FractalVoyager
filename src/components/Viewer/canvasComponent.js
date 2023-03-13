@@ -31,8 +31,12 @@ const Canvas = ({
 
   // console.log(xRes / yRes === 3840 / 2160);
 
+  console.log(canRef.current);
+
   let styWidth = window.innerWidth * 0.8;
   let styHeight = window.innerHeight * 0.8;
+  // let styWidth = canRef.current.clientWidth; //  * 0.8;
+  // let styHeight = canRef.current.offsetHeight;
 
   // first off, we need to have the css size match the ratio of the resoltuiojn size, with 80% being the max on either side for now
   // starting rez is 3840x2160 so....
