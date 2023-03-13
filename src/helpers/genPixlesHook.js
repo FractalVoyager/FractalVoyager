@@ -37,7 +37,6 @@ const useGenPixles = (
 ) => {
   // const [genPixles, setGenPixles] = useState();
   //var [myModule, setMyModule] = useState();
-  //console.log(type, cVal[0], cVal[1]);
 
   const [pixles, setPixles] = useState(null);
   //const [pixelArray, setPixelArray] = useState(null);
@@ -85,15 +84,11 @@ const useGenPixles = (
         164 * Float64Array.BYTES_PER_ELEMENT
       );
 
-      console.log(orbitPtr);
-
       let orbitHeap = new Float64Array(
         myModule.current.HEAPF64.buffer,
         orbitPtr,
         164 * Float64Array.BYTES_PER_ELEMENT
       );
-
-      console.log(orbitHeap);
 
       // using emscriptens malloc to allocate memory on the emscripten heap
       // of array this returns a pointer to it
@@ -129,8 +124,6 @@ const useGenPixles = (
 
       // get the result of the function from the dataheap by way of creating a js array
 
-      console.log("hhhh", orbitHeap.buffer, orbitHeap.byteOffset);
-
       // this works on a fresh make, then fails.... weird
       if (type === 2) {
         let tmpOrbitArray = new Float64Array(
@@ -140,8 +133,6 @@ const useGenPixles = (
         );
         myModule.current._free(myModule.current.HEAPF64.buffer);
         let orbitArr = tmpOrbitArray;
-
-        console.log("here", orbitArr);
 
         return orbitArr;
       } else {

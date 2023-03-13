@@ -4,6 +4,7 @@
 // state of where the mouse is will be stored here, along with the state
 // of the current size and all that shit for the fractal
 
+//////////// BUG - after 3 back and regens its fails with genPixlesHook.js:107 Uncaught (in promise) RangeError: Invalid typed array length: 1312
 import Canvas from "./canvasComponent";
 import "./viewer.css";
 import { useEffect, useState } from "react";
@@ -13,14 +14,23 @@ import { canvasToComplex } from "../../helpers/util";
 import { useCompileCode } from "../../helpers/emceptionHooks";
 import { useCompileStore } from "../../store/zustandTest.js";
 
-const Viewer = ({ xRes, yRes, back, dims, showCords }) => {
+const Viewer = ({
+  xRes,
+  yRes,
+  initXscale,
+  initYscale,
+  initStartX,
+  initStartY,
+  back,
+  showCords,
+}) => {
   const [displayCords, setDisplayCords] = useState({ re: null, im: null });
   const [prevMandCords, setPrevMandCords] = useState([
     {
-      startX: 0,
-      startY: 0,
-      widthScale: 1,
-      heightScale: 1,
+      startX: initStartX,
+      startY: initStartY,
+      widthScale: initXscale,
+      heightScale: initYscale,
     },
   ]);
 
@@ -56,14 +66,14 @@ const Viewer = ({ xRes, yRes, back, dims, showCords }) => {
     type: 0, // paramter plane
     cVal: [0, 0], // c will get set to pixel
     zVal: [0, 0], // 0,0 is ciritcal point
-    startX: 0, // box zoom stuff
-    startY: 0, // box zoom stuff
+    startX: initStartX, // box zoom stuff
+    startY: initStartY, // box zoom stuff
     newCanWidth: xRes, // box zoom stuff
     newCanHeight: yRes, // box zoom stuff
     canWidth: xRes, // box zoom stuff
     canHeight: yRes, // box zoom stuff
-    widthScale: 1, // box zoom stuff
-    heightScale: 1, // box zoom stuff
+    widthScale: initXscale, // box zoom stuff
+    heightScale: initYscale, // box zoom stuff
     arrayLength: xRes * yRes * 4, // length of aray to return
   });
 
@@ -368,7 +378,6 @@ const Viewer = ({ xRes, yRes, back, dims, showCords }) => {
       // don't even really need a button, in mand, click goes to julia, in julia, click shows orbit
       // no box zoom to julia, so no other values need to be changed, should be able to just update
       // the type and c vals of genPixlesParams and it will work, unless weird stuff gets changed
-      console.log("draw julia set");
 
       let canX =
         genPixlesParams.widthScale *
