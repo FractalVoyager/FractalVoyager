@@ -1,14 +1,9 @@
-import * as Comlink from "comlink";
+import * as Comlink from "https://unpkg.com/comlink/dist/esm/comlink.mjs";
 import { useEffect, useRef } from "react";
 import { useCompileStore } from "../store/zustandTest.js";
-import load from "little-loader";
-import { Buffer } from "buffer";
-import { lazy, React } from "react";
 //import * as SystemJS from "systemjs";
 // import SystemJS from "systemjs/dist/system.min.js";
 // import fs from "fs";
-
-window.Buffer = window.Buffer || require("buffer").Buffer; // https://stackoverflow.com/questions/57121467
 
 // async function fetchAndExecuteModule(moduleUrl) {
 //   const response = await fetch(moduleUrl);
@@ -192,66 +187,6 @@ const useCompileCode = (code) => {
           console.log("ran cwrap fcn", main());
 
           console.log(compiledModule);
-
-          // const loader = new systemjs();
-
-          // const loadModule = fetch(url)
-          //   .then((resp) => resp.text())
-          //   .then((data) => {
-          //     console.log(data);
-          //     const mod = import(data).default;
-          //     console.log(mod);
-          //     return mod;
-          //   });
-          // const resp = await fetch(url);
-          // const moduleText = await resp.text();
-          // const loadModule = await new Function(`return ${moduleText}`)();
-          // const myFunction = await fetchAndExecuteModule(url);
-          // console.log(myFunction());
-          //  const resp = await fetch(url + ".mjs");
-          // console.log(resp);
-          // const wasmModule = await import(url + ".mjs").default;
-          // URL.revokeObjectURL(url);
-
-          // const url = "data:text/javascript;base64," + window.btoa(content); // + ".mjs";
-          // console.log(url);
-          // const mod = await import(url);
-          // const wasmModule = await eval(`require('${url}');`).default;
-
-          // await SystemJS.import(
-          //   `data:text/javascript;charset=utf-8,${encodeURIComponent(content)}`
-          // ).default;
-          // console.log(loader);
-
-          //const loadModule = await import(url).default;
-          // const loadModule = await import(
-          //   `data:text/javascript;charset=utf-8,${encodeURIComponent(content)}`
-          // ).default;
-
-          // const loadMoudle = await import("data:text/javascript;base64," + btoa(moduleData))
-
-          // Load the module using the URL of the temporary file
-          //const loadModule = await eval(url);
-          //const loadModule = await doimport(content);
-          // const loadModule = await import(
-          //   `data:text/javascript;charset=utf-8,${encodeURIComponent(content)}`
-          // );
-
-          // const loadModule = await import(
-          //   `data:text/javascript;base64,${window.Buffer.from(content).toString(
-          //     "Base64"
-          //   )}`
-          // );
-          //console.log(content);
-          //const loadModule = (await doimport(new Blob([content]))).default;
-          //console.log(":here");
-          //console.log(loadModule);
-          // const loadModule = requireFromString(content);
-          // const compiledModule = await loader();
-          // console.log(compiledModule);
-
-          // const compiledModule = await loadModule();
-          //console.log(compiledMod);
         } else {
           console.log("Emception compilation failed.");
         }

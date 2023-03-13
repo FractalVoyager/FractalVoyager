@@ -76,6 +76,8 @@ function Control({}) {
       startX: parseFloat(startX),
       startY: parseFloat(startY),
     });
+
+    console.log(xRes, yRes, xScale, yScale, startX, startY);
   }
 
   function handleBack() {
@@ -160,7 +162,7 @@ function Control({}) {
               type="text"
               placeholder="Y axis resolution (default is 2160px)"
             ></Form.Control>
-            <Button variant="primary" type="submit" onClick={handleReset}>
+            <Button variant="primary" onClick={handleReset}>
               Reset
             </Button>
           </Form.Group>

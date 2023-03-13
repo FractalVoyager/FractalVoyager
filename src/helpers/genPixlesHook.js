@@ -80,15 +80,15 @@ const useGenPixles = (
       // BUT WILL PROBALBY BE BEST JUST TO HAVE A DIFFERENT FUNCTION FOR GETTING
       // THE ORBITS
 
-      let orbitPtr = myModule.current._malloc(
-        164 * Float64Array.BYTES_PER_ELEMENT
-      );
+      // let orbitPtr = myModule.current._malloc(
+      //   164 * Float64Array.BYTES_PER_ELEMENT
+      // );
 
-      let orbitHeap = new Float64Array(
-        myModule.current.HEAPF64.buffer,
-        orbitPtr,
-        164 * Float64Array.BYTES_PER_ELEMENT
-      );
+      // let orbitHeap = new Float64Array(
+      //   myModule.current.HEAPF64.buffer,
+      //   orbitPtr,
+      //   164 * Float64Array.BYTES_PER_ELEMENT
+      // );
 
       // using emscriptens malloc to allocate memory on the emscripten heap
       // of array this returns a pointer to it
@@ -119,22 +119,21 @@ const useGenPixles = (
         widthScale,
         heightScale,
         dataheap.byteOffset,
-        orbitHeap.byteOffset
+        5
       );
 
       // get the result of the function from the dataheap by way of creating a js array
 
       // this works on a fresh make, then fails.... weird
       if (type === 2) {
-        let tmpOrbitArray = new Float64Array(
-          orbitHeap.buffer,
-          orbitHeap.byteOffset,
-          164
-        );
-        myModule.current._free(myModule.current.HEAPF64.buffer);
-        let orbitArr = tmpOrbitArray;
-
-        return orbitArr;
+        // let tmpOrbitArray = new Float64Array(
+        //   orbitHeap.buffer,
+        //   orbitHeap.byteOffset,
+        //   164
+        // );
+        // myModule.current._free(myModule.current.HEAPF64.buffer);
+        // let orbitArr = tmpOrbitArray;
+        // return orbitArr;
       } else {
         let tmpPixelArray = new Uint8ClampedArray(
           dataheap.buffer,
