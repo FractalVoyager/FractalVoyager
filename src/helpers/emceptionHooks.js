@@ -1,10 +1,12 @@
-import * as Comlink from "https://unpkg.com/comlink/dist/esm/comlink.mjs";
+import * as Comlink from "comlink";
 import { useEffect, useRef } from "react";
 import { useCompileStore } from "../store/zustandTest.js";
 import load from "little-loader";
 import { Buffer } from "buffer";
+import { lazy, React } from "react";
 //import * as SystemJS from "systemjs";
-import SystemJS from "systemjs/dist/system.min.js";
+// import SystemJS from "systemjs/dist/system.min.js";
+// import fs from "fs";
 
 window.Buffer = window.Buffer || require("buffer").Buffer; // https://stackoverflow.com/questions/57121467
 
@@ -67,16 +69,17 @@ window.Buffer = window.Buffer || require("buffer").Buffer; // https://stackoverf
 //   });
 // }
 
-async function doimport(str) {
+function doimport(str) {
   // if (globalThis.URL.createObjectURL) {
   console.log("glbal this");
 
   const blob = new Blob([str], { type: "text/javascript" });
   const url = URL.createObjectURL(blob);
   console.log(url);
-  const module = import(url);
+  const module = import(/* webpackIgnore: true */ url);
+  // const module = React.lazy(() => import(url));
   console.log(module);
-  //URL.revokeObjectURL(url); // GC objectURLs
+  URL.revokeObjectURL(url); // GC objectURLs
 
   // const blob = new Blob([str], { type: "text/javascript" });
   // console.log(blob);
@@ -173,12 +176,22 @@ const useCompileCode = (code) => {
             "/working/main.mjs",
             { encoding: "utf8" }
           );
-          console.log(content);
-          //console.log(window.Buffer.from(content).toString("Base64"));
-          const blob = new Blob([content], { type: "text/javascript" });
-          console.log(blob);
-          const url = URL.createObjectURL(blob);
-          console.log(url);
+          // console.log(content);
+          // //console.log(window.Buffer.from(content).toString("Base64"));
+          // const blob = new Blob([content], { type: "text/javascript" });
+          // console.log(blob);
+          // const url = URL.createObjectURL(blob);
+          // console.log(url);
+
+          const loadModule = (await doimport(new Blob([content]))).default;
+
+          const compiledModule = await loadModule();
+
+          const main = compiledModule.cwrap("foo", "int", []);
+
+          console.log("ran cwrap fcn", main());
+
+          console.log(compiledModule);
 
           // const loader = new systemjs();
 
@@ -195,7 +208,15 @@ const useCompileCode = (code) => {
           // const loadModule = await new Function(`return ${moduleText}`)();
           // const myFunction = await fetchAndExecuteModule(url);
           // console.log(myFunction());
-          const wasmModule = await import(url).default;
+          //  const resp = await fetch(url + ".mjs");
+          // console.log(resp);
+          // const wasmModule = await import(url + ".mjs").default;
+          // URL.revokeObjectURL(url);
+
+          // const url = "data:text/javascript;base64," + window.btoa(content); // + ".mjs";
+          // console.log(url);
+          // const mod = await import(url);
+          // const wasmModule = await eval(`require('${url}');`).default;
 
           // await SystemJS.import(
           //   `data:text/javascript;charset=utf-8,${encodeURIComponent(content)}`

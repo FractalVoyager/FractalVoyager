@@ -1,5 +1,4 @@
 import createModule from "../cgen/main.mjs";
-
 import { useState, useEffect, useRef } from "react";
 
 const useCgen = (script) => {
@@ -20,6 +19,7 @@ const useCgen = (script) => {
     };
 
     const myCgen = async () => {
+      // TODO, do three funtions, first gen the code, then get the length of the code, then put the code in an array buffer
       let strPtr = myMod.current.allocateUTF8(1000);
       // can do some error catching here, assuming it will throw errros if script is malformed
       await cgen.current(script, strPtr);
@@ -34,7 +34,7 @@ const useCgen = (script) => {
     if (!script) {
       myCreateModule();
     } else {
-      myCgen();
+      return myCgen();
     }
   }, [script]);
 
