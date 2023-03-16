@@ -19,6 +19,7 @@ import "../../../node_modules/xterm/css/xterm.css";
 import { useTermStore } from "../../store/zustandTest";
 const Console = ({}) => {
   const text = useTermStore((state) => state.text);
+  // use ref for this so doesn't rerender each time
   const [term, setTerm] = useState(null);
 
   const termRef = useRef(null);

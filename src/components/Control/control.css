@@ -7,7 +7,7 @@
   justify-content: space-around;
 }
 #control-viewer {
-  flex-basis: 90vh;
+  flex-basis: 85vh;
   display: flex;
   flex-direction: row-reverse;
   justify-content: flex-end;
