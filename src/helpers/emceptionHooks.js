@@ -21,7 +21,6 @@ function doimport(str) {
 // maybe??? should really be ref - could set it up like gen Pixel hooks with two functions in one hook - could also make htis
 // global state variuables in zustand - but try this until it doesn't work anytmore (maybe on multiple hits)
 var emception;
-var genPixles;
 
 // this is loading emception that we only want to do once when the app first loads,
 // once emception is loaded we don't need to
@@ -75,8 +74,7 @@ const useCompileCode = (code) => {
       // TODO - button state
       try {
         // have to get the code from the other thing / state
-        let code =
-          '#include <emscripten.h>\n          #include <iostream>\n          extern "C" { \nEMSCRIPTEN_KEEPALIVE int foo(void) {\nstd::cout << "hello world!" << std::endl;\nreturn 0;\n}\n}\n';
+        console.log(code);
 
         //console.log("emcpetion in compile,", emception);
         //console.log(code);
@@ -84,7 +82,9 @@ const useCompileCode = (code) => {
         await emception.fileSystem.writeFile("/working/main.cpp", code);
         console.log("filesss");
         // -sEXPORT_ES6=1 -sUSE_ES6_IMPORT_META=0
-        const cmd = `emcc -O3 -sSINGLE_FILE=1 -sNO_EXIT_RUNTIME=1 -sEXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -sEXPORT_ES6=1 -sUSE_ES6_IMPORT_META=0 -sEXPORTED_FUNCTIONS=['_malloc','_free','_foo']  -sMODULARIZE=1 -sEXPORT_NAME='createModule' -s ENVIRONMENT='web' -sALLOW_MEMORY_GROWTH main.cpp -o main.mjs`;
+
+        // emcc -o mandlebrotCPP.js  main.cpp -O3  -s NO_EXIT_RUNTIME=1 -s "EXPORTED_RUNTIME_METHODS=['ccall','cwrap']" -s "EXPORTED_FUNCTIONS=['_malloc', '_free', _genPixles]" -s MODULARIZE=1 -s "EXPORT_NAME='createModule'" -s ALLOW_MEMORY_GROWTH
+        const cmd = `emcc -O3 -sSINGLE_FILE=1 -sNO_EXIT_RUNTIME=1 -sEXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -sEXPORT_ES6=1 -sUSE_ES6_IMPORT_META=0 -sEXPORTED_FUNCTIONS=['_malloc','_free','_genPixles','_orbit']  -sMODULARIZE=1 -sEXPORT_NAME='createModule' -s ENVIRONMENT='web' -sALLOW_MEMORY_GROWTH main.cpp -o main.mjs`;
         const result = await emception.run(cmd);
         if (result.returncode == 0) {
           // now we want to set the state where users can interact with stuff like changing the res or clicking for julia and stuff
@@ -110,7 +110,6 @@ const useCompileCode = (code) => {
 
           console.log(compiledModule);
         } else {
-          //console.log("Emception compilation failed.");
           write("Emception compilation failed.");
         }
       } catch (err) {
