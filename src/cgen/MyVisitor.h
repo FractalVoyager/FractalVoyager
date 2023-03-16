@@ -47,6 +47,11 @@
     std::stringstream output;
     int loopCounter = 0;
 
+
+    bool param = false;
+
+    int orbit = false;
+
     
 
     // std::cout << output << "\n";
@@ -62,28 +67,80 @@ public:
   myVisitor(int iters, double maxRadius, double minRadius, std::string& crit_var, std::string& screen, std::complex<double> crit_point) : iters(iters), maxRadius(maxRadius), minRadius(minRadius), crit_var(crit_var), screen_var(screen), crit_point(crit_point) {}
 
 
+    bool getType() {
+      return param;
+    }
+
+
+    std::string cgenOrbit(FractalParser::ScriptContext* tree) {
+
+      orbit = true;
+      output.str("");
+
+      std::stringstream orbitdef;
+      
+      // math for im, re values is done in js, so just need the two values
+      orbitdef << "EMSCRIPTEN_KEEPALIVE void orbit(double fixed_re, double fixed_im, double clicked_re, double clicked_im, int maxIters, double minRadius, double maxRadius, double_t *p){\n";
+
+      visitScript(tree);
+
+      std::stringstream initdefns;
+
+    initdefns << "std::complex<double> z(clicked_re, clicked_im);\n";
+
+    // means there is a c val - still need this for orbit in case there is an already dyn space
+    if(param) {
+      initdefns << "std::complex<double> c(fixed_re,fixed_im);\n";
+    }
+
+    std::stringstream ret;
+
+    ret << orbitdef.str() << initdefns.str() << output.str() << "}\n";
+
+    return ret.str();
+      
+
+    }
+
 
   // this is the main cgen function - for now just return have it return an int - and make this part just a function for calculating the point
     std::string cgen(FractalParser::ScriptContext* tree) {
-    output << "#include <complex.h>\nextern \"C\"{\n";
+    
 
     // maybe include that other stuff taht doesn't change here, and jsut call gen 
-    output << "int gen(double re, double im) {\n";
+
+    std::stringstream fcndef; 
+
+    fcndef << "int calcPixel(double z_re, double z_im, double c_re, double c_im, int maxIters, int minRadius, int maxRadius) {\n";
+
     // screen var to point 
-    output << "std::complex<double> " << screen_var << "(re, im);\n";
+    // output << "std::complex<double> " << screen_var << "(re, im);\n";
     // critical value 
-    output << "std::complex<double> " << crit_var << crit_point << ";\n";
+    // output << "std::complex<double> " << crit_var << crit_point << ";\n";
 
     // int res = visitScript(tree);
     visitScript(tree);
+
+
+    std::stringstream initdefns; 
+    initdefns << "std::complex<double> z(z_re, z_im);\n";
+
+    // means there is a c val
+    if(param) {
+      initdefns << "std::complex<double> c(c_re,c_im);\n";
+    }
+
+    std::stringstream ret;
+
+    // Deal with nested for loops later - TODO 
+    // returns 0 (in set) since it didnt return in the for loop
+    ret << fcndef.str() << initdefns.str() << output.str() << "return 0;\n}\n";
+
+    //ret << fcndef.str() << initdefns.str() << output.str() << "return result0;\n}\n";
    //output << "return result" << itoa(loopCounter) << ";\n}\n";
-    output << "return result0" << ";\n}\n}\n";
-    std::cout << output.str() << "\n";
-
-    // do I need to redefine critical point each time? and the other "global varaibles"? 
-    // or only the variables changing for each pass?
-
-    return output.str();
+    // output << "return result0" << ";\n}\n}\n";
+    //std::cout << output.str() << "\n";
+    return ret.str();
 
   }
 
@@ -122,6 +179,7 @@ public:
   virtual int visitScript(FractalParser::ScriptContext *ctx) override {
     // std:cout << "running script\n";
     visitChildren(ctx);
+    //param = true;
     // std:cout << "done running script\n";
     // not sure how to find iterations to return, will also eventaully be a color - maybe for now get an variable
     return result;
@@ -201,6 +259,11 @@ public:
 
     // need to return the text - sjust printing z won't work because different syntax based on what expression its in
     // for now just do it this way - wont really work but for testing
+
+    // can chekc here if it is c, if so, we are drawing param    - if I do this you can't use c in a dyn program at all
+    if(ctx->getText() == "c") {
+      param = true;
+    }
     output << ctx->getText();
     return inVars[ctx->getText()];
   }
@@ -292,11 +355,24 @@ public:
 
     // get n 
     int n = stoi(ctx->n()->getText());
-    output << "pow("; 
+    if(n == 0) {
+      output << "1";
+    }
+    for(int i = 0; i <n; i++) {
+      if(i != 0) {
+        output << "*";
+      }
+      visit(ctx->expression());
+
+    }
+    // pow is a big slow down
+    //output << "pow("; 
     // get expression - always cpx num
-    const std::complex<double> &expr = visit(ctx->expression());
-    output << "," << n << ")";
-    return pow(expr, n);
+    //const std::complex<double> &expr = visit(ctx->expression());
+    // output << "," << n << ")";
+    //return pow(expr, n);
+    std::complex<double>fake(0.,0.);
+    return fake;
   }
 
   virtual std::complex<double> visitPLUS_EXP(FractalParser::PLUS_EXPContext *ctx) override {
@@ -422,7 +498,7 @@ public:
     // std:cout << "in scapes cond\n";
     const std::complex<double> &expr = visit(ctx->expression());
 
-    output << ") > " << maxRadius;
+    output << ") > maxRadius" ;
     
     return abs(expr) > maxRadius;
     
@@ -515,25 +591,36 @@ public:
 
     // ITERATE expression 'until' condition - var taken to be z  DONE 
     virtual int visitLoopIterateEmpty(FractalParser::LoopIterateEmptyContext *ctx) override {
-      // std:cout << "in loop iterate empty\n";
+      
+      
       // variable is taken to be z - (the one to iterate)
 
 
-      // cgen ///////// 
-      
-      // output << "int counter" << itoa(loopCounter) << " = 0\n";
-      output << "int counter0 = 0;\n";
-      // loopCounter++;
-      output << "while(true) {\n";
-      // cgen expression and set to z
-      output << "z = "; 
+      // not sure wether to start at 1 or 0 - ask dan
+      output << "for(int i = 1; i < maxIters; i++) {\n";
+      if(orbit) {
+        output << "p[i*2-2] = real(z);\np[i*2-1] = imag(z);\n";
+      }
+      output << "z = ";
       visit(ctx->expression());
       output << ";\n";
-      output << "counter0++;\n";
+      
+
+
+      
+
       output << "if(";
       visit(ctx->condition());
+      output << ") {\n";
+      // deal with the nested for loops later TODO
+      if(orbit) {
+        output << "break;\n}\n}\n";
+      } else {
+        output << "return i;\n}\n}\n";
+      }
+      
       //output << "|| " << "counter" << itoa(loopCounter) << " >= " << iters << ") {\n break;\n}\nint result" << itoa(loopCounter) << " = counter" << itoa(loopCounter) << ";\n"; 
-      output << "|| " << "counter0 >= " << iters << ") {\n break;\n}\n}\nint result0 = counter0;\n"; 
+      // output << "|| " << "counter0 >= " << iters << ") {\n break;\n}\n}\nint result0 = counter0;\n"; 
 
 
       // const std::string &var = "z";

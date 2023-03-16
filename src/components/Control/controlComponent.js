@@ -39,7 +39,7 @@ function Control({}) {
   const codeRef = useRef(null);
 
   function handleReset() {
-    console.log(CpxMaxRef);
+    // console.log(CpxMaxRef);
     // assuming we have all parts of the form,
     let height = CpxMaxRef.current.value - CpxMinRef.current.value;
     let width = RealMaxRef.current.value - RealMinRef.current.value;
@@ -78,7 +78,7 @@ function Control({}) {
       startY: parseFloat(startY),
     });
 
-    console.log(xRes, yRes, xScale, yScale, startX, startY);
+    // console.log(xRes, yRes, xScale, yScale, startX, startY);
   }
 
   function handleBack() {

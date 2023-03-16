@@ -5,7 +5,6 @@ const Terminal = ({}) => {
   const text = useTermStore((state) => state.text);
   // use ref for this so doesn't rerender each time
   const termRef = useRef(null);
-  const lastText = useRef(null);
 
   useEffect(() => {
     if (text) {
