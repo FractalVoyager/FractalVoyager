@@ -1,0 +1,10 @@
+#terminal {
+  /* flex-grow: 2; */
+  /* flex-basis: 100%; */
+  margin: 5px;
+  min-height: 0;
+  flex-basis: 15vh;
+  color: white;
+  background-color: black;
+  overflow-y: scroll;
+}

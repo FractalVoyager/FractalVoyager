@@ -2,68 +2,6 @@ import * as Comlink from "https://unpkg.com/comlink/dist/esm/comlink.mjs";
 import { useEffect, useRef } from "react";
 import { useCompileStore } from "../store/zustandTest.js";
 import { useTermStore } from "../store/zustandTest.js";
-//import * as SystemJS from "systemjs";
-// import SystemJS from "systemjs/dist/system.min.js";
-// import fs from "fs";
-
-// async function fetchAndExecuteModule(moduleUrl) {
-//   const response = await fetch(moduleUrl);
-//   const code = await response.text();
-//   const script = document.createElement("script");
-//   script.type = "module";
-//   script.text = code;
-
-//   console.log(script);
-//   document.head.appendChild(script);
-//   return new Promise((resolve) => {
-//     script.addEventListener("load", () => {
-//       const mod = script.module;
-//       resolve(mod.default || mod);
-//     });
-//   });
-// }
-
-// async function fetchAndExecuteModule(moduleUrl) {
-//   const response = await fetch(moduleUrl);
-//   const code = await response.text();
-//   const script = document.createElement("script");
-//   script.type = "module";
-//   script.text = code;
-
-//   document.head.appendChild(script);
-//   return new Promise((resolve) => {
-//     script.addEventListener("load", resolve);
-//   });
-// }
-
-// async function runModule(url) {
-//   const myFunction = await fetchAndExecuteModule(url);
-//   const compiledMod = myFunction();
-//   console.log(compiledMod);
-// }
-
-// async function fetchAndExecuteModule(moduleUrl) {
-//   const response = await fetch(moduleUrl);
-//   const code = await response.text();
-//   const script = document.createElement("script");
-//   script.type = "module";
-//   script.text = code;
-
-//   return new Promise((resolve, reject) => {
-//     script.onload = () => {
-//       const createModule = window.createModule;
-//       if (!createModule) {
-//         reject(new Error("Module does not export myFunction"));
-//       } else {
-//         resolve(createModule);
-//       }
-//     };
-
-//     script.onerror = reject;
-
-//     document.head.appendChild(script);
-//   });
-// }
 
 function doimport(str) {
   console.log("glbal this");
@@ -92,7 +30,7 @@ const useInitEmception = () => {
   const write = useTermStore((state) => state.write);
   useEffect(() => {
     const initEmception = async () => {
-      console.log("useInitEmception");
+      //console.log("useInitEmception");
       // maybe useMemo for htis
       const worker = new Worker(
         "./emception/emception.worker.bundle.worker.js"
@@ -102,17 +40,17 @@ const useInitEmception = () => {
       window.Comlink = Comlink;
 
       // these are call backs, can do stuff like make this a function then use zustand for some cool console state
-      emception.onstdout = Comlink.proxy(console.log);
-      emception.onstderr = Comlink.proxy(console.error);
-      emception.onprocessstart = Comlink.proxy(console.log);
+      emception.onstdout = Comlink.proxy(write);
+      emception.onstderr = Comlink.proxy(write);
+      emception.onprocessstart = Comlink.proxy(write);
       // emception.onprocessstart = Comlink.proxy(addToConsole);
 
       write("Loading emception...");
 
-      console.log("Loading emception...");
+      //console.log("Loading emception...");
       await emception.init();
       setReady();
-      console.log("emceitpion loaded");
+      //console.log("emceitpion loaded");
       write("emceitpion loaded");
     };
 
@@ -126,6 +64,8 @@ const useInitEmception = () => {
 
 const useCompileCode = (code) => {
   const ready = useCompileStore((state) => state.ready);
+  const write = useTermStore((state) => state.write);
+
   // state stuff and refs and vars and stuff here
 
   useEffect(() => {
@@ -138,8 +78,8 @@ const useCompileCode = (code) => {
         let code =
           '#include <emscripten.h>\n          #include <iostream>\n          extern "C" { \nEMSCRIPTEN_KEEPALIVE int foo(void) {\nstd::cout << "hello world!" << std::endl;\nreturn 0;\n}\n}\n';
 
-        console.log("emcpetion in compile,", emception);
-        console.log(code);
+        //console.log("emcpetion in compile,", emception);
+        //console.log(code);
 
         await emception.fileSystem.writeFile("/working/main.cpp", code);
         console.log("filesss");
@@ -149,7 +89,8 @@ const useCompileCode = (code) => {
         if (result.returncode == 0) {
           // now we want to set the state where users can interact with stuff like changing the res or clicking for julia and stuff
           // without recompiling, that will jsut be running the code, set this code to run here
-          console.log("compile succesfull");
+          // console.log("compile succesfull");
+          write("compile succesfull");
 
           ////// test /////
 
@@ -158,12 +99,6 @@ const useCompileCode = (code) => {
             "/working/main.mjs",
             { encoding: "utf8" }
           );
-          // console.log(content);
-          // //console.log(window.Buffer.from(content).toString("Base64"));
-          // const blob = new Blob([content], { type: "text/javascript" });
-          // console.log(blob);
-          // const url = URL.createObjectURL(blob);
-          // console.log(url);
 
           const loadModule = (await doimport(new Blob([content]))).default;
 
@@ -175,7 +110,8 @@ const useCompileCode = (code) => {
 
           console.log(compiledModule);
         } else {
-          console.log("Emception compilation failed.");
+          //console.log("Emception compilation failed.");
+          write("Emception compilation failed.");
         }
       } catch (err) {
         console.error(err);
@@ -183,7 +119,6 @@ const useCompileCode = (code) => {
         // deal with state here? or just return - might be able to do this with the return state cleanup
       }
     };
-    console.log("in compile use effect");
     if (ready) {
       compileCode();
     }

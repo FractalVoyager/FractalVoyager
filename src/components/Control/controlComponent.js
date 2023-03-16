@@ -7,6 +7,7 @@ import { useCompileStore } from "../../store/zustandTest.js";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import useCgen from "../../helpers/cgenHook";
+import Terminal from "../Console/myTermComponent";
 function Control({}) {
   const inputRef = useRef(null);
 
