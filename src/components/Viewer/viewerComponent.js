@@ -13,6 +13,7 @@ import CordsBox from "../CordsBox/cordsBoxComponent";
 import { canvasToComplex } from "../../helpers/util";
 import { useCompileCode } from "../../helpers/emceptionHooks";
 import { useCompileStore } from "../../store/zustandTest.js";
+import { useGenPixles2 } from "../../helpers/emceptionHooks";
 
 const Viewer = ({
   xRes,
@@ -104,6 +105,48 @@ const Viewer = ({
     genPixlesParams.heightScale,
     genPixlesParams.arrayLength
   );
+
+  /*
+  type,
+  color,
+  fixed_re,
+  fixed_im,
+  maxIters,
+  iterMult,
+  minRadius,
+  maxRadius,
+  startX,
+  startY,
+  newCanWidth,
+  newCanHeight,
+  canWidth,
+  canHeight,
+  widthScale,
+  heightScale,
+  arrayLength ///// not needed for fcn!!!!
+  */
+
+  let p2 = useGenPixles2(
+    genPixlesParams.type,
+    0,
+    genPixlesParams.cVal,
+    genPixlesParams.zVal,
+    64,
+    4,
+    0.1,
+    4,
+    genPixlesParams.startX,
+    genPixlesParams.startY,
+    genPixlesParams.newCanWidth,
+    genPixlesParams.newCanHeight,
+    genPixlesParams.canWidth,
+    genPixlesParams.canHeight,
+    genPixlesParams.widthScale,
+    genPixlesParams.heightScale,
+    genPixlesParams.arrayLength
+  );
+
+  console.log("PPPPP@@@@", p2);
 
   const interDrawOrbit = (re, im) => {
     setParamsStack([...paramsStack, genPixlesParams]);
