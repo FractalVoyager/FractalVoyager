@@ -32,8 +32,6 @@ function Control({}) {
 
   const [showCords, setShowCords] = useState(false);
 
-  const [code, setCode] = useState(null);
-
   const [script, setScript] = useState(null);
 
   const codeRef = useRef(null);

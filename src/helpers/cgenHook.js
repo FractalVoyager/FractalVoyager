@@ -1,6 +1,6 @@
 import createModule from "../cgen/main.mjs";
 import { useState, useEffect, useRef } from "react";
-import { useTermStore } from "../store/zustandTest.js";
+import { useTermStore, useCompileStore } from "../store/zustandTest.js";
 
 /*
 
@@ -33,6 +33,7 @@ import { useTermStore } from "../store/zustandTest.js";
 
 const useCgen = (script) => {
   const write = useTermStore((state) => state.write);
+  const setInitialType = useCompileStore((state) => state.setInitialType);
   const myMod = useRef(null);
   // maybe use callback but kinda alreadlly handing unnescarry re runs of this fcn
   const cgen = useRef(null);
@@ -61,7 +62,8 @@ const useCgen = (script) => {
       // can do some error catching here, assuming it will throw errros if script is malformed
       let length = await cgen.current(script.toLowerCase());
       let strPtr = myMod.current.allocateUTF8(length);
-      await getCgen.current(strPtr);
+      let type = await getCgen.current(strPtr);
+      setInitialType(type);
       write("ran");
       setCode(myMod.current.UTF8ToString(strPtr).trim());
       myMod.current._free(strPtr);

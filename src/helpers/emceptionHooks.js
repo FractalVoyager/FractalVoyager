@@ -1,5 +1,5 @@
 import * as Comlink from "https://unpkg.com/comlink/dist/esm/comlink.mjs";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCompileStore } from "../store/zustandTest.js";
 import { useTermStore } from "../store/zustandTest.js";
 
@@ -38,7 +38,6 @@ const useInitEmception = () => {
       window.emception = emception;
       window.Comlink = Comlink;
 
-      // these are call backs, can do stuff like make this a function then use zustand for some cool console state
       emception.onstdout = Comlink.proxy(write);
       emception.onstderr = Comlink.proxy(write);
       emception.onprocessstart = Comlink.proxy(write);
@@ -60,10 +59,131 @@ const useInitEmception = () => {
     // acutally could prob just have this trigger state that allows the user to compile code - check if having this flow is bad
   }, []);
 };
+/*
+            int type, int color, double fixed_re, double fixed_im, int maxIters, double iterMult, double minRadius, double maxRadius, double startX, double startY, double newCanWidth, double newCanHeight, int width, int height, double widthScale, double heightScale, uint8_t *ptr
+            */
+const useGenPixles2 = (
+  type,
+  color,
+  fixed_re,
+  fixed_im,
+  maxIters,
+  iterMult,
+  minRadius,
+  maxRadius,
+  startX,
+  startY,
+  newCanWidth,
+  newCanHeight,
+  canWidth,
+  canHeight,
+  widthScale,
+  heightScale,
+  arrayLength ///// not needed for fcn!!!!
+) => {
+  // state and such here
+  const genPixles = useCompileStore((state) => state.genPixles);
+  const Module = useCompileCode((state) => state.module);
+  const [pixels, setPixles] = useState(null);
+  useEffect(() => {
+    const myGenPixles = async () => {
+      console.log("IN GEN PXILES");
+      let pixlesPtr = Module._malloc(
+        arrayLength * Uint8Array.BYTES_PER_ELEMENT
+      );
+
+      // copy data to Emscripten heap (directly accessed from Module.HEAPU8)
+      let dataheap = new Uint8Array(
+        Module.HEAPU8.buffer,
+        pixlesPtr,
+        arrayLength * Uint8Array.BYTES_PER_ELEMENT
+      );
+
+      console.log("GENENENENENENEE", genPixles);
+
+      /////// CALL FCN ///////
+      await genPixles(
+        type,
+        color,
+        fixed_re,
+        fixed_im,
+        maxIters,
+        iterMult,
+        minRadius,
+        maxRadius,
+        startX,
+        startY,
+        newCanWidth,
+        newCanHeight,
+        canWidth,
+        canHeight,
+        widthScale,
+        heightScale,
+        dataheap.byteOffset
+      );
+
+      // get the result of the function from the dataheap by way of creating a js array
+      let pixelArray = new Uint8ClampedArray(
+        dataheap.buffer,
+        dataheap.byteOffset,
+        arrayLength
+      );
+
+      ///// can also do above as below --- same result //////
+
+      // let pixelArray = new Uint8ClampedArray(
+      //   Module.HEAPU8.buffer,
+      //   pixlesPtr,
+      //   arrayLength
+      // );
+
+      // free the memory
+      Module._free(Module.HEAPU8.buffer);
+
+      // create the image
+      let data = new ImageData(pixelArray, canWidth, canHeight);
+
+      console.log(data);
+
+      setPixles(data);
+    };
+    if (genPixles && Module) {
+      myGenPixles();
+    } else {
+      console.log(" NO GEN PIXLES s");
+    }
+  }, [
+    type,
+    color,
+    fixed_re,
+    fixed_im,
+    maxIters,
+    iterMult,
+    minRadius,
+    maxRadius,
+    startX,
+    startY,
+    newCanWidth,
+    newCanHeight,
+    canWidth,
+    canHeight,
+    widthScale,
+    heightScale,
+    arrayLength,
+  ]);
+  return pixels;
+};
+
+const useGenOrbit = () => {};
 
 const useCompileCode = (code) => {
   const ready = useCompileStore((state) => state.ready);
+  const setGenPixles = useCompileStore((state) => state.setGenPixles);
+  const setOrbit = useCompileStore((state) => state.setOrbit);
+  const setModule = useCompileStore((state) => state.setModule);
   const write = useTermStore((state) => state.write);
+  ////// TESTTESTTEST ////
+  // const myMod = useRef(null);
 
   // state stuff and refs and vars and stuff here
 
@@ -102,13 +222,50 @@ const useCompileCode = (code) => {
 
           const loadModule = (await doimport(new Blob([content]))).default;
 
-          const compiledModule = await loadModule();
+          write("loading module...");
+          loadModule().then((Module) => {
+            /*
+            int type, int color, double fixed_re, double fixed_im, int maxIters, double iterMult, double minRadius, double maxRadius, double startX, double startY, double newCanWidth, double newCanHeight, int width, int height, double widthScale, double heightScale, uint8_t *ptr
+            */
+            let genPixles = Module.cwrap("genPixles", "null", [
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+            ]);
+            /*
+            double fixed_re, double fixed_im, double clicked_re, double clicked_im, int maxIters, double minRadius, double maxRadius, double_t *
+            */
+            let orbit = Module.cwrap("orbit", "null", [
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+              "number",
+            ]);
 
-          const main = compiledModule.cwrap("foo", "int", []);
-
-          console.log("ran cwrap fcn", main());
-
-          console.log(compiledModule);
+            setGenPixles(genPixles);
+            setOrbit(orbit);
+            setModule(Module);
+            /// myMod.current = Module;
+            write("loaded");
+          });
         } else {
           write("Emception compilation failed.");
         }
@@ -126,4 +283,4 @@ const useCompileCode = (code) => {
 
 const useRunCode = () => {};
 
-export { useInitEmception, useCompileCode, useRunCode };
+export { useInitEmception, useCompileCode, useRunCode, useGenPixles2 };
