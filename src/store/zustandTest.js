@@ -21,6 +21,12 @@ const useCompileStore = create((set) => ({
   setModule: (mod) => set({ module: mod }),
   initialType: null,
   setInitialType: (type) => set({ initialType: type }),
+  malloc: null,
+  free: null,
+  setMalloc: (fcn) => set({ malloc: fcn }),
+  setFree: (free) => set({ free: free }),
+  u8buff: null,
+  setU8buff: (buff) => set({ u8buff: buff }),
 }));
 
 const useTermStore = create((set) => ({

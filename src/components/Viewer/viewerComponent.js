@@ -35,6 +35,8 @@ const Viewer = ({
     },
   ]);
 
+  // testing to rerender if this stuff changes
+  const u8buff = useCompileStore((state) => state.u8buff);
   // should always start with 0
   const [hereBack, setHereBack] = useState(back);
 
@@ -126,7 +128,10 @@ const Viewer = ({
   arrayLength ///// not needed for fcn!!!!
   */
 
-  let p2 = useGenPixles2(
+  ////////// !!!!!!!!!!!! this is what is causing that error
+  let p2 = useCompileCode(
+    false,
+    "", // blank script --- annoying I have to do this but only way around copying problem
     genPixlesParams.type,
     0,
     genPixlesParams.cVal,

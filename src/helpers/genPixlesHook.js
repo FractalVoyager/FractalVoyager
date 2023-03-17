@@ -50,6 +50,7 @@ const useGenPixles = (
 
   useEffect(() => {
     const myCreateModule = async () => {
+      console.log("CREATING MODULE !!!!!!!!!!!!!!!!!!!!!!!!!!!");
       createModule().then((Module) => {
         genPixles.current = Module.cwrap("genPixles", "null", [
           "number",
@@ -89,6 +90,8 @@ const useGenPixles = (
       //   orbitPtr,
       //   164 * Float64Array.BYTES_PER_ELEMENT
       // );
+
+      console.log("MY MODDDDDDD", myModule.current);
 
       // using emscriptens malloc to allocate memory on the emscripten heap
       // of array this returns a pointer to it

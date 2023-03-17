@@ -86,7 +86,10 @@ function Control({}) {
   const ready = useCompileStore((state) => state.ready);
   console.log(ready);
   codeRef.current = useCgen(script);
-  useCompileCode(codeRef.current);
+  // the retun val is a test~~~!!!!
+  let myMod = useCompileCode(true, codeRef.current);
+  console.log("!!!!!!");
+  console.log(myMod);
 
   // useCompileCode(code);
   // want to run it right after compile and also whenever somehting changes ------ might need two functions for this

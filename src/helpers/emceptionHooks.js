@@ -83,18 +83,19 @@ const useGenPixles2 = (
 ) => {
   // state and such here
   const genPixles = useCompileStore((state) => state.genPixles);
-  const Module = useCompileCode((state) => state.module);
+  // const Module = useCompileCode((state) => state.module);
+  const malloc = useCompileStore((state) => state.malloc);
+  const free = useCompileStore((state) => state.free);
+  const u8buff = useCompileStore((state) => state.u8buff);
   const [pixels, setPixles] = useState(null);
   useEffect(() => {
     const myGenPixles = async () => {
-      console.log("IN GEN PXILES");
-      let pixlesPtr = Module._malloc(
-        arrayLength * Uint8Array.BYTES_PER_ELEMENT
-      );
+      console.log("IN GEN PXILES", malloc, free, u8buff, genPixles);
+      let pixlesPtr = malloc(arrayLength * Uint8Array.BYTES_PER_ELEMENT);
 
       // copy data to Emscripten heap (directly accessed from Module.HEAPU8)
       let dataheap = new Uint8Array(
-        Module.HEAPU8.buffer,
+        u8buff.buffer,
         pixlesPtr,
         arrayLength * Uint8Array.BYTES_PER_ELEMENT
       );
@@ -138,7 +139,8 @@ const useGenPixles2 = (
       // );
 
       // free the memory
-      Module._free(Module.HEAPU8.buffer);
+      // Module._free(Module.HEAPU8.buffer);
+      free(u8buff.buffer);
 
       // create the image
       let data = new ImageData(pixelArray, canWidth, canHeight);
@@ -147,7 +149,7 @@ const useGenPixles2 = (
 
       setPixles(data);
     };
-    if (genPixles && Module) {
+    if (genPixles && malloc && free && u8buff) {
       myGenPixles();
     } else {
       console.log(" NO GEN PIXLES s");
@@ -176,25 +178,119 @@ const useGenPixles2 = (
 
 const useGenOrbit = () => {};
 
-const useCompileCode = (code) => {
+const useCompileCode = (
+  compile,
+  code,
+  type,
+  color,
+  fixed_re,
+  fixed_im,
+  maxIters,
+  iterMult,
+  minRadius,
+  maxRadius,
+  startX,
+  startY,
+  newCanWidth,
+  newCanHeight,
+  canWidth,
+  canHeight,
+  widthScale,
+  heightScale,
+  arrayLength ///// not needed for fcn!!!!)
+) => {
   const ready = useCompileStore((state) => state.ready);
   const setGenPixles = useCompileStore((state) => state.setGenPixles);
   const setOrbit = useCompileStore((state) => state.setOrbit);
   const setModule = useCompileStore((state) => state.setModule);
+  const setU8buff = useCompileStore((state) => state.setU8buff);
+  const setFree = useCompileStore((state) => state.setFree);
+  const setMalloc = useCompileStore((state) => state.setMalloc);
   const write = useTermStore((state) => state.write);
+
+  const myMod = useRef(null);
+  const myGenPixles = useRef(null);
+  const myOrbit = useRef(null);
+  const [pixels, setPixles] = useState(null);
   ////// TESTTESTTEST ////
   // const myMod = useRef(null);
 
   // state stuff and refs and vars and stuff here
 
   useEffect(() => {
+    const myGenPixlesFcn = async () => {
+      //console.log("IN GEN PXILES", malloc, free, u8buff, genPixles);
+      console.log("ININININININININININININ");
+      console.log(myMod.current, myGenPixles.current, myOrbit.current);
+      // let pixlesPtr = myMod.current._malloc(
+      //   arrayLength * Uint8Array.BYTES_PER_ELEMENT
+      // );
+
+      // // copy data to Emscripten heap (directly accessed from Module.HEAPU8)
+      // let dataheap = new Uint8Array(
+      //   myMod.current.HEAPU8.buffer,
+      //   pixlesPtr,
+      //   arrayLength * Uint8Array.BYTES_PER_ELEMENT
+      // );
+
+      //console.log("GENENENENENENEE", genPixles);
+
+      /////// CALL FCN ///////
+      // await myGenPixles.current(
+      //   type,
+      //   color,
+      //   fixed_re,
+      //   fixed_im,
+      //   maxIters,
+      //   iterMult,
+      //   minRadius,
+      //   maxRadius,
+      //   startX,
+      //   startY,
+      //   newCanWidth,
+      //   newCanHeight,
+      //   canWidth,
+      //   canHeight,
+      //   widthScale,
+      //   heightScale
+      //   //dataheap.byteOffset
+      // );
+
+      // get the result of the function from the dataheap by way of creating a js array
+      // let pixelArray = new Uint8ClampedArray(
+      //   dataheap.buffer,
+      //   dataheap.byteOffset,
+      //   arrayLength
+      // );
+
+      ///// can also do above as below --- same result //////
+
+      // let pixelArray = new Uint8ClampedArray(
+      //   Module.HEAPU8.buffer,
+      //   pixlesPtr,
+      //   arrayLength
+      // );
+
+      // free the memory
+      ///myMod.current._free(myMod.current.HEAPU8.buffer);
+      //free(u8buff.buffer);
+
+      // create the image
+      //let data = new ImageData(pixelArray, canWidth, canHeight);
+      console.log("DATATATATATATATATATATA");
+      //console.log(data);
+
+      //setPixles(data);
+    };
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     const compileCode = async () => {
       // TODO clear console because about to re run (could have it be new or something like htat)
       // TODO - disallaw another compile - this will end up being on some sort of on click - prob some state might be in componet
       // TODO - button state
       try {
         // have to get the code from the other thing / state
-        console.log(code);
+        // console.log(code);
 
         //console.log("emcpetion in compile,", emception);
         //console.log(code);
@@ -219,15 +315,16 @@ const useCompileCode = (code) => {
             "/working/main.mjs",
             { encoding: "utf8" }
           );
+          write("loading module...");
 
           const loadModule = (await doimport(new Blob([content]))).default;
 
-          write("loading module...");
           loadModule().then((Module) => {
             /*
             int type, int color, double fixed_re, double fixed_im, int maxIters, double iterMult, double minRadius, double maxRadius, double startX, double startY, double newCanWidth, double newCanHeight, int width, int height, double widthScale, double heightScale, uint8_t *ptr
             */
-            let genPixles = Module.cwrap("genPixles", "null", [
+            // let genPixles = Module.cwrap("genPixles", "null", [
+            myGenPixles.current = Module.cwrap("genPixles", "null", [
               "number",
               "number",
               "number",
@@ -260,10 +357,24 @@ const useCompileCode = (code) => {
               "number",
             ]);
 
-            setGenPixles(genPixles);
-            setOrbit(orbit);
-            setModule(Module);
-            /// myMod.current = Module;
+            //setGenPixles(genPixles);
+            //setOrbit(orbit);
+            //console.log("MOD", Module);
+            //setMalloc(Module._malloc);
+            //setFree(Module._free);
+            //setU8buff(Module.HEAPU8);
+            // console.log("CLONED MOD", structuredClone(Module));
+            //setModule(structuredClone(Module));
+            myMod.current = Module;
+            //myGenPixles.current = genPixles;
+            myOrbit.current = orbit;
+
+            console.log("mod", Module);
+            console.log("myMod", myMod.current);
+            //console.log("p", genPixles);
+            console.log("myp", myGenPixles.current);
+            console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^6");
+            // myMod.current = Module;
             write("loaded");
           });
         } else {
@@ -275,10 +386,33 @@ const useCompileCode = (code) => {
         // deal with state here? or just return - might be able to do this with the return state cleanup
       }
     };
-    if (ready) {
+    if (ready && compile) {
       compileCode();
+    } else if (ready && !compile) {
+      myGenPixlesFcn();
     }
-  }, [code]);
+  }, [
+    code,
+    type,
+    color,
+    fixed_re,
+    fixed_im,
+    maxIters,
+    iterMult,
+    minRadius,
+    maxRadius,
+    startX,
+    startY,
+    newCanWidth,
+    newCanHeight,
+    canWidth,
+    canHeight,
+    widthScale,
+    heightScale,
+    arrayLength,
+  ]);
+  // return pixles
+  return myMod.current;
 };
 
 const useRunCode = () => {};
