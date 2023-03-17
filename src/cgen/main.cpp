@@ -55,6 +55,8 @@ extern "C" {
 
     EMSCRIPTEN_KEEPALIVE int cgen(const char *stream) {
 
+      std::cout << "HERE IN C!\n";
+
 
 
 
@@ -64,14 +66,17 @@ extern "C" {
     FractalLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
     FractalParser parser(&tokens);
+    std::cout << "HERE IN C!\n"; 
     // call script method - this scriptContext contains method to access the text caputred by the rule
     FractalParser::ScriptContext* tree = parser.script();
+    std::cout << "HERE IN C!\n"; 
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////// - TODO get rid of
   
     std::string crit = "z"; // can have this set by the user 
     // variable to set screen point to 
+    std::cout << "HERE IN C!\n"; 
     std::string screen = "c"; // can have this set by the user
     std::complex<double> crit_point(0.,0.); 
 
@@ -96,7 +101,7 @@ extern "C" {
     // fcn defn
                                                                       // only need these fixed vars for clicked on dyn
     bigLoops << "EMSCRIPTEN_KEEPALIVE void genPixles(int type, int color, double fixed_re, double fixed_im, int maxIters, double iterMult, double minRadius, double maxRadius, double startX, double startY, double newCanWidth, double newCanHeight, int width, int height, double widthScale, double heightScale, uint8_t *ptr)\n{\n";
-    bigLoops << "for (int x = 0; x < floor(newCanWidth); x++){\nfor (int y = 0; y < floor(newCanHeight); y++){\n double screen_re = (((widthScale * x) + startX) - width / 2.) / (height  /2.);\ndouble screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);\n";
+    bigLoops << "for (int x = 0; x < floor(newCanWidth); x++){\nfor (int y = 0; y < floor(newCanHeight); y++){\n double screen_re = (((widthScale * x) + startX) - width / 2.) / (width  /2.);\ndouble screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);\n";
     bigLoops << "int iterations;\nif(type == 0) {\niterations = calcPixel(0.,0.,screen_re,screen_im, maxIters, minRadius, maxRadius);\n} else if(type == 1) {\niterations = calcPixel(screen_re, screen_im, fixed_re, fixed_im, maxIters, minRadius, maxRadius);\n}\nptr[getIdx(x, y, width, 0)] = round(iterations * iterMult);\n ptr[getIdx(x, y, width, 3)] = 255;\n}\n}\n}\n";
 
     // generate getIdx
