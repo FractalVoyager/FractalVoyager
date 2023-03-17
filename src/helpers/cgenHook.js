@@ -2,35 +2,6 @@ import createModule from "../cgen/main.mjs";
 import { useState, useEffect, useRef } from "react";
 import { useTermStore, useCompileStore } from "../store/zustandTest.js";
 
-/*
-
-  let cgen = Module.cwrap("cgen", "number", [
-    "string", // script
-  ]);
-  let getCgen = Module.cwrap("getCgen", "number", [
-    "number", // string pointer
-  ]);
-
-
-
-
-
-
-
-    type = getCgen(strPtr);
-
-    code = Module.UTF8ToString(strPtr); // read from the allocated memory to the javascript string
-
-    console.log(type);
-    console.log(code.trim());
-    document.querySelector("#output").innerText = code.trim();
-
-    Module._free(strPtr); // release the allocated memory
-
-
-
-*/
-
 const useCgen = (script) => {
   const write = useTermStore((state) => state.write);
   const setInitialType = useCompileStore((state) => state.setInitialType);
@@ -68,8 +39,6 @@ const useCgen = (script) => {
       setCode(myMod.current.UTF8ToString(strPtr).trim());
       myMod.current._free(strPtr);
     };
-
-    console.log(script);
 
     if (!myMod.current) {
       myCreateModule();

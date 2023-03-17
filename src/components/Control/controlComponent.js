@@ -2,7 +2,7 @@ import "./control.css";
 import { useRef, useState } from "react";
 import Viewer from "../Viewer/viewerComponent";
 // import { Button, TextField } from "@mui/material";
-import { useCompileCode, useRunCode } from "../../helpers/emceptionHooks";
+import { useCompileCode } from "../../helpers/emceptionHooks";
 import { useCompileStore } from "../../store/zustandTest.js";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
@@ -87,14 +87,7 @@ function Control({}) {
   console.log(ready);
   codeRef.current = useCgen(script);
   // the retun val is a test~~~!!!!
-  let myMod = useCompileCode(true, codeRef.current);
-  console.log("!!!!!!");
-  console.log(myMod);
-
-  // useCompileCode(code);
-  // want to run it right after compile and also whenever somehting changes ------ might need two functions for this
-  // but try to make just one hook
-  useRunCode();
+  useCompileCode(codeRef.current);
 
   return (
     <>

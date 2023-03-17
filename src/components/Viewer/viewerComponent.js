@@ -8,12 +8,10 @@
 import Canvas from "./canvasComponent";
 import "./viewer.css";
 import { useEffect, useState } from "react";
-import useGenPixels from "../../helpers/genPixlesHook";
 import CordsBox from "../CordsBox/cordsBoxComponent";
 import { canvasToComplex } from "../../helpers/util";
-import { useCompileCode } from "../../helpers/emceptionHooks";
 import { useCompileStore } from "../../store/zustandTest.js";
-import { useGenPixles3 } from "../../helpers/emceptionHooks";
+import { useGenPixles } from "../../helpers/emceptionHooks";
 
 const Viewer = ({
   xRes,
@@ -35,25 +33,10 @@ const Viewer = ({
     },
   ]);
 
-  // testing to rerender if this stuff changes
-  const u8buff = useCompileStore((state) => state.u8buff);
   // should always start with 0
   const [hereBack, setHereBack] = useState(back);
 
-  console.log(
-    xRes,
-    yRes,
-    initXscale,
-    initYscale,
-    initStartX,
-    initStartY,
-    back,
-    showCords,
-    hereBack
-  );
-
   useEffect(() => {
-    console.log("here");
     if (back !== hereBack) {
       // we don't want to reset the previous stuff if it is a first drawn julia set with no zooms or a orbit
       if (
@@ -79,9 +62,14 @@ const Viewer = ({
 
   // first gen Pixles
   const [genPixlesParams, setGenPixlesParams] = useState({
-    type: 0, // paramter plane
-    cVal: [0, 0], // c will get set to pixel
-    zVal: [0, 0], // 0,0 is ciritcal point
+    type: 0, // paramter plane, dyn, orbit    ------ TODO - this is based on inital type
+    color: 0,
+    fixedVal: [null, null], // c will get set to pixel    ------ need to keep track of this state for orbit, should alreadly be here
+    clickedVal: [null, null], // for orbit
+    maxIters: 64,
+    iterMult: 4,
+    minRadius: 0.01,
+    maxRadius: 4,
     startX: initStartX, // box zoom stuff
     startY: initStartY, // box zoom stuff
     newCanWidth: xRes, // box zoom stuff
@@ -93,10 +81,17 @@ const Viewer = ({
     arrayLength: xRes * yRes * 4, // length of aray to return
   });
 
-  let p = useGenPixels(
+  let p = useGenPixles(
     genPixlesParams.type,
-    genPixlesParams.cVal,
-    genPixlesParams.zVal,
+    genPixlesParams.color,
+    genPixlesParams.fixedVal[0],
+    genPixlesParams.fixedVal[1],
+    genPixlesParams.clickedVal[0],
+    genPixlesParams.clickedVal[1],
+    genPixlesParams.maxIters,
+    genPixlesParams.iterMult,
+    genPixlesParams.minRadius,
+    genPixlesParams.maxRadius,
     genPixlesParams.startX,
     genPixlesParams.startY,
     genPixlesParams.newCanWidth,
@@ -107,49 +102,6 @@ const Viewer = ({
     genPixlesParams.heightScale,
     genPixlesParams.arrayLength
   );
-
-  /*
-  type,
-  color,
-  fixed_re,
-  fixed_im,
-  maxIters,
-  iterMult,
-  minRadius,
-  maxRadius,
-  startX,
-  startY,
-  newCanWidth,
-  newCanHeight,
-  canWidth,
-  canHeight,
-  widthScale,
-  heightScale,
-  arrayLength ///// not needed for fcn!!!!
-  */
-
-  ////////// !!!!!!!!!!!! this is what is causing that error
-  let p2 = useGenPixles3(
-    genPixlesParams.type,
-    0,
-    genPixlesParams.cVal,
-    genPixlesParams.zVal,
-    64,
-    4,
-    0.1,
-    4,
-    genPixlesParams.startX,
-    genPixlesParams.startY,
-    genPixlesParams.newCanWidth,
-    genPixlesParams.newCanHeight,
-    genPixlesParams.canWidth,
-    genPixlesParams.canHeight,
-    genPixlesParams.widthScale,
-    genPixlesParams.heightScale,
-    genPixlesParams.arrayLength
-  );
-
-  console.log("PPPPP@@@@", p2);
 
   const interDrawOrbit = (re, im) => {
     setParamsStack([...paramsStack, genPixlesParams]);
