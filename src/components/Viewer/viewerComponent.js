@@ -13,7 +13,7 @@ import CordsBox from "../CordsBox/cordsBoxComponent";
 import { canvasToComplex } from "../../helpers/util";
 import { useCompileCode } from "../../helpers/emceptionHooks";
 import { useCompileStore } from "../../store/zustandTest.js";
-import { useGenPixles2 } from "../../helpers/emceptionHooks";
+import { useGenPixles3 } from "../../helpers/emceptionHooks";
 
 const Viewer = ({
   xRes,
@@ -129,9 +129,7 @@ const Viewer = ({
   */
 
   ////////// !!!!!!!!!!!! this is what is causing that error
-  let p2 = useCompileCode(
-    false,
-    "", // blank script --- annoying I have to do this but only way around copying problem
+  let p2 = useGenPixles3(
     genPixlesParams.type,
     0,
     genPixlesParams.cVal,
