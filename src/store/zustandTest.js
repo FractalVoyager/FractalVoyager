@@ -27,6 +27,8 @@ const useCompileStore = create((set) => ({
   setFree: (free) => set({ free: free }),
   u8buff: null,
   setU8buff: (buff) => set({ u8buff: buff }),
+  content: null,
+  setContent: (cont) => set({ content: cont }),
 }));
 
 const useTermStore = create((set) => ({

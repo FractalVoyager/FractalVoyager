@@ -207,6 +207,7 @@ const useCompileCode = (
   const setFree = useCompileStore((state) => state.setFree);
   const setMalloc = useCompileStore((state) => state.setMalloc);
   const write = useTermStore((state) => state.write);
+  const setContent = useCompileStore((state) => state.setContent);
 
   const myMod = useRef(null);
   const myGenPixles = useRef(null);
@@ -317,6 +318,8 @@ const useCompileCode = (
           );
           write("loading module...");
 
+          setContent(content);
+
           const loadModule = (await doimport(new Blob([content]))).default;
 
           loadModule().then((Module) => {
@@ -417,4 +420,161 @@ const useCompileCode = (
 
 const useRunCode = () => {};
 
-export { useInitEmception, useCompileCode, useRunCode, useGenPixles2 };
+const useGenPixles3 = (
+  type,
+  color,
+  fixed_re,
+  fixed_im,
+  maxIters,
+  iterMult,
+  minRadius,
+  maxRadius,
+  startX,
+  startY,
+  newCanWidth,
+  newCanHeight,
+  canWidth,
+  canHeight,
+  widthScale,
+  heightScale,
+  arrayLength ///// not needed for fcn!!!!
+) => {
+  // state and such here
+  // this triggers a re render of "host" component (viewer) so won't need to even have this anywhere in viewer
+  const content = useCompileStore((state) => state.content);
+  const [pixels, setPixles] = useState(null);
+  // these don't even need to be refs
+  const module = useRef(null);
+  const genPixles = useRef(null);
+  useEffect(() => {
+    const createMod = async () => {
+      const loadModule = (await doimport(new Blob([content]))).default;
+
+      loadModule().then((Module) => {
+        /*
+            int type, int color, double fixed_re, double fixed_im, int maxIters, double iterMult, double minRadius, double maxRadius, double startX, double startY, double newCanWidth, double newCanHeight, int width, int height, double widthScale, double heightScale, uint8_t *ptr
+            */
+        // let genPixles = Module.cwrap("genPixles", "null", [
+        genPixles.current = Module.cwrap("genPixles", "null", [
+          "number",
+          "number",
+          "number",
+          "number",
+          "number",
+          "number",
+          "number",
+          "number",
+          "number",
+          "number",
+          "number",
+          "number",
+          "number",
+          "number",
+          "number",
+          "number",
+          "number",
+        ]);
+        module.current = Module;
+      });
+      myGenPixles();
+    };
+    const myGenPixles = async () => {
+      let pixlesPtr = module.current._malloc(
+        arrayLength * Uint8Array.BYTES_PER_ELEMENT
+      );
+      // copy data to Emscripten heap (directly accessed from Module.HEAPU8)
+      let dataheap = new Uint8Array(
+        module.current.HEAPU8.buffer,
+        pixlesPtr,
+        arrayLength * Uint8Array.BYTES_PER_ELEMENT
+      );
+
+      // console.log("GENENENENENENEE", genPixles);
+
+      /////// CALL FCN ///////
+      await genPixles.current(
+        type,
+        color,
+        fixed_re,
+        fixed_im,
+        maxIters,
+        iterMult,
+        minRadius,
+        maxRadius,
+        startX,
+        startY,
+        newCanWidth,
+        newCanHeight,
+        canWidth,
+        canHeight,
+        widthScale,
+        heightScale,
+        dataheap.byteOffset
+      );
+
+      // get the result of the function from the dataheap by way of creating a js array
+      let pixelArray = new Uint8ClampedArray(
+        dataheap.buffer,
+        dataheap.byteOffset,
+        arrayLength
+      );
+
+      ///// can also do above as below --- same result //////
+
+      // let pixelArray = new Uint8ClampedArray(
+      //   Module.HEAPU8.buffer,
+      //   pixlesPtr,
+      //   arrayLength
+      // );
+
+      // free the memory
+      // Module._free(Module.HEAPU8.buffer);
+      module.current._free(module.current.HEAPU8.buffer);
+
+      // create the image
+      let data = new ImageData(pixelArray, canWidth, canHeight);
+
+      console.log("NEW DATATATATATATATATATAT", data);
+
+      setPixles(data);
+    };
+    // could have an if here but pretty positive module and genpixles aren't sticking arpund
+    if (module.current) {
+      console.log("MODULE STUCK AROUND !!!!!!!!!!!!!!!!!!!!! ");
+    }
+    // might need some stuff like only do if content has changed
+    if (content) {
+      createMod();
+    }
+
+    // could have it return pixels, maybe the pixles getting set is cauing rerenders of viewer
+  }, [
+    type,
+    color,
+    fixed_re,
+    fixed_im,
+    maxIters,
+    iterMult,
+    minRadius,
+    maxRadius,
+    startX,
+    startY,
+    newCanWidth,
+    newCanHeight,
+    canWidth,
+    canHeight,
+    widthScale,
+    heightScale,
+    arrayLength,
+    content,
+  ]);
+  return pixels;
+};
+
+export {
+  useInitEmception,
+  useCompileCode,
+  useRunCode,
+  useGenPixles2,
+  useGenPixles3,
+};
