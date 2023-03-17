@@ -84,7 +84,6 @@ function Control({}) {
   }
 
   const ready = useCompileStore((state) => state.ready);
-  console.log(ready);
   codeRef.current = useCgen(script);
   // the retun val is a test~~~!!!!
   useCompileCode(codeRef.current);

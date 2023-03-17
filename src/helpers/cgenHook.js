@@ -29,15 +29,18 @@ const useCgen = (script) => {
     };
 
     const myCgen = async () => {
+      console.log(myMod);
       write("running script throught cgen...");
       // can do some error catching here, assuming it will throw errros if script is malformed
       let length = await cgen.current(script.toLowerCase());
+      console.log("cgenned");
       let strPtr = myMod.current.allocateUTF8(length);
+      // myMod.current._malloc(strPtr);
       let type = await getCgen.current(strPtr);
       setInitialType(type);
       write("ran");
       setCode(myMod.current.UTF8ToString(strPtr).trim());
-      myMod.current._free(strPtr);
+      // myMod.current._free(strPtr);
     };
 
     if (!myMod.current) {
