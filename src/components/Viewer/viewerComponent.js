@@ -9,7 +9,7 @@ import Canvas from "./canvasComponent";
 import "./viewer.css";
 import { useEffect, useState } from "react";
 import CordsBox from "../CordsBox/cordsBoxComponent";
-import { canvasToComplex } from "../../helpers/util";
+import { canvasToComplex, complexToCanvas } from "../../helpers/util";
 import { useCompileStore } from "../../store/zustandTest.js";
 import { useGenPixles } from "../../helpers/emceptionHooks";
 
@@ -23,6 +23,7 @@ const Viewer = ({
   back,
   showCords,
 }) => {
+  // TODO - clean this up to avoid unnescarry re renders
   const [displayCords, setDisplayCords] = useState({ re: null, im: null });
   const [prevMandCords, setPrevMandCords] = useState([
     {
@@ -35,6 +36,8 @@ const Viewer = ({
 
   // should always start with 0
   const [hereBack, setHereBack] = useState(back);
+  // this works but inst going into genPIxlesParams
+  const initType = useCompileStore((state) => state.initialType);
 
   useEffect(() => {
     if (back !== hereBack) {
@@ -61,10 +64,11 @@ const Viewer = ({
   });
 
   // first gen Pixles
+
   const [genPixlesParams, setGenPixlesParams] = useState({
-    type: 0, // paramter plane, dyn, orbit    ------ TODO - this is based on inital type
+    type: initType, // paramter plane, dyn, orbit    ------ TODO - this is based on inital type
     color: 0,
-    fixedVal: [null, null], // c will get set to pixel    ------ need to keep track of this state for orbit, should alreadly be here
+    fixedVal: [null, null], // c will get set to pixel - for type 2 after type 1
     clickedVal: [null, null], // for orbit
     maxIters: 64,
     iterMult: 4,
@@ -80,6 +84,30 @@ const Viewer = ({
     heightScale: initYscale, // box zoom stuff
     arrayLength: xRes * yRes * 4, // length of aray to return
   });
+  console.log(initType);
+  // to reset genPIxlesParams with initType
+  useEffect(() => {
+    setGenPixlesParams({
+      type: initType,
+      color: genPixlesParams.color,
+      fixedVal: genPixlesParams.fixedVal, // this should hold the old fixed value
+      clickedVal: genPixlesParams.clickedVal,
+      maxIters: genPixlesParams.maxIters,
+      iterMult: genPixlesParams.iterMult,
+      minRadius: genPixlesParams.iterMult,
+      maxRadius: genPixlesParams.maxRadius,
+      startX: genPixlesParams.startX,
+      startY: genPixlesParams.startY,
+      newCanWidth: genPixlesParams.newCanWidth,
+      newCanHeight: genPixlesParams.newCanHeight,
+      canWidth: genPixlesParams.canWidth,
+      canHeight: genPixlesParams.canHeight,
+      widthScale: genPixlesParams.widthScale,
+      heightScale: genPixlesParams.heightScale,
+      arrayLength: genPixlesParams.arrayLength,
+    });
+  }, [initType]);
+  console.log(genPixlesParams.type);
 
   let p = useGenPixles(
     genPixlesParams.type,
@@ -105,10 +133,16 @@ const Viewer = ({
 
   const interDrawOrbit = (re, im) => {
     setParamsStack([...paramsStack, genPixlesParams]);
+    // TODO = change this to only change the stuff to be changed
     setGenPixlesParams({
       type: 2,
-      cVal: genPixlesParams.cVal,
-      zVal: [re, im],
+      color: genPixlesParams.color,
+      fixedVal: genPixlesParams.fixedVal, // this should hold the old fixed value
+      clickedVal: [re, im],
+      maxIters: genPixlesParams.maxIters,
+      iterMult: genPixlesParams.iterMult,
+      minRadius: genPixlesParams.iterMult,
+      maxRadius: genPixlesParams.maxRadius,
       startX: genPixlesParams.startX,
       startY: genPixlesParams.startY,
       newCanWidth: genPixlesParams.newCanWidth,
@@ -121,19 +155,19 @@ const Viewer = ({
     });
   };
 
-  // extract the reclacuating logic out of the draw mand to a function to make it do all that stuff so it can be
-  // used in drawJulia too
-  // actually its just working fine now because on zoom, interDrawMand is being called,
-  // that saves what we had for julia set stuff\
-
   // rioght now, the julia set is drawn with the current zoom in the mandlebrot, but easy fix to not do that
 
   const interDrawJulia = (re, im) => {
     setParamsStack([...paramsStack, genPixlesParams]);
     setGenPixlesParams({
       type: 1,
-      cVal: [re, im],
-      zVal: genPixlesParams.zVal,
+      color: genPixlesParams.color,
+      fixedVal: [re, im],
+      clickedVal: genPixlesParams.clickedVal,
+      maxIters: genPixlesParams.maxIters,
+      iterMult: genPixlesParams.iterMult,
+      minRadius: genPixlesParams.iterMult,
+      maxRadius: genPixlesParams.maxRadius,
       startX: genPixlesParams.startX,
       startY: genPixlesParams.startY,
       newCanWidth: genPixlesParams.newCanWidth,
@@ -151,6 +185,8 @@ const Viewer = ({
     // state to trigger the what we need for genPixles hook to run
     // it is called on mouse up
     // will always be on second iteration
+
+    console.log("inter draw mand");
 
     // add last p to the stack
     setParamsStack([...paramsStack, genPixlesParams]);
@@ -195,11 +231,23 @@ const Viewer = ({
       heightScale = (yRes / newCanHeight) * heightScale;
     }
 
+    let type;
+    if (genPixlesParams.type === 2) {
+      type = 1;
+    } else {
+      type = genPixlesParams.type;
+    }
+
     // now we have all we need for the useGenPixles hook to rerun, so set that state
     setGenPixlesParams({
-      type: genPixlesParams.type,
-      cVal: genPixlesParams.cVal,
-      zVal: genPixlesParams.zVal,
+      type: type,
+      color: genPixlesParams.color,
+      fixedVal: genPixlesParams.fixedVal,
+      clickedVal: genPixlesParams.clickedVal,
+      maxIters: genPixlesParams.maxIters,
+      iterMult: genPixlesParams.iterMult,
+      minRadius: genPixlesParams.iterMult,
+      maxRadius: genPixlesParams.maxRadius,
       startX: startX,
       startY: startY,
       newCanWidth: newCanWidth,
@@ -400,11 +448,13 @@ const Viewer = ({
         genPixlesParams.startY;
 
       const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
+      console.log("TESTING", re, im, canX, canY);
+      console.log(complexToCanvas(re, im, xRes, yRes));
       // to prevent "dobule drawn" julia sets, if this is false, then we should do the orbit
       if (genPixlesParams.type === 0) {
         interDrawJulia(re, im);
         // click in Julia
-      } else if (genPixlesParams.type === 1) {
+      } else if (genPixlesParams.type === 1 || genPixlesParams.type === 2) {
         interDrawOrbit(re, im);
         // now orbit
       }

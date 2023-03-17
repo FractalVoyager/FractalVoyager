@@ -2,17 +2,14 @@ import * as Comlink from "https://unpkg.com/comlink/dist/esm/comlink.mjs";
 import { useEffect, useRef, useState } from "react";
 import { useCompileStore } from "../store/zustandTest.js";
 import { useTermStore } from "../store/zustandTest.js";
+import { complexToCanvas } from "./util.js";
 
 function doimport(str) {
-  console.log("glbal this");
-
   const blob = new Blob([str], { type: "text/javascript" });
   const url = URL.createObjectURL(blob);
-  console.log(url);
   // neeed this to tell webpack to take this as a normal import() and not do anything speical with it
   const module = import(/* webpackIgnore: true */ url);
 
-  console.log(module);
   URL.revokeObjectURL(url); // GC objectURLs
 
   return module;
@@ -122,10 +119,10 @@ const useGenPixles = (
   heightScale,
   arrayLength
 ) => {
+  console.log("type in outer gen pixles", type);
   // state and such here
   // this triggers a re render of "host" component (viewer) so won't need to even have this anywhere in viewer
   const content = useCompileStore((state) => state.content);
-  console.log(content);
   const [pixels, setPixles] = useState(null);
   // these don't even need to be refs
   //const module = useRef(null);
@@ -183,6 +180,7 @@ const useGenPixles = (
     };
     const myGenPixles = async (Module, fcn) => {
       write("generating pixels");
+      console.log("type in gen pixles", type);
 
       if (type === 0 || type === 1) {
         let pixlesPtr = Module._malloc(
@@ -241,8 +239,6 @@ const useGenPixles = (
         // create the image
         let data = new ImageData(pixelArray, canWidth, canHeight);
 
-        console.log("NEW DATATATATATATATATATAT", data);
-
         setPixles(data);
       } else {
         let orbitPtr = Module._malloc(164 * Float64Array.BYTES_PER_ELEMENT);
@@ -263,11 +259,37 @@ const useGenPixles = (
           maxRadius,
           orbitHeap.byteOffset
         );
+
+        let tmpOrbitArray = new Float64Array(
+          orbitHeap.buffer,
+          orbitHeap.byteOffset,
+          164
+        );
+        Module._free(Module.HEAPF64.buffer);
+        let orbitArr = tmpOrbitArray;
+
+        console.log("here", orbitArr);
+        let newOrbit = orbitArr.reduce((acc, val, idx, arr) => {
+          // console.log(acc);
+          if (val === 0 && arr[idx + 1] === 0) {
+            return acc;
+          }
+          if (idx % 2 === 0) {
+            acc.push(
+              complexToCanvas(val, arr[idx + 1], newCanWidth, newCanHeight)
+            );
+            return acc;
+          } else {
+            return acc;
+          }
+        }, []);
+        console.log(newOrbit);
+
+        return newOrbit;
       }
     };
 
     // might need some stuff like only do if content has changed
-    console.log("CONTENT", content);
     if (content) {
       createMod();
     }
