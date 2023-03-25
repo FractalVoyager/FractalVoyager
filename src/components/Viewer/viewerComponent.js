@@ -9,7 +9,11 @@ import Canvas from "./canvasComponent";
 import "./viewer.css";
 import { useEffect, useState } from "react";
 import CordsBox from "../CordsBox/cordsBoxComponent";
-import { canvasToComplex, complexToCanvas } from "../../helpers/util";
+import {
+  canvasToComplex,
+  complexToCanvas,
+  canvasToPoint,
+} from "../../helpers/util";
 import { useCompileStore } from "../../store/zustandTest.js";
 import { useGenPixles } from "../../helpers/emceptionHooks";
 
@@ -47,7 +51,7 @@ const Viewer = ({
         (paramsStack.at(paramsStack.length - 1).type === 1 &&
           genPixlesParams.type === 1)
       ) {
-        console.log("in if", prevMandCords);
+        // // console.log("in if", prevMandCords);
         setPrevMandCords((prevMandCords) => prevMandCords.slice(0, -1));
       }
 
@@ -84,7 +88,7 @@ const Viewer = ({
     heightScale: initYscale, // box zoom stuff
     arrayLength: xRes * yRes * 4, // length of aray to return
   });
-  console.log(initType);
+  // // console.log(initType);
   // to reset genPIxlesParams with initType
   useEffect(() => {
     setGenPixlesParams({
@@ -107,7 +111,7 @@ const Viewer = ({
       arrayLength: genPixlesParams.arrayLength,
     });
   }, [initType]);
-  console.log(genPixlesParams.type);
+  // // console.log(genPixlesParams.type);
 
   let p = useGenPixles(
     genPixlesParams.type,
@@ -186,7 +190,7 @@ const Viewer = ({
     // it is called on mouse up
     // will always be on second iteration
 
-    console.log("inter draw mand");
+    // // console.log("inter draw mand");
 
     // add last p to the stack
     setParamsStack([...paramsStack, genPixlesParams]);
@@ -203,7 +207,7 @@ const Viewer = ({
     let widthScale = width / xRes;
     let heightScale = height / yRes;
 
-    // console.log(prevMandCords);
+    // // // console.log(prevMandCords);
 
     startX =
       prevMandCords.at(-1).widthScale * startX + prevMandCords.at(-1).startX;
@@ -292,8 +296,62 @@ const Viewer = ({
     // calling this everytime anyway so
 
     if (p) {
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.putImageData(p, 0, 0);
+      if (genPixlesParams.type === 0 || genPixlesParams.type === 1) {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.putImageData(p, 0, 0);
+
+        // p is array of two things to draw lines to for orbit
+        // if is a workaround for too many rerenders
+      } else if (!p.data) {
+        console.log(p);
+        let tmp = canvasToPoint(
+          p[0][1],
+          p[0][1],
+          genPixlesParams.widthScale,
+          genPixlesParams.heightScale,
+          xRes,
+          yRes,
+          clinetDims.width,
+          clinetDims.height,
+          genPixlesParams.startX,
+          genPixlesParams.startY
+        );
+        console.log(
+          p[0][1],
+          p[0][1],
+          genPixlesParams.widthScale,
+          genPixlesParams.heightScale,
+          xRes,
+          yRes,
+          clinetDims.width,
+          clinetDims.height,
+          genPixlesParams.startX,
+          genPixlesParams.startY
+        );
+        console.log(tmp[0], tmp[1]);
+        ctx.moveTo(tmp[0], tmp[1]);
+        ctx.beginPath();
+        p.shift();
+        p.forEach((cords) => {
+          let tmp = canvasToPoint(
+            cords[0],
+            cords[1],
+            genPixlesParams.widthScale,
+            genPixlesParams.heightScale,
+            xRes,
+            yRes,
+            clinetDims.width,
+            clinetDims.height,
+            genPixlesParams.startX,
+            genPixlesParams.startY
+          );
+          console.log(tmp[0], tmp[1]);
+          ctx.lineTo(tmp[0], tmp[1]);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(tmp[0], tmp[1]);
+        });
+      }
     }
   };
 
@@ -340,6 +398,11 @@ const Viewer = ({
     lineWidth: xRes * (5 / 3840),
   };
 
+  const orbitOpts = {
+    strokeStyle: "blue",
+    lineWidth: xRes * (5 / 3840),
+  };
+
   function mouseDown(e) {
     e.preventDefault();
     setStartRectCords({
@@ -352,7 +415,7 @@ const Viewer = ({
 
   function mouseMoveCalcCords(e) {
     e.preventDefault();
-    // console.log(clinetDims);
+    // // // console.log(clinetDims);
     // (widthScale * x) + startX)
     let canX =
       genPixlesParams.widthScale *
@@ -362,11 +425,11 @@ const Viewer = ({
       genPixlesParams.heightScale *
         (e.nativeEvent.offsetY * (yRes / clinetDims.height)) +
       genPixlesParams.startY;
-    //console.log("cans, ", canX, canY);
+    //// console.log("cans, ", canX, canY);
 
     if (showCords) {
       const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
-      //console.log("cords: ", re, im);
+      //// console.log("cords: ", re, im);
       setDisplayCords({ re: re, im: im });
     }
   }
@@ -382,7 +445,7 @@ const Viewer = ({
 
     if (showCords) {
       const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
-      // console.log("cords: ", re, im);
+      // // console.log("cords: ", re, im);
       setDisplayCords({ re: re, im: im });
     }
 
@@ -448,8 +511,12 @@ const Viewer = ({
         genPixlesParams.startY;
 
       const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
-      console.log("TESTING", re, im, canX, canY);
+      console.log(e.nativeEvent.offsetX);
+      console.log(e.nativeEvent.offsetY);
+      console.log("before anything", re, im, canX, canY);
       console.log(complexToCanvas(re, im, xRes, yRes));
+      // console.log("TESTING", re, im, canX, canY);
+      // console.log(complexToCanvas(re, im, xRes, yRes));
       // to prevent "dobule drawn" julia sets, if this is false, then we should do the orbit
       if (genPixlesParams.type === 0) {
         interDrawJulia(re, im);
@@ -475,6 +542,7 @@ const Viewer = ({
         <div id="outer-cans">
           <Canvas
             className="can"
+            options={orbitOpts}
             draw={drawMand}
             xRes={xRes}
             yRes={yRes}
