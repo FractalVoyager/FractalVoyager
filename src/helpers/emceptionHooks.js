@@ -26,7 +26,6 @@ const useInitEmception = () => {
   const write = useTermStore((state) => state.write);
   useEffect(() => {
     const initEmception = async () => {
-      //console.log("useInitEmception");
       // maybe useMemo for htis
       const worker = new Worker(
         "./emception/emception.worker.bundle.worker.js"
@@ -42,16 +41,13 @@ const useInitEmception = () => {
 
       write("Loading emception...");
 
-      //console.log("Loading emception...");
       await emception.init();
       setReady();
-      //console.log("emceitpion loaded");
       write("emceitpion loaded");
     };
 
     initEmception();
 
-    // console.log("emcpetion in init,", emception);
     // TODO - maybe figure out how to deal with only reutirn this after this is done, think it does that anyway - using async in genPixles
     // acutally could prob just have this trigger state that allows the user to compile code - check if having this flow is bad
   }, []);
@@ -119,7 +115,6 @@ const useGenPixles = (
   heightScale,
   arrayLength
 ) => {
-  console.log("type in outer gen pixles", type);
   // state and such here
   // this triggers a re render of "host" component (viewer) so won't need to even have this anywhere in viewer
   const content = useCompileStore((state) => state.content);
@@ -180,7 +175,6 @@ const useGenPixles = (
     };
     const myGenPixles = async (Module, fcn) => {
       write("generating pixels");
-      console.log("type in gen pixles", type);
 
       if (type === 0 || type === 1) {
         let pixlesPtr = Module._malloc(
@@ -192,8 +186,6 @@ const useGenPixles = (
           pixlesPtr,
           arrayLength * Uint8Array.BYTES_PER_ELEMENT
         );
-
-        // console.log("GENENENENENENEE", genPixles);
 
         /////// CALL FCN ///////
         await fcn(
@@ -267,25 +259,35 @@ const useGenPixles = (
         );
         Module._free(Module.HEAPF64.buffer);
         let orbitArr = tmpOrbitArray;
+        console.log(orbitArr);
 
-        console.log("here", orbitArr);
-        let newOrbit = orbitArr.reduce((acc, val, idx, arr) => {
-          // console.log(acc);
-          if (val === 0 && arr[idx + 1] === 0) {
-            return acc;
-          }
-          if (idx % 2 === 0) {
-            acc.push(
-              complexToCanvas(val, arr[idx + 1], newCanWidth, newCanHeight)
+        let newOrbit = [[]];
+        orbitArr.forEach((val, idx, arr) => {
+          if (!(val === 0 && arr[idx + 1] === 0) && idx % 2 === 0) {
+            newOrbit.push(
+              complexToCanvas(val, arr[idx + 1], canWidth, canHeight)
             );
-            return acc;
-          } else {
-            return acc;
           }
-        }, []);
+        });
         console.log(newOrbit);
 
-        return newOrbit;
+        // let newOrbit = orbitArr.reduce((acc, val, idx, arr) => {
+        //   console.log(acc);
+        //   if (val === 0 && arr[idx + 1] === 0) {
+        //     return acc;
+        //   }
+        //   if (idx % 2 === 0) {
+        //     acc.push(
+        //       complexToCanvas(val, arr[idx + 1], newCanWidth, newCanHeight)
+        //     );
+        //     return acc;
+        //   } else {
+        //     return acc;
+        //   }
+        // }, []);
+        // console.log(newOrbit);
+
+        setPixles(newOrbit);
       }
     };
 
