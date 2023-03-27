@@ -55,8 +55,6 @@ extern "C" {
 
     EMSCRIPTEN_KEEPALIVE int cgen(const char *stream) {
 
-      std::cout << "HERE IN C!\n";
-
 
 
 
@@ -66,21 +64,20 @@ extern "C" {
     FractalLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
     FractalParser parser(&tokens);
-    std::cout << "HERE IN C!\n"; 
     // call script method - this scriptContext contains method to access the text caputred by the rule
     FractalParser::ScriptContext* tree = parser.script();
-    std::cout << "HERE IN C!\n"; 
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////// - TODO get rid of
   
     std::string crit = "z"; // can have this set by the user 
     // variable to set screen point to 
-    std::cout << "HERE IN C!\n"; 
     std::string screen = "c"; // can have this set by the user
     std::complex<double> crit_point(0.,0.); 
 
-    myVisitor visitor(16, 4., 0.1, crit, screen, crit_point); // CHANGE
+    //myVisitor visitor(16, 4., 0.1, crit, screen, crit_point); // CHANGE
+    myVisitor visitor; // CHANGE
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -88,12 +85,12 @@ extern "C" {
     // generate headers
     std::stringstream headers; 
     headers << "#include <math.h>\n#include <stdint.h>\n#include <complex.h>\n#include<stdio.h>\n#include <emscripten/emscripten.h>\n";
-    std::cout << headers.str();
+    // std::cout << headers.str();
     // generate defns
     // if starting as dyn fcn, will only need 
     std::stringstream defns;
     // onle need one because z is always set to 0 unless there is a set in script (may need to handle this additionally)
-    defns << "int calcPixel(double z_re, double z_im, double c_re, double c_im, int maxIters, int minRadius, int maxRadius);\n";
+    defns << "int calcPixel(double z_re, double z_im, double c_re, double c_im, int maxIters, int minRadius, int maxRadius, int type);\n";
     defns << "int getIdx(int x, int y, int width, int color);\n" ;// gonna wanna change this when I have more complex coloring
 
     // "main" (big loops) fcn 
@@ -101,8 +98,8 @@ extern "C" {
     // fcn defn
                                                                       // only need these fixed vars for clicked on dyn
     bigLoops << "EMSCRIPTEN_KEEPALIVE void genPixles(int type, int color, double fixed_re, double fixed_im, int maxIters, double iterMult, double minRadius, double maxRadius, double startX, double startY, double newCanWidth, double newCanHeight, int width, int height, double widthScale, double heightScale, uint8_t *ptr)\n{\n";
-    bigLoops << "for (int x = 0; x < floor(newCanWidth); x++){\nfor (int y = 0; y < floor(newCanHeight); y++){\n double screen_re = (((widthScale * x) + startX) - width / 2.) / (width  /2.);\ndouble screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);\n";
-    bigLoops << "int iterations;\nif(type == 0) {\niterations = calcPixel(0.,0.,screen_re,screen_im, maxIters, minRadius, maxRadius);\n} else if(type == 1) {\niterations = calcPixel(screen_re, screen_im, fixed_re, fixed_im, maxIters, minRadius, maxRadius);\n}\nptr[getIdx(x, y, width, 0)] = round(iterations * iterMult);\n ptr[getIdx(x, y, width, 3)] = 255;\n}\n}\n}\n";
+    bigLoops << "for (int x = 0; x < floor(newCanWidth); x++){\nfor (int y = 0; y < floor(newCanHeight); y++){\n double screen_re = (((widthScale * x) + startX) - width / 2.) / (height  /2.);\ndouble screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);\n";
+    bigLoops << "int iterations;\nif(type == 0) {\niterations = calcPixel(0.,0.,screen_re,screen_im, maxIters, minRadius, maxRadius, type);\n} else if(type == 1) {\niterations = calcPixel(screen_re, screen_im, fixed_re, fixed_im, maxIters, minRadius, maxRadius, type);\n}\nptr[getIdx(x, y, width, 0)] = round(iterations * iterMult);\n ptr[getIdx(x, y, width, 3)] = 255;\n}\n}\n}\n";
 
     // generate getIdx
     std::stringstream getIdx;
@@ -110,13 +107,18 @@ extern "C" {
 
     std::string codeBody = visitor.cgen(tree);
 
+
     std::string orbit = visitor.cgenOrbit(tree);
 
 
     std::stringstream tmp; 
     tmp << headers.str() << defns.str() << getIdx.str() << codeBody << "extern \"C\" {\n" << bigLoops.str() << orbit << "}\n";
     outputCode = tmp.str();
-    type = 0;
+    type = visitor.getType();
+    // std::cout << visitor.getType() << "adfsgas\n";
+
+    
+
     return outputCode.length() + 1;
 
 
@@ -135,6 +137,10 @@ extern "C" {
 
     // instead 
     std::strcpy(reinterpret_cast<char*>(ptr), outputCode.c_str());
+
+
+
+    std::cout << type << "\n";
 
 
 

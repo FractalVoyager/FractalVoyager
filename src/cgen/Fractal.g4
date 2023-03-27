@@ -4,7 +4,7 @@ grammar Fractal;
 script: (command '.')+;
 
 command: 'set' variable 'to' expression #SET_TO_COM | 
-        'default' variable 'to' expression #DEFAULT_TO_COM |
+        'default' variable 'to' expression #DEFAULT_TO_COM | // lets the value be edited isn params tab, so this one is useless for now, same as set
         ('block' | ':') (command)+ 'end' #BLOCK_COM | 
         color_command #COLOR_COM |
         'par' command #PAR_COM |
@@ -53,10 +53,11 @@ expression: (PLUS | MINUS)? atom #SIGNED_ATOM_EXP |
 condition : expression (GT | LT | GT EQUALS | LT EQUALS | EQUALS) expression #COMP_COND |
             expression 'escapes' #ESCAPES_COND |
             expression 'vanishes' #VANISHES_COND |
-            expression 'stops' #STOPS_COND |
+            expression (STOPS) #STOPS_COND |
             condition (OR | AND | XOR) condition #COMB_COND // will probably want tokens for or and xor
             ;
 
+STOPS: 'stops';
 
 if_then : 'if' condition 'then' command #IF_THEN |
           'if' condition 'then' command 'else' command #IF_THEN_ELSE
@@ -171,6 +172,8 @@ AND: 'and';
 XOR:  'xor';
 
 VARIABLE : ('a' .. 'z')+ ;
+
+
 
 
 LPAREN : '(' ;
