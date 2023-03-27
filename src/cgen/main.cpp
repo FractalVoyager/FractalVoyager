@@ -57,6 +57,7 @@ extern "C" {
 
 
 
+    std::cout << stream << "\n";
 
     // turn the input into antlr format 
     antlr4::ANTLRInputStream input(stream);
@@ -105,8 +106,9 @@ extern "C" {
     std::stringstream getIdx;
     getIdx << "int getIdx(int x, int y, int width, int color){\nint red = y * (width * 4) + x * 4;\nreturn red + color;\n}\n";
 
+    std::cout << "here in c\n";
     std::string codeBody = visitor.cgen(tree);
-
+    std::cout << "here in c\n";
 
     std::string orbit = visitor.cgenOrbit(tree);
 

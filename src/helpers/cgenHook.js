@@ -26,6 +26,7 @@ const useCgen = (script) => {
         myMod.current = Module;
       });
       write("created");
+      myCgen();
     };
 
     const myCgen = async () => {
@@ -38,15 +39,17 @@ const useCgen = (script) => {
       setInitialType(type);
       write("ran");
       setCode(myMod.current.UTF8ToString(strPtr).trim());
-
-      // myMod.current._free(strPtr);
+      myMod.current._free(strPtr);
     };
 
-    if (!myMod.current) {
-      myCreateModule();
-    } else {
-      myCgen();
-    }
+    // NOT WORKING to have module stick around even though it is in old version because memeory overflow in wasm on this line     FractalParser::ScriptContext* tree = parser.script();
+    //myCreateModule();
+    // if (!myMod.current) {
+    //   myCreateModule();
+    // } else {
+    //   myCgen();
+    // }
+    myCreateModule();
   }, [script]);
   return code;
 };
