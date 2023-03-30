@@ -8,6 +8,8 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import useCgen from "../../helpers/cgenHook";
 import Terminal from "../Console/myTermComponent";
+import Header from "../Header/headerComponent";
+import Modal from "react-bootstrap/Modal";
 function Control({}) {
   const inputRef = useRef(null);
 
@@ -67,6 +69,8 @@ function Control({}) {
     let startX = -((xRes / 2) * (xScale - 1)) + shiftX;
     let startY = -((yRes / 2) * (yScale - 1)) - shiftY;
 
+    console.log(xRes, yRes, xScale, yScale, startX, startY);
+
     setRes({
       x: parseInt(Math.round(xRes)),
       y: parseInt(Math.round(yRes)),
@@ -92,6 +96,7 @@ function Control({}) {
     <>
       <div id="control-viewer">
         <div id="controls">
+          <Header />
           <Form id="script-form">
             <Form.Group>
               <Form.Control
@@ -100,9 +105,6 @@ function Control({}) {
                 type="text"
                 placeholder="Enter Script"
                 id="script-area"
-              ></Form.Control>
-              <Form.Control
-              // type="text"
               ></Form.Control>
             </Form.Group>
             {ready ? (

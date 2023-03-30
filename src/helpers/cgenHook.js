@@ -26,7 +26,9 @@ const useCgen = (script) => {
         myMod.current = Module;
       });
       write("created");
-      myCgen();
+      if (script) {
+        myCgen();
+      }
     };
 
     const myCgen = async () => {
@@ -51,6 +53,7 @@ const useCgen = (script) => {
     // }
     myCreateModule();
   }, [script]);
+  console.log(code);
   return code;
 };
 

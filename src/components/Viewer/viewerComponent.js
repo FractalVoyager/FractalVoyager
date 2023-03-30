@@ -1,10 +1,3 @@
-// want to have the click handler here and pass it down to the canvas
-// compoenent
-
-// state of where the mouse is will be stored here, along with the state
-// of the current size and all that shit for the fractal
-
-//////////// BUG - after 3 back and regens its fails with genPixlesHook.js:107 Uncaught (in promise) RangeError: Invalid typed array length: 1312
 import Canvas from "./canvasComponent";
 import "./viewer.css";
 import { useEffect, useState } from "react";
@@ -354,6 +347,8 @@ const Viewer = ({
       }
     }
   };
+
+  console.log(p);
 
   // RECTANGLE STUFF //
   /////////////////////////////////////////////
