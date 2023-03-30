@@ -233,12 +233,14 @@ const useGenPixles = (
 
         setPixles(data);
       } else {
-        let orbitPtr = Module._malloc(164 * Float64Array.BYTES_PER_ELEMENT);
+        let orbitPtr = Module._malloc(
+          maxIters * 2 * Float64Array.BYTES_PER_ELEMENT
+        );
 
         let orbitHeap = new Float64Array(
           Module.HEAPF64.buffer,
           orbitPtr,
-          164 * Float64Array.BYTES_PER_ELEMENT
+          maxIters * 2 * Float64Array.BYTES_PER_ELEMENT
         );
         // // double fixed_re, double fixed_im, double clicked_re, clicked_im, int maxIters, double minRadius, double maxRadius, double_t *p
         await fcn(
@@ -255,7 +257,7 @@ const useGenPixles = (
         let tmpOrbitArray = new Float64Array(
           orbitHeap.buffer,
           orbitHeap.byteOffset,
-          164
+          maxIters * 2
         );
         Module._free(Module.HEAPF64.buffer);
         let orbitArr = tmpOrbitArray;

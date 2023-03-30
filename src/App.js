@@ -3,7 +3,6 @@ import Viewer from "./components/Viewer/viewerComponent";
 import Control from "./components/Control/controlComponent";
 import { useInitEmception } from "./helpers/emceptionHooks";
 import useCgen from "./helpers/cgenHook";
-import Console from "./components/Console/consoleComponent";
 import Terminal from "./components/Console/myTermComponent";
 
 function App() {
