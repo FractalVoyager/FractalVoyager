@@ -370,8 +370,9 @@ public:
 
     if(!stopsSecond) {
       // first pass
-      output << "prev == ";
+      output << "abs(abs(prev) - abs( ";
       visit(ctx->expression());
+      output << ")) < 0.0000001";
     } else {
       visit(ctx->expression());
     }

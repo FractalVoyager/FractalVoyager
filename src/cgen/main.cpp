@@ -85,7 +85,7 @@ extern "C" {
 
     // generate headers
     std::stringstream headers; 
-    headers << "#include <math.h>\n#include <stdint.h>\n#include <complex.h>\n#include<stdio.h>\n#include <emscripten/emscripten.h>\n";
+    headers << "#include <math.h>\n#include <cmath>\n#include <stdint.h>\n#include <complex.h>\n#include<stdio.h>\n#include <emscripten/emscripten.h>\n";
     // std::cout << headers.str();
     // generate defns
     // if starting as dyn fcn, will only need 
@@ -98,9 +98,12 @@ extern "C" {
     std::stringstream bigLoops;
     // fcn defn
                                                                       // only need these fixed vars for clicked on dyn
-    bigLoops << "EMSCRIPTEN_KEEPALIVE void genPixles(int type, int color, double fixed_re, double fixed_im, int maxIters, double iterMult, double minRadius, double maxRadius, double startX, double startY, double newCanWidth, double newCanHeight, int width, int height, double widthScale, double heightScale, uint8_t *ptr)\n{\n";
+    bigLoops << "EMSCRIPTEN_KEEPALIVE void genPixles(int type, int color, double fixed_re, double fixed_im, int maxIters, double iterMult, double minRadius, double maxRadius, double startX, double startY, double newCanWidth, double newCanHeight, int width, int height, double widthScale, double heightScale, uint8_t *ptr, int numColors, uint8_t *redPtr, uint8_t *greenPtr, uint8_t *bluePtr)\n{\n";
     bigLoops << "for (int x = 0; x < floor(newCanWidth); x++){\nfor (int y = 0; y < floor(newCanHeight); y++){\n double screen_re = (((widthScale * x) + startX) - width / 2.) / (width  /2.);\ndouble screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);\n";
-    bigLoops << "int iterations;\nif(type == 0) {\niterations = calcPixel(0.,0.,screen_re,screen_im, maxIters, minRadius, maxRadius, type);\n} else if(type == 1) {\niterations = calcPixel(screen_re, screen_im, fixed_re, fixed_im, maxIters, minRadius, maxRadius, type);\n}\nptr[getIdx(x, y, width, 0)] = round(iterations * iterMult);\n ptr[getIdx(x, y, width, 3)] = 255;\n}\n}\n}\n";
+    bigLoops << "int iterations;\nif(type == 0) {\niterations = calcPixel(0.,0.,screen_re,screen_im, maxIters, minRadius, maxRadius, type);\n} else if(type == 1) {\niterations = calcPixel(screen_re, screen_im, fixed_re, fixed_im, maxIters, minRadius, maxRadius, type);\n}\n";
+
+    bigLoops << "int color = ceil((double)iterations*numColors/maxIters);\n";
+    bigLoops << "ptr[getIdx(x, y, width, 0)] = redPtr[color];\nptr[getIdx(x, y, width, 1)] = greenPtr[color];\nptr[getIdx(x, y, width, 2)] = bluePtr[color]; \nptr[getIdx(x, y, width, 3)] = 255;\n}\n}\n}\n";
 
     // generate getIdx
     std::stringstream getIdx;

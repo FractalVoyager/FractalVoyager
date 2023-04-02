@@ -9,6 +9,7 @@ import {
 } from "../../helpers/util";
 import { useCompileStore } from "../../store/zustandTest.js";
 import { useGenPixles } from "../../helpers/emceptionHooks";
+import { useColorsStore } from "../../store/zustandTest.js";
 
 const Viewer = ({
   xRes,
@@ -20,6 +21,8 @@ const Viewer = ({
   back,
   showCords,
 }) => {
+  const numColors = useColorsStore((state) => state.amt);
+  const colors = useColorsStore((state) => state.colors);
   // TODO - clean this up to avoid unnescarry re renders
   const [displayCords, setDisplayCords] = useState({ re: null, im: null });
   const [prevMandCords, setPrevMandCords] = useState([
@@ -62,6 +65,14 @@ const Viewer = ({
 
   // first gen Pixles
 
+  useEffect(() => {
+    setGenPixlesParams({
+      ...genPixlesParams,
+      colors: colors,
+      numColors: numColors,
+    });
+  }, [colors, numColors]);
+
   const [genPixlesParams, setGenPixlesParams] = useState({
     type: initType, // paramter plane, dyn, orbit    ------ TODO - this is based on inital type
     color: 0,
@@ -80,6 +91,8 @@ const Viewer = ({
     widthScale: initXscale, // box zoom stuff
     heightScale: initYscale, // box zoom stuff
     arrayLength: xRes * yRes * 4, // length of aray to return
+    colors: colors,
+    numColors: numColors,
   });
   // // console.log(initType);
   // to reset genPIxlesParams with initType
@@ -91,7 +104,7 @@ const Viewer = ({
       clickedVal: genPixlesParams.clickedVal,
       maxIters: genPixlesParams.maxIters,
       iterMult: genPixlesParams.iterMult,
-      minRadius: genPixlesParams.iterMult,
+      minRadius: genPixlesParams.minRadius,
       maxRadius: genPixlesParams.maxRadius,
       startX: genPixlesParams.startX,
       startY: genPixlesParams.startY,
@@ -102,6 +115,8 @@ const Viewer = ({
       widthScale: genPixlesParams.widthScale,
       heightScale: genPixlesParams.heightScale,
       arrayLength: genPixlesParams.arrayLength,
+      colors: genPixlesParams.colors,
+      numColors: genPixlesParams.numColors,
     });
   }, [initType]);
   // // console.log(genPixlesParams.type);
@@ -125,7 +140,9 @@ const Viewer = ({
     genPixlesParams.canHeight,
     genPixlesParams.widthScale,
     genPixlesParams.heightScale,
-    genPixlesParams.arrayLength
+    genPixlesParams.arrayLength,
+    genPixlesParams.colors,
+    genPixlesParams.numColors
   );
 
   const interDrawOrbit = (re, im) => {
@@ -149,6 +166,8 @@ const Viewer = ({
       widthScale: genPixlesParams.widthScale,
       heightScale: genPixlesParams.heightScale,
       arrayLength: xRes * yRes * 4,
+      colors: genPixlesParams.colors,
+      numColors: genPixlesParams.numColors,
     });
   };
 
@@ -174,6 +193,8 @@ const Viewer = ({
       widthScale: genPixlesParams.widthScale,
       heightScale: genPixlesParams.heightScale,
       arrayLength: xRes * yRes * 4,
+      colors: genPixlesParams.colors,
+      numColors: genPixlesParams.numColors,
     });
   };
 
@@ -254,6 +275,8 @@ const Viewer = ({
       widthScale: widthScale,
       heightScale: heightScale,
       arrayLength: xRes * yRes * 4,
+      colors: genPixlesParams.colors,
+      numColors: genPixlesParams.numColors,
     });
 
     setPrevMandCords([
@@ -296,7 +319,6 @@ const Viewer = ({
         // p is array of two things to draw lines to for orbit
         // if is a workaround for too many rerenders
       } else if (!p.data) {
-        console.log(p);
         let tmp = canvasToPoint(
           p[0][1],
           p[0][1],
@@ -309,19 +331,19 @@ const Viewer = ({
           genPixlesParams.startX,
           genPixlesParams.startY
         );
-        console.log(
-          p[0][1],
-          p[0][1],
-          genPixlesParams.widthScale,
-          genPixlesParams.heightScale,
-          xRes,
-          yRes,
-          clinetDims.width,
-          clinetDims.height,
-          genPixlesParams.startX,
-          genPixlesParams.startY
-        );
-        console.log(tmp[0], tmp[1]);
+        // console.log(
+        //   p[0][1],
+        //   p[0][1],
+        //   genPixlesParams.widthScale,
+        //   genPixlesParams.heightScale,
+        //   xRes,
+        //   yRes,
+        //   clinetDims.width,
+        //   clinetDims.height,
+        //   genPixlesParams.startX,
+        //   genPixlesParams.startY
+        // );
+        // console.log(tmp[0], tmp[1]);
         ctx.moveTo(tmp[0], tmp[1]);
         ctx.beginPath();
         p.shift();
@@ -347,8 +369,6 @@ const Viewer = ({
       }
     }
   };
-
-  console.log(p);
 
   // RECTANGLE STUFF //
   /////////////////////////////////////////////

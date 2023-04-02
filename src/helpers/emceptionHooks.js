@@ -67,7 +67,7 @@ const useCompileCode = (code) => {
         await emception.fileSystem.writeFile("/working/main.cpp", code);
 
         // emcc -o mandlebrotCPP.js  main.cpp -O3  -s NO_EXIT_RUNTIME=1 -s "EXPORTED_RUNTIME_METHODS=['ccall','cwrap']" -s "EXPORTED_FUNCTIONS=['_malloc', '_free', _genPixles]" -s MODULARIZE=1 -s "EXPORT_NAME='createModule'" -s ALLOW_MEMORY_GROWTH
-        const cmd = `emcc -O3 -sSINGLE_FILE=1 -sNO_EXIT_RUNTIME=1 -sEXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -sEXPORT_ES6=1 -sUSE_ES6_IMPORT_META=0 -sEXPORTED_FUNCTIONS=['_malloc','_free','_genPixles','_orbit']  -sMODULARIZE=1 -sEXPORT_NAME='createModule' -s ENVIRONMENT='web' -sALLOW_MEMORY_GROWTH main.cpp -o main.mjs`;
+        const cmd = `emcc -O3 -sSINGLE_FILE=1 -sNO_EXIT_RUNTIME=1 -sEXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -sEXPORT_ES6=1 -sUSE_ES6_IMPORT_META=0 -sEXPORTED_FUNCTIONS=['_malloc','_free','_genPixles','_orbit','setValue']  -sMODULARIZE=1 -sEXPORT_NAME='createModule' -s ENVIRONMENT='web' -sALLOW_MEMORY_GROWTH main.cpp -o main.mjs`;
         const result = await emception.run(cmd);
         if (result.returncode == 0) {
           write("compile succesfull");
@@ -113,12 +113,15 @@ const useGenPixles = (
   canHeight,
   widthScale,
   heightScale,
-  arrayLength
+  arrayLength,
+  colors,
+  numColors
 ) => {
   // state and such here
   // this triggers a re render of "host" component (viewer) so won't need to even have this anywhere in viewer
   const content = useCompileStore((state) => state.content);
   const [pixels, setPixles] = useState(null);
+
   // these don't even need to be refs
   //const module = useRef(null);
   // const genPixles = useRef(null);
@@ -138,6 +141,10 @@ const useGenPixles = (
 
         if (type === 0 || type === 1) {
           let genPixles = Module.cwrap("genPixles", "null", [
+            "number",
+            "number",
+            "number",
+            "number",
             "number",
             "number",
             "number",
@@ -187,6 +194,26 @@ const useGenPixles = (
           arrayLength * Uint8Array.BYTES_PER_ELEMENT
         );
 
+        let reds = [];
+        let greens = [];
+        let blues = [];
+
+        colors.forEach((color) => {
+          reds.push(color[0]);
+          greens.push(color[1]);
+          blues.push(color[2]);
+        });
+
+        let redPtr = Module._malloc(numColors * Uint8Array.BYTES_PER_ELEMENT);
+        let bluePtr = Module._malloc(numColors * Uint8Array.BYTES_PER_ELEMENT);
+        let greenPtr = Module._malloc(numColors * Uint8Array.BYTES_PER_ELEMENT);
+
+        for (let i = 0; i < numColors; i++) {
+          Module.setValue(redPtr + i, reds[i], "i8");
+          Module.setValue(bluePtr + i, blues[i], "i8");
+          Module.setValue(greenPtr + i, greens[i], "i8");
+        }
+
         /////// CALL FCN ///////
         await fcn(
           type,
@@ -205,7 +232,11 @@ const useGenPixles = (
           canHeight,
           widthScale,
           heightScale,
-          dataheap.byteOffset
+          dataheap.byteOffset,
+          numColors,
+          redPtr,
+          greenPtr,
+          bluePtr
         );
         write("pixel array generated");
 
@@ -227,6 +258,9 @@ const useGenPixles = (
         // free the memory
         // Module._free(Module.HEAPU8.buffer);
         Module._free(Module.HEAPU8.buffer);
+        Module._free(redPtr);
+        Module._free(greenPtr);
+        Module._free(bluePtr);
 
         // create the image
         let data = new ImageData(pixelArray, canWidth, canHeight);
@@ -320,6 +354,8 @@ const useGenPixles = (
     heightScale,
     arrayLength,
     content,
+    colors,
+    numColors,
   ]);
   return pixels;
 };
