@@ -1,0 +1,15 @@
+#slider-cont {
+  display: flex;
+  flex-direction: column;
+  min-width: 400px;
+}
+
+#colors-cont {
+  width: max-content;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.hue-picker {
+  margin-bottom: 10px;
+}

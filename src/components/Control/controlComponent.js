@@ -7,9 +7,8 @@ import { useCompileStore } from "../../store/zustandTest.js";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import useCgen from "../../helpers/cgenHook";
-import Terminal from "../Console/myTermComponent";
 import Header from "../Header/headerComponent";
-import Modal from "react-bootstrap/Modal";
+import ColorPicker from "../Colors/SliderComponent";
 function Control({}) {
   const inputRef = useRef(null);
 
@@ -37,6 +36,8 @@ function Control({}) {
   const [script, setScript] = useState(null);
 
   const codeRef = useRef(null);
+
+  const [numColors, setNumColors] = useState(10);
 
   function handleReset() {
     // console.log(CpxMaxRef);
@@ -170,7 +171,15 @@ function Control({}) {
               Show cpx
             </Button>
           </Form>
+          <Form.Control
+            onChange={(evt) => setNumColors(evt.target.value)}
+            type="number"
+            defaultValue={numColors}
+            placeholder="Enter number of colors"
+          ></Form.Control>
+          <ColorPicker num={numColors} />
         </div>
+
         {/* the key is what triggers a re render type thing, we don't want back there, becuase then the whole thing will start over */}
         <Viewer
           key={

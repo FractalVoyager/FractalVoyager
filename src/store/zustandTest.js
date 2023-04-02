@@ -36,6 +36,12 @@ const useTermStore = create((set) => ({
   write: (newText) => set({ text: newText }),
 }));
 
-export { useDimStore, useCompileStore, useTermStore };
+const useColorsStore = create((set) => ({
+  amt: null,
+  colors: null,
+  set: (colors, len) => set({ amt: len, colors: colors }),
+}));
+
+export { useDimStore, useCompileStore, useTermStore, useColorsStore };
 
 //const useClickStore = create((set))
