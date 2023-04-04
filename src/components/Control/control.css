@@ -1,8 +1,7 @@
 #controls {
   /* float: right; */
-  flex-grow: 1;
-  flex-shrink: 1;
-  flex-basis: 25%;
+  flex-basis: 50%;
+  margin-left: 5px;
   display: flex;
   flex-direction: column;
   /* padding: 10px; */

@@ -10,6 +10,8 @@ const Canvas = ({
   draw,
   xRes,
   yRes,
+  maxWidth,
+  maxHeight,
   className,
   id,
   options,
@@ -19,11 +21,13 @@ const Canvas = ({
 }) => {
   const canRef = useCanvas(draw, options);
 
+  console.log(maxWidth, maxHeight, "maxes!");
+
+  let styWidth = maxWidth;
+  let styHeight = maxHeight;
+
   // let styWidth = window.innerWidth * 0.8;
   // let styHeight = window.innerHeight * 0.8;
-
-  let styWidth = window.innerWidth * 0.8;
-  let styHeight = window.innerHeight * 0.8;
 
   // we need to cut some off the width - css
   if (styWidth / styHeight > xRes / yRes) {
