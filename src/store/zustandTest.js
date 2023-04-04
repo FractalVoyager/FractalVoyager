@@ -42,6 +42,17 @@ const useColorsStore = create((set) => ({
   set: (colors, len) => set({ amt: len, colors: colors }),
 }));
 
-export { useDimStore, useCompileStore, useTermStore, useColorsStore };
+const useBackState = create((set) => ({
+  allowed: false,
+  setAllowed: (bool) => set({ allowed: bool }),
+}));
+
+export {
+  useDimStore,
+  useCompileStore,
+  useTermStore,
+  useColorsStore,
+  useBackState,
+};
 
 //const useClickStore = create((set))

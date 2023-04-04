@@ -3,12 +3,15 @@ import { useRef, useState } from "react";
 import Viewer from "../Viewer/viewerComponent";
 // import { Button, TextField } from "@mui/material";
 import { useCompileCode } from "../../helpers/emceptionHooks";
-import { useCompileStore } from "../../store/zustandTest.js";
+import { useBackState, useCompileStore } from "../../store/zustandTest.js";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import useCgen from "../../helpers/cgenHook";
 import Header from "../Header/headerComponent";
 import ColorPicker from "../Colors/SliderComponent";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 function Control({}) {
   const inputRef = useRef(null);
 
@@ -37,7 +40,7 @@ function Control({}) {
 
   const codeRef = useRef(null);
 
-  const [numColors, setNumColors] = useState(10);
+  const [numColors, setNumColors] = useState(50);
 
   function handleReset() {
     // console.log(CpxMaxRef);
@@ -87,8 +90,8 @@ function Control({}) {
   function handleBack() {
     setBack((prev) => prev + 1);
   }
-
-  const ready = useCompileStore((state) => state.ready);
+  const backReady = useBackState((state) => state.allowed);
+  const compileReady = useCompileStore((state) => state.ready);
   codeRef.current = useCgen(script);
   // the retun val is a test~~~!!!!
   useCompileCode(codeRef.current);
@@ -98,86 +101,127 @@ function Control({}) {
       <div id="control-viewer">
         <div id="controls">
           <Header />
-          <Form id="script-form">
-            <Form.Group>
-              <Form.Control
-                as="textarea"
-                ref={inputRef}
-                type="text"
-                placeholder="Enter Script"
-                id="script-area"
-              ></Form.Control>
-            </Form.Group>
-            {ready ? (
-              <Button
-                variant="primary"
-                onClick={() => {
-                  setScript(inputRef.current.value);
-                }}
-              >
-                Compile & Run
-              </Button>
-            ) : (
-              <Button
-                variant="primary"
-                disabled
-                onClick={() => {
-                  setScript(inputRef.current.value);
-                }}
-              >
-                Compile & Run
-              </Button>
-            )}
-          </Form>
+          <Container fluid>
+            <Row>
+              <Col>
+                <Form id="script-form">
+                  <Form.Group>
+                    <Form.Control
+                      as="textarea"
+                      ref={inputRef}
+                      type="text"
+                      placeholder="Enter Script"
+                      id="script-area"
+                    ></Form.Control>
+                  </Form.Group>
+                  {compileReady ? (
+                    <Button
+                      variant="primary"
+                      onClick={() => {
+                        setScript(inputRef.current.value);
+                      }}
+                    >
+                      Compile & Run
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="primary"
+                      disabled
+                      onClick={() => {
+                        setScript(inputRef.current.value);
+                      }}
+                    >
+                      Compile & Run
+                    </Button>
+                  )}
+                </Form>
 
-          <Form id="viewer-form">
-            <Button variant="primary" onClick={handleBack}>
-              Back
-            </Button>
-            <Form.Group>
+                <Form>
+                  <Form.Group>
+                    <Form.Label>Max Radius</Form.Label>
+                    <Form.Control></Form.Control>
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Label>Min Radius</Form.Label>
+                    <Form.Control></Form.Control>
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Label>Epsilon</Form.Label>
+                    <Form.Control></Form.Control>
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Label>Max Iterations</Form.Label>
+                    <Form.Control></Form.Control>
+                  </Form.Group>
+                </Form>
+              </Col>
+              <Col>
+                <Form id="viewer-form">
+                  {backReady ? (
+                    <Button variant="primary" onClick={handleBack}>
+                      Back
+                    </Button>
+                  ) : (
+                    <Button variant="primary" disabled onClick={handleBack}>
+                      Back
+                    </Button>
+                  )}
+                  <Button variant="primary">Forward</Button>
+
+                  <Form.Group>
+                    <Form.Control
+                      ref={RealMinRef}
+                      type="text"
+                      placeholder="Real axis min value (default is -2)"
+                    ></Form.Control>
+                    <Form.Control
+                      ref={RealMaxRef}
+                      type="text"
+                      placeholder="Real axis max value (default is 2)"
+                    ></Form.Control>
+                    <Form.Control
+                      ref={CpxMinRef}
+                      type="text"
+                      placeholder="Complex axis min value (default is -2)"
+                    ></Form.Control>
+                    <Form.Control
+                      ref={CpxMaxRef}
+                      type="text"
+                      placeholder="Complex axis max value (default is 2)"
+                    ></Form.Control>
+                    <Form.Control
+                      ref={yResRef}
+                      type="text"
+                      placeholder="Y axis resolution (default is 2160px)"
+                    ></Form.Control>
+                    <Button variant="primary" onClick={handleReset}>
+                      Reset
+                    </Button>
+                    <Button variant="primary">Update</Button>
+                  </Form.Group>
+                  <Button
+                    variant="primary"
+                    onClick={() => setShowCords((prev) => !prev)}
+                  >
+                    Show cpx
+                  </Button>
+                </Form>
+                <Form>
+                  <Form.Control placeholder="real part"></Form.Control>
+                  <Form.Control placeholder="imag part"></Form.Control>
+                  <Button variant="primary">Generate Dynaical Space</Button>
+                </Form>
+              </Col>
+
               <Form.Control
-                ref={RealMinRef}
-                type="text"
-                placeholder="Real axis min value (default is -2)"
+                onChange={(evt) => setNumColors(evt.target.value)}
+                type="number"
+                defaultValue={numColors}
+                placeholder="Enter number of colors"
               ></Form.Control>
-              <Form.Control
-                ref={RealMaxRef}
-                type="text"
-                placeholder="Real axis max value (default is 2)"
-              ></Form.Control>
-              <Form.Control
-                ref={CpxMinRef}
-                type="text"
-                placeholder="Complex axis min value (default is -2)"
-              ></Form.Control>
-              <Form.Control
-                ref={CpxMaxRef}
-                type="text"
-                placeholder="Complex axis max value (default is 2)"
-              ></Form.Control>
-              <Form.Control
-                ref={yResRef}
-                type="text"
-                placeholder="Y axis resolution (default is 2160px)"
-              ></Form.Control>
-              <Button variant="primary" onClick={handleReset}>
-                Reset
-              </Button>
-            </Form.Group>
-            <Button
-              variant="primary"
-              onClick={() => setShowCords((prev) => !prev)}
-            >
-              Show cpx
-            </Button>
-          </Form>
-          <Form.Control
-            onChange={(evt) => setNumColors(evt.target.value)}
-            type="number"
-            defaultValue={numColors}
-            placeholder="Enter number of colors"
-          ></Form.Control>
-          <ColorPicker num={numColors} />
+              <ColorPicker num={numColors} />
+            </Row>
+          </Container>
         </div>
 
         {/* the key is what triggers a re render type thing, we don't want back there, becuase then the whole thing will start over */}

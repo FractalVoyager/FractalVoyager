@@ -1,13 +1,13 @@
 import Canvas from "./canvasComponent";
 import "./viewer.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import CordsBox from "../CordsBox/cordsBoxComponent";
 import {
   canvasToComplex,
   complexToCanvas,
   canvasToPoint,
 } from "../../helpers/util";
-import { useCompileStore } from "../../store/zustandTest.js";
+import { useBackState, useCompileStore } from "../../store/zustandTest.js";
 import { useGenPixles } from "../../helpers/emceptionHooks";
 import { useColorsStore } from "../../store/zustandTest.js";
 
@@ -34,8 +34,12 @@ const Viewer = ({
     },
   ]);
 
+  const wrapperRef = useRef(null);
+
   // should always start with 0
   const [hereBack, setHereBack] = useState(back);
+
+  const setBackOk = useBackState((state) => state.setAllowed);
   // this works but inst going into genPIxlesParams
   const initType = useCompileStore((state) => state.initialType);
 
@@ -316,6 +320,14 @@ const Viewer = ({
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.putImageData(p, 0, 0);
 
+        console.log(paramsStack);
+
+        if (paramsStack.length >= 1) {
+          setBackOk(true);
+        } else {
+          setBackOk(false);
+        }
+
         // p is array of two things to draw lines to for orbit
         // if is a workaround for too many rerenders
       } else if (!p.data) {
@@ -526,10 +538,10 @@ const Viewer = ({
         genPixlesParams.startY;
 
       const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
-      console.log(e.nativeEvent.offsetX);
-      console.log(e.nativeEvent.offsetY);
-      console.log("before anything", re, im, canX, canY);
-      console.log(complexToCanvas(re, im, xRes, yRes));
+      // console.log(e.nativeEvent.offsetX);
+      // console.log(e.nativeEvent.offsetY);
+      // console.log("before anything", re, im, canX, canY);
+      // console.log(complexToCanvas(re, im, xRes, yRes));
       // console.log("TESTING", re, im, canX, canY);
       // console.log(complexToCanvas(re, im, xRes, yRes));
       // to prevent "dobule drawn" julia sets, if this is false, then we should do the orbit
@@ -554,28 +566,42 @@ const Viewer = ({
   return (
     <>
       <div id="viewer">
-        <div id="outer-cans">
-          <Canvas
-            className="can"
-            options={orbitOpts}
-            draw={drawMand}
-            xRes={xRes}
-            yRes={yRes}
-            id="mandCan"
-          />
-          <Canvas
-            className="can"
-            xRes={xRes}
-            yRes={yRes}
-            draw={drawing && isDown ? drawRect : clearRect}
-            id="rectCan"
-            options={rectOpts}
-            mouseDown={(e) => mouseDown(e)}
-            mouseMove={(e) =>
-              isDown ? mouseMove(e) : showCords ? mouseMoveCalcCords(e) : null
-            }
-            mouseUp={(e) => mouseUp(e)}
-          />
+        <div id="outer-cans" ref={wrapperRef}>
+          {wrapperRef.current ? (
+            <>
+              <Canvas
+                className="can"
+                options={orbitOpts}
+                draw={drawMand}
+                xRes={xRes}
+                yRes={yRes}
+                maxWidth={wrapperRef.current.clientWidth}
+                maxHeight={wrapperRef.current.clientHeight}
+                id="mandCan"
+              />
+              <Canvas
+                className="can"
+                xRes={xRes}
+                yRes={yRes}
+                maxWidth={wrapperRef.current.clientWidth}
+                maxHeight={wrapperRef.current.clientHeight}
+                draw={drawing && isDown ? drawRect : clearRect}
+                id="rectCan"
+                options={rectOpts}
+                mouseDown={(e) => mouseDown(e)}
+                mouseMove={(e) =>
+                  isDown
+                    ? mouseMove(e)
+                    : showCords
+                    ? mouseMoveCalcCords(e)
+                    : null
+                }
+                mouseUp={(e) => mouseUp(e)}
+              />
+            </>
+          ) : (
+            ""
+          )}
         </div>
         <CordsBox display={showCords} cords={displayCords} id="cords-box" />
       </div>
