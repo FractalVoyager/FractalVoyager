@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { HuePicker } from "react-color";
-import chroma from "chroma-js";
 import ColorDisplayer from "./ColorDisplayComponent";
 import "./colors.css";
 import { useColorsStore } from "../../store/zustandTest";
