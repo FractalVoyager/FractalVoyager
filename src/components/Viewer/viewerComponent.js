@@ -11,6 +11,9 @@ import { useBackState, useCompileStore } from "../../store/zustandTest.js";
 import { useGenPixles } from "../../helpers/emceptionHooks";
 import { useColorsStore } from "../../store/zustandTest.js";
 
+/*
+
+*/
 const Viewer = ({
   xRes,
   yRes,
@@ -621,7 +624,12 @@ const Viewer = ({
             ""
           )}
         </div>
-        <CordsBox display={showCords} cords={displayCords} id="cords-box" />
+        <div id="lower-cont">
+          <a href="#" id="down">
+            Download
+          </a>
+          <CordsBox display={showCords} cords={displayCords} id="cords-box" />
+        </div>
       </div>
     </>
   );

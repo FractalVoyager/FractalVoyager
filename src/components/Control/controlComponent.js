@@ -1,7 +1,6 @@
 import "./control.css";
 import { useRef, useState } from "react";
 import Viewer from "../Viewer/viewerComponent";
-// import { Button, TextField } from "@mui/material";
 import { useCompileCode } from "../../helpers/emceptionHooks";
 import { useBackState, useCompileStore } from "../../store/zustandTest.js";
 import Form from "react-bootstrap/Form";
@@ -12,12 +11,31 @@ import ColorPicker from "../Colors/SliderComponent";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { scale } from "chroma-js";
+
+/*
+Props: none 
+Returns: header, all buttons and controls for fractal, viewer component
+Description: 
+*/
+
 function Control({}) {
+  // * refs * //
+  // script
   const inputRef = useRef(null);
+  // axeses - refs start as the default values set in the component
+  const RealMinRef = useRef(-2);
+  const CpxMinRef = useRef(2);
+  const RealMaxRef = useRef(-2);
+  const CpxMaxRef = useRef(2);
+  // y axis resolution  - x is calulated from this
+  const yResRef = useRef(2160);
 
+  // * local state * //
+  // passed as prop to viewer to know wether to go back or not
   const [back, setBack] = useState(0);
-
+  // if cpx cords are shown - default true
+  const [showCords, setShowCords] = useState(true);
+  // resolution state - starts as default values
   const [res, setRes] = useState({
     x: 2160,
     y: 2160,
@@ -26,16 +44,6 @@ function Control({}) {
     startX: -1080,
     startY: -1080,
   });
-
-  const RealMinRef = useRef(-1);
-  const CpxMinRef = useRef(-1);
-
-  const RealMaxRef = useRef(1);
-  const CpxMaxRef = useRef(1);
-
-  const yResRef = useRef(null);
-
-  const [showCords, setShowCords] = useState(false);
 
   const [script, setScript] = useState(null);
 
@@ -95,12 +103,48 @@ function Control({}) {
   function handlePan(direction) {
     switch (direction) {
       case "left":
+        setRes({
+          x: res.x,
+          y: res.y,
+          scaleX: res.scaleX,
+          scaleY: res.scaleY,
+          startX: res.startX - (res.x / 2) * res.scaleX,
+          startY: res.startY,
+        });
+        break;
 
       case "right":
+        setRes({
+          x: res.x,
+          y: res.y,
+          scaleX: res.scaleX,
+          scaleY: res.scaleY,
+          startX: res.startX + (res.x / 2) * res.scaleX,
+          startY: res.startY,
+        });
+        break;
 
       case "up":
+        setRes({
+          x: res.x,
+          y: res.y,
+          scaleX: res.scaleX,
+          scaleY: res.scaleY,
+          startX: res.startX,
+          startY: res.startY - (res.y / 2) * res.scaleY,
+        });
+        break;
 
       case "down":
+        setRes({
+          x: res.x,
+          y: res.y,
+          scaleX: res.scaleX,
+          scaleY: res.scaleY,
+          startX: res.startX,
+          startY: res.startY + (res.y / 2) * res.scaleY,
+        });
+        break;
 
       default:
         return;
@@ -121,6 +165,8 @@ function Control({}) {
         scaleY: scaleY * 0.5,
         startX: (startX + res.x / 2) / 2,
         startY: (startY + res.y / 2) / 2,
+        // startX: (startX + (res.x + startX * scaleX * 0.5) / 2) / 2,
+        // startY: (startY + (res.y + startY * scaleY * 0.5) / 2) / 2,
       });
 
       // this works - ust doest seem like it since scales and stuff in here doesn't get updated after they change in viewer component
@@ -237,6 +283,7 @@ function Control({}) {
                     <Form.Control
                       ref={RealMinRef}
                       type="text"
+                      defaultValue={2}
                       placeholder="Real axis min value (default is -2)"
                     ></Form.Control>
                     <Form.Control
@@ -297,7 +344,8 @@ function Control({}) {
             res.scaleX ||
             res.scaleY ||
             res.startX ||
-            res.startY
+            res.startY ||
+            showCords
           }
           xRes={res.x}
           yRes={res.y}
