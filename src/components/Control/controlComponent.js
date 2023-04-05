@@ -260,11 +260,11 @@ function Control({}) {
         {/* the key is what triggers a re render type thing, we don't want back there, becuase then the whole thing will start over */}
         <Viewer
           key={
-            res.x &&
-            res.y &&
-            res.scaleX &&
-            res.scaleY &&
-            res.startX &&
+            res.x ||
+            res.y ||
+            res.scaleX ||
+            res.scaleY ||
+            res.startX ||
             res.startY
           }
           xRes={res.x}

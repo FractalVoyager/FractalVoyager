@@ -62,6 +62,19 @@ const Viewer = ({
     }
   }, [back]);
 
+  // TESTING FOR FIXING ZOOMS
+  useEffect(() => {
+    setGenPixlesParams({
+      ...genPixlesParams,
+      widthScale: initXscale,
+      heightScale: initYscale,
+      startX: initStartX,
+      startY: initStartY,
+      canWidth: xRes,
+      canHeight: yRes,
+    });
+  }, [xRes, yRes, initXscale, initYscale, initStartX, initStartY]);
+
   const [paramsStack, setParamsStack] = useState([]);
 
   const [clinetDims, setClientDims] = useState({
