@@ -53,7 +53,6 @@ const useCgen = (script) => {
     // }
     myCreateModule();
   }, [script]);
-  console.log(code);
   return code;
 };
 

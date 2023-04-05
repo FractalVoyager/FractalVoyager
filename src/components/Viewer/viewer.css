@@ -17,8 +17,11 @@
 }
 
 #viewer {
+  /* flex-basis: 50%; */
+  /* flex-grow: 0; */
   flex-basis: 50%;
   margin-right: 5px;
+  /* flex-shrink: 4; */
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -28,6 +31,13 @@
 
 #outer-cans {
   flex-grow: 6;
+}
+
+#lower-cont {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+  align-items: flex-end;
 }
 
 #cords-box {
