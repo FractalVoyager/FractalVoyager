@@ -12,6 +12,7 @@ import ColorPicker from "../Colors/SliderComponent";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { scale } from "chroma-js";
 function Control({}) {
   const inputRef = useRef(null);
 
@@ -91,9 +92,26 @@ function Control({}) {
     setBack((prev) => prev + 1);
   }
 
+  function handlePan(direction) {
+    switch (direction) {
+      case "left":
+
+      case "right":
+
+      case "up":
+
+      case "down":
+
+      default:
+        return;
+    }
+  }
+
   function handleZoom(zoomIn) {
     let scaleX = res.scaleX;
     let scaleY = res.scaleY;
+    let startX = res.startX;
+    let startY = res.startY;
 
     if (zoomIn) {
       setRes({
@@ -101,17 +119,19 @@ function Control({}) {
         y: res.y,
         scaleX: scaleX * 0.5,
         scaleY: scaleY * 0.5,
-        startX: res.startX,
-        startY: res.startY,
+        startX: (startX + res.x / 2) / 2,
+        startY: (startY + res.y / 2) / 2,
       });
+
+      // this works - ust doest seem like it since scales and stuff in here doesn't get updated after they change in viewer component
     } else {
       setRes({
         x: res.x,
         y: res.y,
         scaleX: scaleX * 2,
         scaleY: scaleY * 2,
-        startX: res.startX,
-        startY: res.startY,
+        startX: startX * 2 - res.x / 2,
+        startY: startY * 2 - res.y / 2,
       });
     }
   }
@@ -185,6 +205,18 @@ function Control({}) {
                   </Button>
                   <Button variant="primary" onClick={() => handleZoom(false)}>
                     -
+                  </Button>
+                  <Button variant="primary" onClick={() => handlePan("left")}>
+                    left
+                  </Button>
+                  <Button variant="primary" onClick={() => handlePan("right")}>
+                    right
+                  </Button>
+                  <Button variant="primary" onClick={() => handlePan("up")}>
+                    up
+                  </Button>
+                  <Button variant="primary" onClick={() => handlePan("down")}>
+                    down
                   </Button>
                 </Form>
               </Col>
