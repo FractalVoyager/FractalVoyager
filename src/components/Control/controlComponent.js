@@ -90,6 +90,31 @@ function Control({}) {
   function handleBack() {
     setBack((prev) => prev + 1);
   }
+
+  function handleZoom(zoomIn) {
+    let scaleX = res.scaleX;
+    let scaleY = res.scaleY;
+
+    if (zoomIn) {
+      setRes({
+        x: res.x,
+        y: res.y,
+        scaleX: scaleX * 0.5,
+        scaleY: scaleY * 0.5,
+        startX: res.startX,
+        startY: res.startY,
+      });
+    } else {
+      setRes({
+        x: res.x,
+        y: res.y,
+        scaleX: scaleX * 2,
+        scaleY: scaleY * 2,
+        startX: res.startX,
+        startY: res.startY,
+      });
+    }
+  }
   const backReady = useBackState((state) => state.allowed);
   const compileReady = useCompileStore((state) => state.ready);
   codeRef.current = useCgen(script);
@@ -153,6 +178,14 @@ function Control({}) {
                     <Form.Label>Max Iterations</Form.Label>
                     <Form.Control></Form.Control>
                   </Form.Group>
+                </Form>
+                <Form>
+                  <Button variant="primary" onClick={() => handleZoom(true)}>
+                    +
+                  </Button>
+                  <Button variant="primary" onClick={() => handleZoom(false)}>
+                    -
+                  </Button>
                 </Form>
               </Col>
               <Col>
@@ -227,11 +260,11 @@ function Control({}) {
         {/* the key is what triggers a re render type thing, we don't want back there, becuase then the whole thing will start over */}
         <Viewer
           key={
-            res.x ||
-            res.y ||
-            res.scaleX ||
-            res.scaleY ||
-            res.startX ||
+            res.x &&
+            res.y &&
+            res.scaleX &&
+            res.scaleY &&
+            res.startX &&
             res.startY
           }
           xRes={res.x}

@@ -34,6 +34,8 @@ const Viewer = ({
     },
   ]);
 
+  console.log(initXscale, initYscale);
+
   const wrapperRef = useRef(null);
 
   // should always start with 0
@@ -98,6 +100,9 @@ const Viewer = ({
     colors: colors,
     numColors: numColors,
   });
+
+  console.log(genPixlesParams.widthScale);
+
   // // console.log(initType);
   // to reset genPIxlesParams with initType
   useEffect(() => {
