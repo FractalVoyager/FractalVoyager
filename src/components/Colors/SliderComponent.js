@@ -16,9 +16,9 @@ function ColorPicker({ num }) {
   // setWidth(wrapperRef.current.clientWidth);
   const [width, setWidth] = useState(null);
 
-  console.log(selectedColor);
+  // console.log((selectedColor);
 
-  // console.log(wrapperRef);
+  // // console.log((wrapperRef);
 
   // useEffect(() => {
   //   handle(selectedColor);
@@ -44,7 +44,7 @@ function ColorPicker({ num }) {
 
   // l of 10 to 90
 
-  // console.log(selectedColor);
+  // // console.log((selectedColor);
 
   return (
     <div id="slider-cont">

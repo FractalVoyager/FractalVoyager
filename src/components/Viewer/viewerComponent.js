@@ -48,9 +48,13 @@ const Viewer = ({
   const setAxises = useTmpParamsStore((state) => state.setAxises);
   const setAllTmpParamsStore = useTmpParamsStore((state) => state.setAll);
 
-  // // // console.log(initXscale, initYscale);
+  // // // // console.log(initXscale, initYscale);
 
   const wrapperRef = useRef(null);
+
+  // const [clearOribt, setClearOrbit] = useState(false);
+
+  const [oldOrbit, setOldOrbit] = useState(null);
 
   // should always start with 0
   const [hereBack, setHereBack] = useState(back);
@@ -67,15 +71,20 @@ const Viewer = ({
         (paramsStack.at(paramsStack.length - 1).type === 1 &&
           genPixlesParams.type === 1)
       ) {
-        // // // // // console.log("in if", prevMandCords);
+        // // // // // // console.log("in if", prevMandCords);
         setPrevMandCords((prevMandCords) => prevMandCords.slice(0, -1));
       }
+
+      // if (genPixlesParams.type == 2) {
+      //   // console.log("CONNNNNSSSOOLLLE");
+      //   setClearOrbit(true);
+      // }
 
       let params = paramsStack.pop();
 
       setGenPixlesParams(params);
       // now need to set the tmpParamStore to update the control
-      console.log("PPPPPPPP", params);
+      // console.log("PPPPPPPP", params);
       setAllTmpParamsStore(
         (params.widthScale * params.canWidth +
           params.startX -
@@ -103,17 +112,17 @@ const Viewer = ({
 
   // TESTING FOR FIXING ZOOMS
   useEffect(() => {
-    console.log("HERERERERR");
-    console.log(
-      xRes,
-      yRes,
-      initXscale,
-      initYscale,
-      initStartX,
-      initStartY,
-      colors,
-      numColors
-    );
+    // console.log("HERERERERR");
+    // console.log(
+    //   xRes,
+    //   yRes,
+    //   initXscale,
+    //   initYscale,
+    //   initStartX,
+    //   initStartY,
+    //   colors,
+    //   numColors
+    // );
     setGenPixlesParams({
       ...genPixlesParams,
       widthScale: initXscale,
@@ -187,15 +196,15 @@ const Viewer = ({
     //orbitNum: orbitNum,
   });
 
-  // // // console.log(genPixlesParams.widthScale);
+  // // // // console.log(genPixlesParams.widthScale);
 
-  // // // // // console.log(initType);
+  // // // // // // console.log(initType);
   // to reset genPIxlesParams with initType
   useEffect(() => {
     setGenPixlesParams({ ...genPixlesParams, type: initType });
   }, [initType]);
-  // // // // // console.log(genPixlesParams.type);
-  console.log("PARAMS IN VIEWER", genPixlesParams);
+  // // // // // // console.log(genPixlesParams.type);
+  // console.log("PARAMS IN VIEWER", genPixlesParams);
 
   let p = useGenPixles(
     genPixlesParams.type,
@@ -221,9 +230,11 @@ const Viewer = ({
     genPixlesParams.orbitNum
   );
 
-  console.log("PPPPPPPPP", p);
+  // console.log("PPPPPPPPP", p);
 
   const interDrawOrbit = (re, im) => {
+    console.log("inter draw orbit");
+    // setClearOrbit(true);
     setParamsStack([...paramsStack, genPixlesParams]);
     setGenPixlesParams({
       ...genPixlesParams,
@@ -249,11 +260,11 @@ const Viewer = ({
     // it is called on mouse up
     // will always be on second iteration
 
-    // // // // // console.log("inter draw mand");
+    // // // // // // console.log("inter draw mand");
 
-    console.log("inter draw mand");
+    // console.log("inter draw mand");
 
-    console.log(startX, startY, endX, endY);
+    // console.log(startX, startY, endX, endY);
 
     // add last p to the stack
     setParamsStack([...paramsStack, genPixlesParams]);
@@ -270,7 +281,7 @@ const Viewer = ({
     let widthScale = width / xRes;
     let heightScale = height / yRes;
 
-    // // // // // // console.log(prevMandCords);
+    // // // // // // // console.log(prevMandCords);
 
     startX =
       prevMandCords.at(-1).widthScale * startX + prevMandCords.at(-1).startX;
@@ -349,10 +360,15 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
   };
 
   const drawOrbit = (ctx) => {
-    // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    if (p === oldOrbit) {
+      return;
+    }
+    console.log(p);
+
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
     if (p && !p.data && p.length > 0) {
-      console.log("HHHHH", p);
-      // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      // console.log("HHHHH", p);
       let tmp = canvasToPoint(
         p[0][1],
         p[0][1],
@@ -366,10 +382,10 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
         genPixlesParams.startY
       );
 
-      // // // // console.log(tmp[0], tmp[1]);
+      // // // // // console.log(tmp[0], tmp[1]);
       ctx.moveTo(tmp[0], tmp[1]);
       ctx.beginPath();
-      p.shift();
+      // p.shift();
       p.forEach((cords) => {
         let tmp = canvasToPoint(
           cords[0],
@@ -383,12 +399,14 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
           genPixlesParams.startX,
           genPixlesParams.startY
         );
-        // // // console.log(tmp[0], tmp[1]);
+        // // // // console.log(tmp[0], tmp[1]);
         ctx.lineTo(tmp[0], tmp[1]);
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(tmp[0], tmp[1]);
       });
+
+      setOldOrbit(p);
     }
   };
 
@@ -415,10 +433,13 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
 
     if (p) {
       if (genPixlesParams.type === 0 || genPixlesParams.type === 1) {
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        ctx.putImageData(p, 0, 0);
+        // attempt to fix break after back in first orbit - worked!!!!
+        if (p.data) {
+          ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+          ctx.putImageData(p, 0, 0);
+        }
 
-        // // // console.log(paramsStack);
+        // // // // console.log(paramsStack);
 
         if (paramsStack.length >= 1) {
           setBackOk(true);
@@ -429,7 +450,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
         // p is array of two things to draw lines to for orbit
         // if is a workaround for too many rerenders
       } else if (!p.data) {
-        console.log("HHHHH", p);
+        // console.log("HHHHH", p);
         // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         // let tmp = canvasToPoint(
         //   p[0][1],
@@ -443,7 +464,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
         //   genPixlesParams.startX,
         //   genPixlesParams.startY
         // );
-        // // // // // console.log(
+        // // // // // // console.log(
         // //   p[0][1],
         // //   p[0][1],
         // //   genPixlesParams.widthScale,
@@ -455,7 +476,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
         // //   genPixlesParams.startX,
         // //   genPixlesParams.startY
         // // );
-        // // // // // console.log(tmp[0], tmp[1]);
+        // // // // // // console.log(tmp[0], tmp[1]);
         // ctx.moveTo(tmp[0], tmp[1]);
         // ctx.beginPath();
         // p.shift();
@@ -472,7 +493,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
         //     genPixlesParams.startX,
         //     genPixlesParams.startY
         //   );
-        //   // // // console.log(tmp[0], tmp[1]);
+        //   // // // // console.log(tmp[0], tmp[1]);
         //   ctx.lineTo(tmp[0], tmp[1]);
         //   ctx.stroke();
         //   ctx.beginPath();
@@ -537,12 +558,12 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
       y: parseInt(e.nativeEvent.offsetY), // * (yRes / rectCanvas.clientHeight), //+ parseInt(e.offsetY);
     });
     // the 3840/ 356 and 2160/ 200 is to convert from the pixel range to the css size range - 356 and 200 is size of the canvas in css pixels
-    setIsDown(true);
+    if (genPixlesParams.type == 0 || genPixlesParams.type == 1) setIsDown(true);
   }
 
   function mouseMoveCalcCords(e) {
     e.preventDefault();
-    // // // // // // console.log(clinetDims);
+    // // // // // // // console.log(clinetDims);
     // (widthScale * x) + startX)
     let canX =
       genPixlesParams.widthScale *
@@ -552,11 +573,11 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
       genPixlesParams.heightScale *
         (e.nativeEvent.offsetY * (yRes / clinetDims.height)) +
       genPixlesParams.startY;
-    //// // // // console.log("cans, ", canX, canY);
+    //// // // // // console.log("cans, ", canX, canY);
 
     if (showCords) {
       const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
-      //// // // // console.log("cords: ", re, im);
+      //// // // // // console.log("cords: ", re, im);
       setDisplayCords({ re: re, im: im });
     }
   }
@@ -580,7 +601,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
 
     if (showCords) {
       const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
-      // // // // // console.log("cords: ", re, im);
+      // // // // // // console.log("cords: ", re, im);
       setDisplayCords({ re: re, im: im });
     }
 
@@ -617,7 +638,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
       endY = tmpStart;
     }
 
-    console.log("BLAHHHHH", startX, startY, endX, endY);
+    // console.log("BLAHHHHH", startX, startY, endX, endY);
 
     // instead call a function to with these and set all variables used in genPixles hook at once,
     // make that function dshould be a hook but I don't think it needs to
@@ -646,17 +667,18 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
         genPixlesParams.startY;
 
       const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
-      // // // // console.log(e.nativeEvent.offsetX);
-      // // // // console.log(e.nativeEvent.offsetY);
-      // // // // console.log("before anything", re, im, canX, canY);
-      // // // // console.log(complexToCanvas(re, im, xRes, yRes));
-      // // // // console.log("TESTING", re, im, canX, canY);
-      // // // // console.log(complexToCanvas(re, im, xRes, yRes));
+      // // // // // console.log(e.nativeEvent.offsetX);
+      // // // // // console.log(e.nativeEvent.offsetY);
+      // // // // // console.log("before anything", re, im, canX, canY);
+      // // // // // console.log(complexToCanvas(re, im, xRes, yRes));
+      // // // // // console.log("TESTING", re, im, canX, canY);
+      // // // // // console.log(complexToCanvas(re, im, xRes, yRes));
       // to prevent "dobule drawn" julia sets, if this is false, then we should do the orbit
       if (genPixlesParams.type === 0) {
         interDrawJulia(re, im);
         // click in Julia
       } else if (genPixlesParams.type === 1 || genPixlesParams.type === 2) {
+        console.log("calling inter draw orbit");
         interDrawOrbit(re, im);
         // now orbit
       }

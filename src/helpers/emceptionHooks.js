@@ -196,7 +196,7 @@ const useGenPixles = (
         let reds = [];
         let greens = [];
         let blues = [];
-        console.log(colors);
+        // console.log((colors);
 
         colors.forEach((color) => {
           reds.push(color[0]);
@@ -294,7 +294,7 @@ const useGenPixles = (
         );
         Module._free(Module.HEAPF64.buffer);
         let orbitArr = tmpOrbitArray;
-        // console.log(orbitArr);
+        // // console.log((orbitArr);
 
         let newOrbit = [[]];
         orbitArr.forEach((val, idx, arr) => {
@@ -304,10 +304,10 @@ const useGenPixles = (
             );
           }
         });
-        // console.log(newOrbit);
+        // // console.log((newOrbit);
 
         // let newOrbit = orbitArr.reduce((acc, val, idx, arr) => {
-        //   // console.log(acc);
+        //   // // console.log((acc);
         //   if (val === 0 && arr[idx + 1] === 0) {
         //     return acc;
         //   }
@@ -320,9 +320,10 @@ const useGenPixles = (
         //     return acc;
         //   }
         // }, []);
-        // // console.log(newOrbit);
+        // // // console.log((newOrbit);
 
         setPixles(newOrbit);
+        console.log(newOrbit);
       }
     };
 
