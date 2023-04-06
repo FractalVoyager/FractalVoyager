@@ -98,7 +98,7 @@ extern "C" {
     std::stringstream bigLoops;
     // fcn defn
                                                                       // only need these fixed vars for clicked on dyn
-    bigLoops << "EMSCRIPTEN_KEEPALIVE void genPixles(int type, int color, double fixed_re, double fixed_im, int maxIters, double iterMult, double minRadius, double maxRadius, double startX, double startY, double newCanWidth, double newCanHeight, int width, int height, double widthScale, double heightScale, uint8_t *ptr, int numColors, uint8_t *redPtr, uint8_t *greenPtr, uint8_t *bluePtr)\n{\n";
+    bigLoops << "EMSCRIPTEN_KEEPALIVE void genPixles(int type, double fixed_re, double fixed_im, int maxIters, double epsilon, double minRadius, double maxRadius, double startX, double startY, double newCanWidth, double newCanHeight, int width, int height, double widthScale, double heightScale, uint8_t *ptr, int numColors, uint8_t *redPtr, uint8_t *greenPtr, uint8_t *bluePtr)\n{\n";
     bigLoops << "for (int x = 0; x < floor(newCanWidth); x++){\nfor (int y = 0; y < floor(newCanHeight); y++){\n double screen_re = (((widthScale * x) + startX) - width / 2.) / (width  /2.);\ndouble screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);\n";
     bigLoops << "int iterations;\nif(type == 0) {\niterations = calcPixel(0.,0.,screen_re,screen_im, maxIters, minRadius, maxRadius, type);\n} else if(type == 1) {\niterations = calcPixel(screen_re, screen_im, fixed_re, fixed_im, maxIters, minRadius, maxRadius, type);\n}\n";
 

@@ -21,7 +21,7 @@ const Canvas = ({
 }) => {
   const canRef = useCanvas(draw, options);
 
-  console.log(maxWidth, maxHeight, "maxes!");
+  // console.log(maxWidth, maxHeight, "maxes!");
 
   let styWidth = maxWidth;
   let styHeight = maxHeight;
@@ -44,7 +44,7 @@ const Canvas = ({
   // } else if (xRes / yRes < 3840 / 2160) {
   // }
 
-  // console.log(canRef);
+  // // console.log(canRef);
   // canRef.current.width = xRes;
   // canRef.currentheight = yRes;
 
