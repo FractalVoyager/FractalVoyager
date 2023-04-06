@@ -45,6 +45,7 @@ const Viewer = ({
   ]);
 
   const setAxises = useTmpParamsStore((state) => state.setAxises);
+  const setAllTmpParamsStore = useTmpParamsStore((state) => state.setAll);
 
   // // // console.log(initXscale, initYscale);
 
@@ -69,7 +70,32 @@ const Viewer = ({
         setPrevMandCords((prevMandCords) => prevMandCords.slice(0, -1));
       }
 
-      setGenPixlesParams(paramsStack.pop());
+      let params = paramsStack.pop();
+
+      setGenPixlesParams(params);
+      // now need to set the tmpParamStore to update the control
+      console.log("PPPPPPPP", params);
+      setAllTmpParamsStore(
+        (params.widthScale * params.canWidth +
+          params.startX -
+          params.canWidth / 2) /
+          (params.canWidth / 2),
+        (params.startX - params.canWidth / 2) / (params.canWidth / 2),
+        -(params.startY - params.canHeight / 2) / (params.canHeight / 2),
+        -(
+          params.heightScale * params.canHeight +
+          params.startY -
+          params.canHeight / 2
+        ) /
+          (params.canHeight / 2),
+        params.maxRadius,
+        params.minRadius,
+        params.epsilon,
+        params.maxIters,
+        params.canHeight
+      );
+
+      // setAllTmpParamsStore();
       setHereBack(back);
     }
   }, [back]);
@@ -103,6 +129,7 @@ const Viewer = ({
       epsilon: epsilon,
       minRadius: minRad,
       maxRadius: maxRad,
+      arrayLength: xRes * yRes * 4,
     });
   }, [
     xRes,
@@ -166,6 +193,7 @@ const Viewer = ({
     setGenPixlesParams({ ...genPixlesParams, type: initType });
   }, [initType]);
   // // // // // console.log(genPixlesParams.type);
+  console.log("PARAMS IN VIEWER", genPixlesParams);
   let p = useGenPixles(
     genPixlesParams.type,
     genPixlesParams.fixedVal[0],
@@ -219,6 +247,8 @@ const Viewer = ({
     // // // // // console.log("inter draw mand");
 
     console.log("inter draw mand");
+
+    console.log(startX, startY, endX, endY);
 
     // add last p to the stack
     setParamsStack([...paramsStack, genPixlesParams]);
@@ -486,8 +516,16 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
     // want to trigger a redraw - should do it by changing the draw function,
     // as change is props trigger re render
 
-    let canX = e.nativeEvent.offsetX * (xRes / clinetDims.width);
-    let canY = e.nativeEvent.offsetY * (yRes / clinetDims.height);
+    // let canX = e.nativeEvent.offsetX * (xRes / clinetDims.width);
+    // let canY = e.nativeEvent.offsetY * (yRes / clinetDims.height);
+    let canX =
+      genPixlesParams.widthScale *
+        (e.nativeEvent.offsetX * (xRes / clinetDims.width)) +
+      genPixlesParams.startX;
+    let canY =
+      genPixlesParams.heightScale *
+        (e.nativeEvent.offsetY * (yRes / clinetDims.height)) +
+      genPixlesParams.startY;
 
     if (showCords) {
       const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
@@ -528,7 +566,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
       endY = tmpStart;
     }
 
-    // so this isn't working
+    console.log("BLAHHHHH", startX, startY, endX, endY);
 
     // instead call a function to with these and set all variables used in genPixles hook at once,
     // make that function dshould be a hook but I don't think it needs to

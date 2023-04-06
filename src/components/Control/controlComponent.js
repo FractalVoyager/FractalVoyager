@@ -54,6 +54,7 @@ function Control({}) {
   const tmpParamsStore = useTmpParamsStore();
   const resetTmpGlobal = useTmpParamsStore((state) => state.reset);
   const setAlltmpParamsStore = useTmpParamsStore((state) => state.setAll);
+  const setAxises = useTmpParamsStore((state) => state.setAxises);
 
   // // console.log(colors);
   useEffect(() => {
@@ -265,28 +266,40 @@ function Control({}) {
   }
 
   function handleZoom(zoomIn) {
-    let scaleX = res.scaleX;
-    let scaleY = res.scaleY;
-    let startX = res.startX;
-    let startY = res.startY;
+    let scaleX = params.scaleX;
+    let scaleY = params.scaleY;
+    let startX = params.startX;
+    let startY = params.startY;
 
     if (zoomIn) {
-      setRes({
-        x: res.x,
-        y: res.y,
-        scaleX: scaleX * 0.5,
-        scaleY: scaleY * 0.5,
-        startX: (startX + res.x / 2) / 2,
-        startY: (startY + res.y / 2) / 2,
+      let scaleX = params.scaleX * 0.5;
+      let scaleY = params.scaleY * 0.5;
+      let startX = (params.startX + params.x / 2) / 2;
+      let startY = (params.startY + params.y / 2) / 2;
+      setParams({
+        ...params,
+        scaleX: scaleX,
+        scaleY: scaleY,
+        startX: startX,
+        startY: startY,
         // startX: (startX + (res.x + startX * scaleX * 0.5) / 2) / 2,
         // startY: (startY + (res.y + startY * scaleY * 0.5) / 2) / 2,
       });
+      setAxises(
+        (startX - params.x / 2) / (params.x / 2),
+        (scaleX * params.x + startX - params.x / 2) / (params.x / 2),
+        -(scaleY * params.y + startY - params.y / 2) / (params.y / 2),
+        -(startY - params.y / 2) / (params.y / 2)
+      );
 
       // this works - ust doest seem like it since scales and stuff in here doesn't get updated after they change in viewer component
     } else {
-      setRes({
-        x: res.x,
-        y: res.y,
+      let scaleX = params.scaleX;
+      let scaleY = params.scaleY;
+      let startX = params.startX;
+      let startY = params.startY;
+      setParams({
+        ...params,
         scaleX: scaleX * 2,
         scaleY: scaleY * 2,
         startX: startX * 2 - res.x / 2,
