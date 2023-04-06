@@ -56,7 +56,7 @@ function Control({}) {
   const setAlltmpParamsStore = useTmpParamsStore((state) => state.setAll);
   const setAxises = useTmpParamsStore((state) => state.setAxises);
 
-  // // console.log(colors);
+  // // // console.log((colors);
   useEffect(() => {
     setParams({ ...params, colors: colors, numColors: finalNumColors });
   }, [colors, finalNumColors]);
@@ -126,15 +126,15 @@ function Control({}) {
       // TODO error checking - and if it works out - allow update (ex axeses difference postivie)
       setUpdateOk(true);
     } else {
-      console.log("equal");
-      console.log(tmpParamsStore, tmpParams);
+      // console.log(("equal");
+      // console.log((tmpParamsStore, tmpParams);
       setUpdateOk(false);
     }
   }, [tmpParams]);
 
   // handles
   function handleUpdate() {
-    // // // console.log(CpxMaxRef);
+    // // // // console.log((CpxMaxRef);
     // TODO think I need to set tmpParamStore
     // assuming we have all parts of the form,
     // let height = CpxMaxRef.current.value - CpxMinRef.current.value;
@@ -146,9 +146,9 @@ function Control({}) {
     let yRes = tmpParams.imagAxisRes;
 
     //let yRes = yResRef.current.value;
-    console.log("VALS", tmpParams.realMax, tmpParams.realMin);
+    // console.log(("VALS", tmpParams.realMax, tmpParams.realMin);
 
-    console.log(height, width, "HEIGHT AND WIDTH");
+    // console.log((height, width, "HEIGHT AND WIDTH");
     let xRes = (width / height) * yRes;
 
     // 2 because the dfeault scale is -1 to 1 on both axises
@@ -168,9 +168,9 @@ function Control({}) {
     let startX = -((xRes / 2) * (xScale - 1)) + shiftX;
     let startY = -((yRes / 2) * (yScale - 1)) - shiftY;
 
-    console.log("STASRTS", startX, startY, xRes, yRes);
+    // console.log(("STASRTS", startX, startY, xRes, yRes);
 
-    // // console.log(xRes, yRes, xScale, yScale, startX, startY);
+    // // // console.log((xRes, yRes, xScale, yScale, startX, startY);
 
     setParams({
       ...params,
@@ -207,7 +207,7 @@ function Control({}) {
     //   startY: parseFloat(startY),
     // });
 
-    // // // console.log(xRes, yRes, xScale, yScale, startX, startY);
+    // // // // console.log((xRes, yRes, xScale, yScale, startX, startY);
   }
 
   function handleBack() {
