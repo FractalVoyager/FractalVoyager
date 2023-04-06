@@ -9,7 +9,7 @@ import {
 } from "../../helpers/util";
 import { useBackState, useCompileStore } from "../../store/zustandTest.js";
 import { useGenPixles } from "../../helpers/emceptionHooks";
-import { useColorsStore } from "../../store/zustandTest.js";
+import { useColorsStore, useTmpParamsStore } from "../../store/zustandTest.js";
 
 /*
 
@@ -22,10 +22,17 @@ const Viewer = ({
   initStartX,
   initStartY,
   back,
+  numColors,
+  colors,
+  maxRad,
+  minRad,
+  epsilon,
+  maxIters,
   showCords,
+  foo,
 }) => {
-  const numColors = useColorsStore((state) => state.amt);
-  const colors = useColorsStore((state) => state.colors);
+  // const numColors = useColorsStore((state) => state.amt);
+  // const colors = useColorsStore((state) => state.colors);
   // TODO - clean this up to avoid unnescarry re renders
   const [displayCords, setDisplayCords] = useState({ re: null, im: null });
   const [prevMandCords, setPrevMandCords] = useState([
@@ -37,7 +44,9 @@ const Viewer = ({
     },
   ]);
 
-  console.log(initXscale, initYscale);
+  const setAxises = useTmpParamsStore((state) => state.setAxises);
+
+  // // // console.log(initXscale, initYscale);
 
   const wrapperRef = useRef(null);
 
@@ -56,7 +65,7 @@ const Viewer = ({
         (paramsStack.at(paramsStack.length - 1).type === 1 &&
           genPixlesParams.type === 1)
       ) {
-        // // console.log("in if", prevMandCords);
+        // // // // // console.log("in if", prevMandCords);
         setPrevMandCords((prevMandCords) => prevMandCords.slice(0, -1));
       }
 
@@ -67,6 +76,17 @@ const Viewer = ({
 
   // TESTING FOR FIXING ZOOMS
   useEffect(() => {
+    console.log("HERERERERR");
+    console.log(
+      xRes,
+      yRes,
+      initXscale,
+      initYscale,
+      initStartX,
+      initStartY,
+      colors,
+      numColors
+    );
     setGenPixlesParams({
       ...genPixlesParams,
       widthScale: initXscale,
@@ -75,8 +95,30 @@ const Viewer = ({
       startY: initStartY,
       canWidth: xRes,
       canHeight: yRes,
+      newCanHeight: yRes,
+      newCanWidth: xRes,
+      colors: colors,
+      numColors: numColors,
+      maxIters: maxIters,
+      epsilon: epsilon,
+      minRadius: minRad,
+      maxRadius: maxRad,
     });
-  }, [xRes, yRes, initXscale, initYscale, initStartX, initStartY]);
+  }, [
+    xRes,
+    yRes,
+    initXscale,
+    initYscale,
+    initStartX,
+    initStartY,
+    colors,
+    numColors,
+    maxRad,
+    minRad,
+    epsilon,
+    maxIters,
+    foo,
+  ]);
 
   const [paramsStack, setParamsStack] = useState([]);
 
@@ -97,64 +139,41 @@ const Viewer = ({
 
   const [genPixlesParams, setGenPixlesParams] = useState({
     type: initType, // paramter plane, dyn, orbit    ------ TODO - this is based on inital type
-    color: 0,
     fixedVal: [null, null], // c will get set to pixel - for type 2 after type 1
     clickedVal: [null, null], // for orbit
-    maxIters: 64,
-    iterMult: 4,
-    minRadius: 0.01,
-    maxRadius: 4,
-    startX: initStartX, // box zoom stuff
-    startY: initStartY, // box zoom stuff
-    newCanWidth: xRes, // box zoom stuff
-    newCanHeight: yRes, // box zoom stuff
-    canWidth: xRes, // box zoom stuff
-    canHeight: yRes, // box zoom stuff
-    widthScale: initXscale, // box zoom stuff
-    heightScale: initYscale, // box zoom stuff
-    arrayLength: xRes * yRes * 4, // length of aray to return
+    maxIters: maxIters,
+    epsilon: epsilon,
+    minRadius: minRad,
+    maxRadius: maxRad,
+    startX: initStartX,
+    startY: initStartY,
+    newCanWidth: xRes,
+    newCanHeight: yRes,
+    canWidth: xRes,
+    canHeight: yRes,
+    widthScale: initXscale,
+    heightScale: initYscale,
+    arrayLength: xRes * yRes * 4,
     colors: colors,
     numColors: numColors,
   });
 
-  console.log(genPixlesParams.widthScale);
+  // // // console.log(genPixlesParams.widthScale);
 
-  // // console.log(initType);
+  // // // // // console.log(initType);
   // to reset genPIxlesParams with initType
   useEffect(() => {
-    setGenPixlesParams({
-      type: initType,
-      color: genPixlesParams.color,
-      fixedVal: genPixlesParams.fixedVal, // this should hold the old fixed value
-      clickedVal: genPixlesParams.clickedVal,
-      maxIters: genPixlesParams.maxIters,
-      iterMult: genPixlesParams.iterMult,
-      minRadius: genPixlesParams.minRadius,
-      maxRadius: genPixlesParams.maxRadius,
-      startX: genPixlesParams.startX,
-      startY: genPixlesParams.startY,
-      newCanWidth: genPixlesParams.newCanWidth,
-      newCanHeight: genPixlesParams.newCanHeight,
-      canWidth: genPixlesParams.canWidth,
-      canHeight: genPixlesParams.canHeight,
-      widthScale: genPixlesParams.widthScale,
-      heightScale: genPixlesParams.heightScale,
-      arrayLength: genPixlesParams.arrayLength,
-      colors: genPixlesParams.colors,
-      numColors: genPixlesParams.numColors,
-    });
+    setGenPixlesParams({ ...genPixlesParams, type: initType });
   }, [initType]);
-  // // console.log(genPixlesParams.type);
-
+  // // // // // console.log(genPixlesParams.type);
   let p = useGenPixles(
     genPixlesParams.type,
-    genPixlesParams.color,
     genPixlesParams.fixedVal[0],
     genPixlesParams.fixedVal[1],
     genPixlesParams.clickedVal[0],
     genPixlesParams.clickedVal[1],
     genPixlesParams.maxIters,
-    genPixlesParams.iterMult,
+    genPixlesParams.epsilon,
     genPixlesParams.minRadius,
     genPixlesParams.maxRadius,
     genPixlesParams.startX,
@@ -174,25 +193,9 @@ const Viewer = ({
     setParamsStack([...paramsStack, genPixlesParams]);
     // TODO = change this to only change the stuff to be changed
     setGenPixlesParams({
+      ...genPixlesParams,
       type: 2,
-      color: genPixlesParams.color,
-      fixedVal: genPixlesParams.fixedVal, // this should hold the old fixed value
       clickedVal: [re, im],
-      maxIters: genPixlesParams.maxIters,
-      iterMult: genPixlesParams.iterMult,
-      minRadius: genPixlesParams.iterMult,
-      maxRadius: genPixlesParams.maxRadius,
-      startX: genPixlesParams.startX,
-      startY: genPixlesParams.startY,
-      newCanWidth: genPixlesParams.newCanWidth,
-      newCanHeight: genPixlesParams.newCanHeight,
-      canWidth: xRes,
-      canHeight: yRes,
-      widthScale: genPixlesParams.widthScale,
-      heightScale: genPixlesParams.heightScale,
-      arrayLength: xRes * yRes * 4,
-      colors: genPixlesParams.colors,
-      numColors: genPixlesParams.numColors,
     });
   };
 
@@ -201,25 +204,9 @@ const Viewer = ({
   const interDrawJulia = (re, im) => {
     setParamsStack([...paramsStack, genPixlesParams]);
     setGenPixlesParams({
+      ...genPixlesParams,
       type: 1,
-      color: genPixlesParams.color,
       fixedVal: [re, im],
-      clickedVal: genPixlesParams.clickedVal,
-      maxIters: genPixlesParams.maxIters,
-      iterMult: genPixlesParams.iterMult,
-      minRadius: genPixlesParams.iterMult,
-      maxRadius: genPixlesParams.maxRadius,
-      startX: genPixlesParams.startX,
-      startY: genPixlesParams.startY,
-      newCanWidth: genPixlesParams.newCanWidth,
-      newCanHeight: genPixlesParams.newCanHeight,
-      canWidth: xRes,
-      canHeight: yRes,
-      widthScale: genPixlesParams.widthScale,
-      heightScale: genPixlesParams.heightScale,
-      arrayLength: xRes * yRes * 4,
-      colors: genPixlesParams.colors,
-      numColors: genPixlesParams.numColors,
     });
   };
 
@@ -229,7 +216,9 @@ const Viewer = ({
     // it is called on mouse up
     // will always be on second iteration
 
-    // // console.log("inter draw mand");
+    // // // // // console.log("inter draw mand");
+
+    console.log("inter draw mand");
 
     // add last p to the stack
     setParamsStack([...paramsStack, genPixlesParams]);
@@ -246,7 +235,7 @@ const Viewer = ({
     let widthScale = width / xRes;
     let heightScale = height / yRes;
 
-    // // // console.log(prevMandCords);
+    // // // // // // console.log(prevMandCords);
 
     startX =
       prevMandCords.at(-1).widthScale * startX + prevMandCords.at(-1).startX;
@@ -274,6 +263,23 @@ const Viewer = ({
       heightScale = (yRes / newCanHeight) * heightScale;
     }
 
+    /*
+     double screen_re = (((widthScale * x) + startX) - width / 2.) / (width  /2.);
+double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
+
+    real min = (startX - xRes/2) / xRes/2
+    real max = (((widthScale*xRes) + startX) - xRes/2) / (xRes/2)
+
+
+    */
+
+    setAxises(
+      (startX - xRes / 2) / (xRes / 2),
+      (widthScale * xRes + startX - xRes / 2) / (xRes / 2),
+      -(heightScale * yRes + startY - yRes / 2) / (yRes / 2),
+      -(startY - yRes / 2) / (yRes / 2)
+    );
+
     let type;
     if (genPixlesParams.type === 2) {
       type = 1;
@@ -283,14 +289,8 @@ const Viewer = ({
 
     // now we have all we need for the useGenPixles hook to rerun, so set that state
     setGenPixlesParams({
+      ...genPixlesParams,
       type: type,
-      color: genPixlesParams.color,
-      fixedVal: genPixlesParams.fixedVal,
-      clickedVal: genPixlesParams.clickedVal,
-      maxIters: genPixlesParams.maxIters,
-      iterMult: genPixlesParams.iterMult,
-      minRadius: genPixlesParams.iterMult,
-      maxRadius: genPixlesParams.maxRadius,
       startX: startX,
       startY: startY,
       newCanWidth: newCanWidth,
@@ -300,8 +300,6 @@ const Viewer = ({
       widthScale: widthScale,
       heightScale: heightScale,
       arrayLength: xRes * yRes * 4,
-      colors: genPixlesParams.colors,
-      numColors: genPixlesParams.numColors,
     });
 
     setPrevMandCords([
@@ -341,7 +339,7 @@ const Viewer = ({
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.putImageData(p, 0, 0);
 
-        console.log(paramsStack);
+        // // // console.log(paramsStack);
 
         if (paramsStack.length >= 1) {
           setBackOk(true);
@@ -364,7 +362,7 @@ const Viewer = ({
           genPixlesParams.startX,
           genPixlesParams.startY
         );
-        // console.log(
+        // // // // console.log(
         //   p[0][1],
         //   p[0][1],
         //   genPixlesParams.widthScale,
@@ -376,7 +374,7 @@ const Viewer = ({
         //   genPixlesParams.startX,
         //   genPixlesParams.startY
         // );
-        // console.log(tmp[0], tmp[1]);
+        // // // // console.log(tmp[0], tmp[1]);
         ctx.moveTo(tmp[0], tmp[1]);
         ctx.beginPath();
         p.shift();
@@ -393,7 +391,7 @@ const Viewer = ({
             genPixlesParams.startX,
             genPixlesParams.startY
           );
-          console.log(tmp[0], tmp[1]);
+          // // // console.log(tmp[0], tmp[1]);
           ctx.lineTo(tmp[0], tmp[1]);
           ctx.stroke();
           ctx.beginPath();
@@ -463,7 +461,7 @@ const Viewer = ({
 
   function mouseMoveCalcCords(e) {
     e.preventDefault();
-    // // // console.log(clinetDims);
+    // // // // // // console.log(clinetDims);
     // (widthScale * x) + startX)
     let canX =
       genPixlesParams.widthScale *
@@ -473,11 +471,11 @@ const Viewer = ({
       genPixlesParams.heightScale *
         (e.nativeEvent.offsetY * (yRes / clinetDims.height)) +
       genPixlesParams.startY;
-    //// console.log("cans, ", canX, canY);
+    //// // // // console.log("cans, ", canX, canY);
 
     if (showCords) {
       const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
-      //// console.log("cords: ", re, im);
+      //// // // // console.log("cords: ", re, im);
       setDisplayCords({ re: re, im: im });
     }
   }
@@ -493,7 +491,7 @@ const Viewer = ({
 
     if (showCords) {
       const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
-      // // console.log("cords: ", re, im);
+      // // // // // console.log("cords: ", re, im);
       setDisplayCords({ re: re, im: im });
     }
 
@@ -559,12 +557,12 @@ const Viewer = ({
         genPixlesParams.startY;
 
       const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
-      // console.log(e.nativeEvent.offsetX);
-      // console.log(e.nativeEvent.offsetY);
-      // console.log("before anything", re, im, canX, canY);
-      // console.log(complexToCanvas(re, im, xRes, yRes));
-      // console.log("TESTING", re, im, canX, canY);
-      // console.log(complexToCanvas(re, im, xRes, yRes));
+      // // // // console.log(e.nativeEvent.offsetX);
+      // // // // console.log(e.nativeEvent.offsetY);
+      // // // // console.log("before anything", re, im, canX, canY);
+      // // // // console.log(complexToCanvas(re, im, xRes, yRes));
+      // // // // console.log("TESTING", re, im, canX, canY);
+      // // // // console.log(complexToCanvas(re, im, xRes, yRes));
       // to prevent "dobule drawn" julia sets, if this is false, then we should do the orbit
       if (genPixlesParams.type === 0) {
         interDrawJulia(re, im);

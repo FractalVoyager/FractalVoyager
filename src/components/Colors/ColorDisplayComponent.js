@@ -4,7 +4,7 @@ import chroma from "chroma-js";
 import { useColorsStore } from "../../store/zustandTest";
 
 function ColorDisplayer({ selectedColor, num, width, height }) {
-  console.log("HERE");
+  // // // console.log("HERE");
   const [colors, setColors] = useState();
   const set = useColorsStore((state) => state.set);
 
@@ -34,7 +34,7 @@ function ColorDisplayer({ selectedColor, num, width, height }) {
   // if (height && colors) {
   // }
 
-  //console.log(colors);
+  //// // // console.log(colors);
   if (colors && width) {
     return (
       <div id="colors-cont">

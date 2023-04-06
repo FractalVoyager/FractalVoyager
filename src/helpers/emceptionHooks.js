@@ -96,13 +96,12 @@ const useCompileCode = (code) => {
 
 const useGenPixles = (
   type,
-  color, // make color an array
   fixed_re, // for initial 0 then 1
   fixed_im, // for inital 0 then 1
   clicked_re, // for orbit
   clicked_im,
   maxIters,
-  iterMult,
+  epsilon,
   minRadius,
   maxRadius,
   startX,
@@ -161,7 +160,6 @@ const useGenPixles = (
             "number",
             "number",
             "number",
-            "number",
           ]);
           myGenPixles(Module, genPixles);
         } else {
@@ -197,6 +195,7 @@ const useGenPixles = (
         let reds = [];
         let greens = [];
         let blues = [];
+        console.log(colors);
 
         colors.forEach((color) => {
           reds.push(color[0]);
@@ -217,11 +216,10 @@ const useGenPixles = (
         /////// CALL FCN ///////
         await fcn(
           type,
-          color,
           fixed_re,
           fixed_im,
           maxIters,
-          iterMult,
+          epsilon,
           minRadius,
           maxRadius,
           startX,
@@ -295,7 +293,7 @@ const useGenPixles = (
         );
         Module._free(Module.HEAPF64.buffer);
         let orbitArr = tmpOrbitArray;
-        console.log(orbitArr);
+        // console.log(orbitArr);
 
         let newOrbit = [[]];
         orbitArr.forEach((val, idx, arr) => {
@@ -305,10 +303,10 @@ const useGenPixles = (
             );
           }
         });
-        console.log(newOrbit);
+        // console.log(newOrbit);
 
         // let newOrbit = orbitArr.reduce((acc, val, idx, arr) => {
-        //   console.log(acc);
+        //   // console.log(acc);
         //   if (val === 0 && arr[idx + 1] === 0) {
         //     return acc;
         //   }
@@ -321,7 +319,7 @@ const useGenPixles = (
         //     return acc;
         //   }
         // }, []);
-        // console.log(newOrbit);
+        // // console.log(newOrbit);
 
         setPixles(newOrbit);
       }
@@ -335,13 +333,12 @@ const useGenPixles = (
     // could have it return pixels, maybe the pixles getting set is cauing rerenders of viewer
   }, [
     type,
-    color,
     fixed_re,
     fixed_im,
     clicked_re,
     clicked_im,
     maxIters,
-    iterMult,
+    epsilon,
     minRadius,
     maxRadius,
     startX,

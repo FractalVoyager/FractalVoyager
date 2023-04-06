@@ -47,12 +47,63 @@ const useBackState = create((set) => ({
   setAllowed: (bool) => set({ allowed: bool }),
 }));
 
+const useTmpParamsStore = create((set) => ({
+  realMin: -2,
+  realMax: 2,
+  imgMin: -2,
+  imgMax: 2,
+  maxRad: 4,
+  minRad: 0.001,
+  epsilon: 0.000001,
+  maxIters: 64,
+  imagAxisRes: 2160,
+  reset: () =>
+    set({
+      realMin: -2,
+      realMax: 2,
+      imgMin: -2,
+      imgMax: 2,
+      maxRad: 4,
+      minRad: 0.001,
+      epsilon: 0.000001,
+      maxIters: 64,
+      imagAxisRes: 2160,
+    }),
+
+  setAll: (
+    realMax,
+    realMin,
+    imgMax,
+    imgMin,
+    maxRad,
+    minRad,
+    epsilon,
+    maxIters,
+    imagAxisRes
+  ) => {
+    set({
+      realMax: realMax,
+      realMin: realMin,
+      imgMax: imgMax,
+      imgMin: imgMin,
+      maxRad: maxRad,
+      minRad: minRad,
+      epsilon: epsilon,
+      maxIters: maxIters,
+      imagAxisRes: imagAxisRes,
+    });
+  },
+  setAxises: (realMin, realMax, imgMin, imgMax) =>
+    set({ realMin: realMin, realMax: realMax, imgMin: imgMin, imgMax: imgMax }),
+}));
+
 export {
   useDimStore,
   useCompileStore,
   useTermStore,
   useColorsStore,
   useBackState,
+  useTmpParamsStore,
 };
 
 //const useClickStore = create((set))
