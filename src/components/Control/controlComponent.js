@@ -504,6 +504,7 @@ function Control({}) {
                 <Form>
                   <Form.Control placeholder="real part"></Form.Control>
                   <Form.Control placeholder="imag part"></Form.Control>
+                  <Form.Control placeholder="orbit number"></Form.Control>
                   <Button variant="primary">Generate Dynaical Space</Button>
                 </Form>
               </Col>

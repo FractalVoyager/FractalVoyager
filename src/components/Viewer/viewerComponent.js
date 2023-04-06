@@ -30,6 +30,7 @@ const Viewer = ({
   maxIters,
   showCords,
   foo,
+  orbitNum,
 }) => {
   // const numColors = useColorsStore((state) => state.amt);
   // const colors = useColorsStore((state) => state.colors);
@@ -183,6 +184,7 @@ const Viewer = ({
     arrayLength: xRes * yRes * 4,
     colors: colors,
     numColors: numColors,
+    //orbitNum: orbitNum,
   });
 
   // // // console.log(genPixlesParams.widthScale);
@@ -194,6 +196,7 @@ const Viewer = ({
   }, [initType]);
   // // // // // console.log(genPixlesParams.type);
   console.log("PARAMS IN VIEWER", genPixlesParams);
+
   let p = useGenPixles(
     genPixlesParams.type,
     genPixlesParams.fixedVal[0],
@@ -214,12 +217,14 @@ const Viewer = ({
     genPixlesParams.heightScale,
     genPixlesParams.arrayLength,
     genPixlesParams.colors,
-    genPixlesParams.numColors
+    genPixlesParams.numColors,
+    genPixlesParams.orbitNum
   );
+
+  console.log("PPPPPPPPP", p);
 
   const interDrawOrbit = (re, im) => {
     setParamsStack([...paramsStack, genPixlesParams]);
-    // TODO = change this to only change the stuff to be changed
     setGenPixlesParams({
       ...genPixlesParams,
       type: 2,
@@ -343,6 +348,50 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
     ]);
   };
 
+  const drawOrbit = (ctx) => {
+    // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    if (p && !p.data && p.length > 0) {
+      console.log("HHHHH", p);
+      // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      let tmp = canvasToPoint(
+        p[0][1],
+        p[0][1],
+        genPixlesParams.widthScale,
+        genPixlesParams.heightScale,
+        xRes,
+        yRes,
+        clinetDims.width,
+        clinetDims.height,
+        genPixlesParams.startX,
+        genPixlesParams.startY
+      );
+
+      // // // // console.log(tmp[0], tmp[1]);
+      ctx.moveTo(tmp[0], tmp[1]);
+      ctx.beginPath();
+      p.shift();
+      p.forEach((cords) => {
+        let tmp = canvasToPoint(
+          cords[0],
+          cords[1],
+          genPixlesParams.widthScale,
+          genPixlesParams.heightScale,
+          xRes,
+          yRes,
+          clinetDims.width,
+          clinetDims.height,
+          genPixlesParams.startX,
+          genPixlesParams.startY
+        );
+        // // // console.log(tmp[0], tmp[1]);
+        ctx.lineTo(tmp[0], tmp[1]);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(tmp[0], tmp[1]);
+      });
+    }
+  };
+
   const drawMand = (ctx) => {
     // in here have mandCords stuff, will cause rerun (thus update the mandlebeort canvas)
     // hoping to call genPixlesHook in here to get the pxiels we need, but might not be how
@@ -380,19 +429,9 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
         // p is array of two things to draw lines to for orbit
         // if is a workaround for too many rerenders
       } else if (!p.data) {
-        let tmp = canvasToPoint(
-          p[0][1],
-          p[0][1],
-          genPixlesParams.widthScale,
-          genPixlesParams.heightScale,
-          xRes,
-          yRes,
-          clinetDims.width,
-          clinetDims.height,
-          genPixlesParams.startX,
-          genPixlesParams.startY
-        );
-        // // // // console.log(
+        console.log("HHHHH", p);
+        // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        // let tmp = canvasToPoint(
         //   p[0][1],
         //   p[0][1],
         //   genPixlesParams.widthScale,
@@ -404,29 +443,41 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
         //   genPixlesParams.startX,
         //   genPixlesParams.startY
         // );
-        // // // // console.log(tmp[0], tmp[1]);
-        ctx.moveTo(tmp[0], tmp[1]);
-        ctx.beginPath();
-        p.shift();
-        p.forEach((cords) => {
-          let tmp = canvasToPoint(
-            cords[0],
-            cords[1],
-            genPixlesParams.widthScale,
-            genPixlesParams.heightScale,
-            xRes,
-            yRes,
-            clinetDims.width,
-            clinetDims.height,
-            genPixlesParams.startX,
-            genPixlesParams.startY
-          );
-          // // // console.log(tmp[0], tmp[1]);
-          ctx.lineTo(tmp[0], tmp[1]);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(tmp[0], tmp[1]);
-        });
+        // // // // // console.log(
+        // //   p[0][1],
+        // //   p[0][1],
+        // //   genPixlesParams.widthScale,
+        // //   genPixlesParams.heightScale,
+        // //   xRes,
+        // //   yRes,
+        // //   clinetDims.width,
+        // //   clinetDims.height,
+        // //   genPixlesParams.startX,
+        // //   genPixlesParams.startY
+        // // );
+        // // // // // console.log(tmp[0], tmp[1]);
+        // ctx.moveTo(tmp[0], tmp[1]);
+        // ctx.beginPath();
+        // p.shift();
+        // p.forEach((cords) => {
+        //   let tmp = canvasToPoint(
+        //     cords[0],
+        //     cords[1],
+        //     genPixlesParams.widthScale,
+        //     genPixlesParams.heightScale,
+        //     xRes,
+        //     yRes,
+        //     clinetDims.width,
+        //     clinetDims.height,
+        //     genPixlesParams.startX,
+        //     genPixlesParams.startY
+        //   );
+        //   // // // console.log(tmp[0], tmp[1]);
+        //   ctx.lineTo(tmp[0], tmp[1]);
+        //   ctx.stroke();
+        //   ctx.beginPath();
+        //   ctx.moveTo(tmp[0], tmp[1]);
+        // });
       }
     }
   };
@@ -635,6 +686,16 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
                 maxWidth={wrapperRef.current.clientWidth}
                 maxHeight={wrapperRef.current.clientHeight}
                 id="mandCan"
+              />
+              <Canvas
+                className="can"
+                options={orbitOpts}
+                draw={drawOrbit}
+                xRes={xRes}
+                yRes={yRes}
+                maxWidth={wrapperRef.current.clientWidth}
+                maxHeight={wrapperRef.current.clientHeight}
+                id="orbitCan"
               />
               <Canvas
                 className="can"

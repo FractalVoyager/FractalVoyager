@@ -114,7 +114,8 @@ const useGenPixles = (
   heightScale,
   arrayLength,
   colors,
-  numColors
+  numColors,
+  orbitNum
 ) => {
   // state and such here
   // this triggers a re render of "host" component (viewer) so won't need to even have this anywhere in viewer
