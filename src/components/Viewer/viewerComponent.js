@@ -102,7 +102,9 @@ const Viewer = ({
         params.minRadius,
         params.epsilon,
         params.maxIters,
-        params.canHeight
+        params.canHeight,
+        params.colors,
+        params.numColors
       );
 
       // setAllTmpParamsStore();
@@ -123,6 +125,14 @@ const Viewer = ({
     //   colors,
     //   numColors
     // );
+    console.log("here, NIM SO", numColors, colors);
+    console.log(genPixlesParams);
+    // this should make it so you can go back from the params set in the control
+    // need the check because this runs the first time through
+    if (genPixlesParams.type !== null) {
+      console.log("SETTTING STACK IN USE EFFECT");
+      setParamsStack([...paramsStack, genPixlesParams]);
+    }
     setGenPixlesParams({
       ...genPixlesParams,
       widthScale: initXscale,
@@ -166,13 +176,13 @@ const Viewer = ({
 
   // first gen Pixles
 
-  useEffect(() => {
-    setGenPixlesParams({
-      ...genPixlesParams,
-      colors: colors,
-      numColors: numColors,
-    });
-  }, [colors, numColors]);
+  // useEffect(() => {
+  //   setGenPixlesParams({
+  //     ...genPixlesParams,
+  //     colors: colors,
+  //     numColors: numColors,
+  //   });
+  // }, [colors, numColors]);
 
   const [genPixlesParams, setGenPixlesParams] = useState({
     type: initType, // paramter plane, dyn, orbit    ------ TODO - this is based on inital type
@@ -439,7 +449,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
           ctx.putImageData(p, 0, 0);
         }
 
-        // // // // console.log(paramsStack);
+        console.log(paramsStack);
 
         if (paramsStack.length >= 1) {
           setBackOk(true);
@@ -450,55 +460,6 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
         // p is array of two things to draw lines to for orbit
         // if is a workaround for too many rerenders
       } else if (!p.data) {
-        // console.log("HHHHH", p);
-        // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        // let tmp = canvasToPoint(
-        //   p[0][1],
-        //   p[0][1],
-        //   genPixlesParams.widthScale,
-        //   genPixlesParams.heightScale,
-        //   xRes,
-        //   yRes,
-        //   clinetDims.width,
-        //   clinetDims.height,
-        //   genPixlesParams.startX,
-        //   genPixlesParams.startY
-        // );
-        // // // // // // console.log(
-        // //   p[0][1],
-        // //   p[0][1],
-        // //   genPixlesParams.widthScale,
-        // //   genPixlesParams.heightScale,
-        // //   xRes,
-        // //   yRes,
-        // //   clinetDims.width,
-        // //   clinetDims.height,
-        // //   genPixlesParams.startX,
-        // //   genPixlesParams.startY
-        // // );
-        // // // // // // console.log(tmp[0], tmp[1]);
-        // ctx.moveTo(tmp[0], tmp[1]);
-        // ctx.beginPath();
-        // p.shift();
-        // p.forEach((cords) => {
-        //   let tmp = canvasToPoint(
-        //     cords[0],
-        //     cords[1],
-        //     genPixlesParams.widthScale,
-        //     genPixlesParams.heightScale,
-        //     xRes,
-        //     yRes,
-        //     clinetDims.width,
-        //     clinetDims.height,
-        //     genPixlesParams.startX,
-        //     genPixlesParams.startY
-        //   );
-        //   // // // // console.log(tmp[0], tmp[1]);
-        //   ctx.lineTo(tmp[0], tmp[1]);
-        //   ctx.stroke();
-        //   ctx.beginPath();
-        //   ctx.moveTo(tmp[0], tmp[1]);
-        // });
       }
     }
   };
@@ -667,13 +628,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
         genPixlesParams.startY;
 
       const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
-      // // // // // console.log(e.nativeEvent.offsetX);
-      // // // // // console.log(e.nativeEvent.offsetY);
-      // // // // // console.log("before anything", re, im, canX, canY);
-      // // // // // console.log(complexToCanvas(re, im, xRes, yRes));
-      // // // // // console.log("TESTING", re, im, canX, canY);
-      // // // // // console.log(complexToCanvas(re, im, xRes, yRes));
-      // to prevent "dobule drawn" julia sets, if this is false, then we should do the orbit
+
       if (genPixlesParams.type === 0) {
         interDrawJulia(re, im);
         // click in Julia
@@ -701,7 +656,6 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
             <>
               <Canvas
                 className="can"
-                options={orbitOpts}
                 draw={drawMand}
                 xRes={xRes}
                 yRes={yRes}

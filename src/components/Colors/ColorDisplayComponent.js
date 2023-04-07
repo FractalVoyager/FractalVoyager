@@ -22,6 +22,7 @@ function ColorDisplayer({ selectedColor, num, width, height }) {
 
     setColors(cs);
     set(cs, num);
+    console.log(cs, selectedColor);
   }, [selectedColor, num]);
 
   let wStr;
