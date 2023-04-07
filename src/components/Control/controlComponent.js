@@ -29,18 +29,6 @@ function Control({}) {
   // script
   const inputRef = useRef(null);
   // axeses - refs start as the default values set in the component
-  const RealMinRef = useRef(-2);
-  const CpxMinRef = useRef(2);
-  const RealMaxRef = useRef(-2);
-  const CpxMaxRef = useRef(2);
-  // y axis resolution  - x is calulated from this
-  const yResRef = useRef(2160);
-  const xResRef = useRef(2160);
-  // program doptions refs
-  const maxRadRef = useRef(4);
-  const minRadRef = useRef(0.001);
-  const epsilonRef = useRef(0.000001);
-  const maxItersRef = useRef(64);
 
   const codeRef = useRef(null);
 
@@ -48,8 +36,13 @@ function Control({}) {
 
   const backReady = useBackState((state) => state.allowed);
   const compileReady = useCompileStore((state) => state.ready);
-  const finalNumColors = useColorsStore((state) => state.amt);
-  const colors = useColorsStore((state) => state.colors);
+  // const finalNumColors = useColorsStore((state) => state.amt);
+  // const colors = useColorsStore((state) => state.colors);
+
+  const { finalNumColors, colors } = useColorsStore((state) => ({
+    finalNumColors: state.amt,
+    colors: state.colors,
+  }));
 
   const tmpParamsStore = useTmpParamsStore();
   const resetTmpGlobal = useTmpParamsStore((state) => state.reset);
@@ -58,20 +51,16 @@ function Control({}) {
 
   // // // console.log((colors);
   useEffect(() => {
-    setParams({ ...params, colors: colors, numColors: finalNumColors });
+    setTmpParams({ ...tmpParams, colors: colors, numColors: finalNumColors });
   }, [colors, finalNumColors]);
 
   // * local state * //
   const [back, setBack] = useState(0);
   const [showCords, setShowCords] = useState(true);
-  const [res, setRes] = useState({
-    x: 2160,
-    y: 2160,
-    scaleX: 2,
-    scaleY: 2,
-    startX: -1080,
-    startY: -1080,
-  });
+
+  const [foo, setFoo] = useState(0);
+
+  const [tmpParams, setTmpParams] = useState(tmpParamsStore);
 
   // this will replace above
   const [params, setParams] = useState({
@@ -85,19 +74,16 @@ function Control({}) {
     minRad: 0.001,
     epsilon: 0.000001,
     maxIters: 64,
-    numColors: finalNumColors,
-    colors: colors,
+    numColors: tmpParamsStore.numColors,
+    colors: tmpParamsStore.colors,
   });
-
-  const [foo, setFoo] = useState(0);
-
-  const [tmpParams, setTmpParams] = useState(tmpParamsStore);
 
   // orginally jsut need this for the axis because I thought thats all that viewer would write to
   // control, but the backs mean that everything must be written back ---- this should take care of it,
   // just need to update the tmpParamsStore on back
   useEffect(() => {
     setTmpParams(tmpParamsStore);
+    // setParams?????
   }, [tmpParamsStore]);
 
   const [script, setScript] = useState(null);
@@ -121,8 +107,12 @@ function Control({}) {
       tmpParamsStore.epsilon != tmpParams.epsilon ||
       tmpParamsStore.maxIters != tmpParams.maxIters ||
       tmpParamsStore.minRad != tmpParams.minRad ||
-      tmpParamsStore.maxRad != tmpParams.maxRad
+      tmpParamsStore.maxRad != tmpParams.maxRad ||
+      JSON.stringify(tmpParamsStore.colors) !==
+        JSON.stringify(tmpParams.colors) ||
+      tmpParamsStore.numColors != tmpParams.numColors
     ) {
+      console.log("STORE", tmpParamsStore.colors, "HERE", tmpParams.colors);
       // TODO error checking - and if it works out - allow update (ex axeses difference postivie)
       setUpdateOk(true);
     } else {
@@ -172,6 +162,8 @@ function Control({}) {
 
     // // // console.log((xRes, yRes, xScale, yScale, startX, startY);
 
+    console.log(tmpParams);
+
     setParams({
       ...params,
       x: parseInt(Math.round(xRes)),
@@ -183,6 +175,9 @@ function Control({}) {
       maxRad: parseFloat(tmpParams.maxRad),
       minRad: parseFloat(tmpParams.minRad),
       epsilon: parseFloat(tmpParams.epsilon),
+      maxIters: parseInt(tmpParams.maxIters),
+      colors: tmpParams.colors,
+      numColors: tmpParams.numColors,
       foo: foo + 1,
     });
     setAlltmpParamsStore(
@@ -194,7 +189,9 @@ function Control({}) {
       tmpParams.minRad,
       tmpParams.epsilon,
       tmpParams.maxIters,
-      tmpParams.imagAxisRes
+      tmpParams.imagAxisRes,
+      tmpParams.colors,
+      tmpParams.numColors
     );
     setFoo((prev) => prev + 1);
 
@@ -215,49 +212,70 @@ function Control({}) {
   }
 
   function handlePan(direction) {
+    let startX;
+    let startY;
     switch (direction) {
       case "left":
-        setRes({
-          x: res.x,
-          y: res.y,
-          scaleX: res.scaleX,
-          scaleY: res.scaleY,
-          startX: res.startX - (res.x / 2) * res.scaleX,
-          startY: res.startY,
+        startX = params.startX - (params.x / 2) * params.scaleX;
+        setParams({
+          ...params,
+          startX: startX,
         });
+        setAxises(
+          (startX - params.x / 2) / (params.x / 2),
+          (params.scaleX * params.x + startX - params.x / 2) / (params.x / 2),
+          -(params.scaleY * params.y + params.startY - params.y / 2) /
+            (params.y / 2),
+          -(params.startY - params.y / 2) / (params.y / 2)
+        );
+
         break;
 
       case "right":
-        setRes({
-          x: res.x,
-          y: res.y,
-          scaleX: res.scaleX,
-          scaleY: res.scaleY,
-          startX: res.startX + (res.x / 2) * res.scaleX,
-          startY: res.startY,
+        startX = params.startX + (params.x / 2) * params.scaleX;
+        setParams({
+          ...params,
+          startX: startX,
         });
+        // TODO make this a function
+        setAxises(
+          (startX - params.x / 2) / (params.x / 2),
+          (params.scaleX * params.x + startX - params.x / 2) / (params.x / 2),
+          -(params.scaleY * params.y + params.startY - params.y / 2) /
+            (params.y / 2),
+          -(params.startY - params.y / 2) / (params.y / 2)
+        );
+
         break;
 
       case "up":
-        setRes({
-          x: res.x,
-          y: res.y,
-          scaleX: res.scaleX,
-          scaleY: res.scaleY,
-          startX: res.startX,
-          startY: res.startY - (res.y / 2) * res.scaleY,
+        startY = params.startY - (params.y / 2) * params.scaleY;
+        setParams({
+          ...params,
+          startY: startY,
         });
+        setAxises(
+          (params.startX - params.x / 2) / (params.x / 2),
+          (params.scaleX * params.x + params.startX - params.x / 2) /
+            (params.x / 2),
+          -(params.scaleY * params.y + startY - params.y / 2) / (params.y / 2),
+          -(startY - params.y / 2) / (params.y / 2)
+        );
         break;
 
       case "down":
-        setRes({
-          x: res.x,
-          y: res.y,
-          scaleX: res.scaleX,
-          scaleY: res.scaleY,
-          startX: res.startX,
-          startY: res.startY + (res.y / 2) * res.scaleY,
+        startY = params.startY + (params.y / 2) * params.scaleY;
+        setParams({
+          ...params,
+          startY: startY,
         });
+        setAxises(
+          (params.startX - params.x / 2) / (params.x / 2),
+          (params.scaleX * params.x + params.startX - params.x / 2) /
+            (params.x / 2),
+          -(params.scaleY * params.y + startY - params.y / 2) / (params.y / 2),
+          -(startY - params.y / 2) / (params.y / 2)
+        );
         break;
 
       default:
@@ -266,11 +284,6 @@ function Control({}) {
   }
 
   function handleZoom(zoomIn) {
-    let scaleX = params.scaleX;
-    let scaleY = params.scaleY;
-    let startX = params.startX;
-    let startY = params.startY;
-
     if (zoomIn) {
       let scaleX = params.scaleX * 0.5;
       let scaleY = params.scaleY * 0.5;
@@ -294,17 +307,23 @@ function Control({}) {
 
       // this works - ust doest seem like it since scales and stuff in here doesn't get updated after they change in viewer component
     } else {
-      let scaleX = params.scaleX;
-      let scaleY = params.scaleY;
-      let startX = params.startX;
-      let startY = params.startY;
+      let scaleX = params.scaleX * 2;
+      let scaleY = params.scaleY * 2;
+      let startX = params.startX * 2 - params.x / 2;
+      let startY = params.startY * 2 - params.y / 2;
       setParams({
         ...params,
-        scaleX: scaleX * 2,
-        scaleY: scaleY * 2,
-        startX: startX * 2 - res.x / 2,
-        startY: startY * 2 - res.y / 2,
+        scaleX: scaleX,
+        scaleY: scaleY,
+        startX: startX,
+        startY: startY,
       });
+      setAxises(
+        (startX - params.x / 2) / (params.x / 2),
+        (scaleX * params.x + startX - params.x / 2) / (params.x / 2),
+        -(scaleY * params.y + startY - params.y / 2) / (params.y / 2),
+        -(startY - params.y / 2) / (params.y / 2)
+      );
     }
   }
 
@@ -319,6 +338,83 @@ function Control({}) {
           <Header />
           <Container fluid>
             <Row>
+              <Col>
+                <Form>
+                  <Form.Group>
+                    <Form.Label>Max Radius</Form.Label>
+                    <Form.Control
+                      value={tmpParams.maxRad}
+                      onChange={(e) =>
+                        setTmpParams({ ...tmpParams, maxRad: e.target.value })
+                      }
+                      type="text"
+                    ></Form.Control>
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Label>Min Radius</Form.Label>
+                    <Form.Control
+                      value={tmpParams.minRad}
+                      onChange={(e) =>
+                        setTmpParams({ ...tmpParams, minRad: e.target.value })
+                      }
+                      type="text"
+                    ></Form.Control>
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Label>Epsilon</Form.Label>
+                    <Form.Control
+                      value={tmpParams.epsilon}
+                      onChange={(e) =>
+                        setTmpParams({ ...tmpParams, epsilon: e.target.value })
+                      }
+                      type="text"
+                    ></Form.Control>
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Label>Max Iterations</Form.Label>
+                    <Form.Control
+                      value={tmpParams.maxIters}
+                      onChange={(e) =>
+                        setTmpParams({ ...tmpParams, maxIters: e.target.value })
+                      }
+                      type="text"
+                    ></Form.Control>
+                  </Form.Group>
+                </Form>
+                <Form>
+                  <Button variant="primary" onClick={() => handleZoom(true)}>
+                    +
+                  </Button>
+                  <Button variant="primary" onClick={() => handleZoom(false)}>
+                    -
+                  </Button>
+                  <Button variant="primary" onClick={() => handlePan("left")}>
+                    left
+                  </Button>
+                  <Button variant="primary" onClick={() => handlePan("right")}>
+                    right
+                  </Button>
+                  <Button variant="primary" onClick={() => handlePan("up")}>
+                    up
+                  </Button>
+                  <Button variant="primary" onClick={() => handlePan("down")}>
+                    down
+                  </Button>
+                  <Form>
+                    <Form.Control placeholder="real part"></Form.Control>
+                    <Form.Control placeholder="imag part"></Form.Control>
+                    <Form.Control placeholder="orbit number"></Form.Control>
+                    <Form.Label>Orbit Color</Form.Label>
+                    <Form.Select aria-label="Default select example">
+                      <option value="red">Red</option>
+                      <option value="blue">Blue</option>
+                      <option value="green">Green</option>
+                    </Form.Select>
+
+                    <Button variant="primary">Generate Dynaical Space</Button>
+                  </Form>
+                </Form>
+              </Col>
               <Col>
                 <Form id="script-form">
                   <Form.Group>
@@ -351,75 +447,6 @@ function Control({}) {
                     </Button>
                   )}
                 </Form>
-
-                <Form>
-                  <Form.Group>
-                    <Form.Label>Max Radius</Form.Label>
-                    <Form.Control
-                      ref={maxRadRef}
-                      value={tmpParams.maxRad}
-                      onChange={(e) =>
-                        setTmpParams({ ...tmpParams, maxRad: e.target.value })
-                      }
-                      type="text"
-                    ></Form.Control>
-                  </Form.Group>
-                  <Form.Group>
-                    <Form.Label>Min Radius</Form.Label>
-                    <Form.Control
-                      ref={minRadRef}
-                      value={tmpParams.minRad}
-                      onChange={(e) =>
-                        setTmpParams({ ...tmpParams, minRad: e.target.value })
-                      }
-                      type="text"
-                    ></Form.Control>
-                  </Form.Group>
-                  <Form.Group>
-                    <Form.Label>Epsilon</Form.Label>
-                    <Form.Control
-                      ref={epsilonRef}
-                      value={tmpParams.epsilon}
-                      onChange={(e) =>
-                        setTmpParams({ ...tmpParams, epsilon: e.target.value })
-                      }
-                      type="text"
-                    ></Form.Control>
-                  </Form.Group>
-                  <Form.Group>
-                    <Form.Label>Max Iterations</Form.Label>
-                    <Form.Control
-                      ref={maxItersRef}
-                      value={tmpParams.maxIters}
-                      onChange={(e) =>
-                        setTmpParams({ ...tmpParams, maxIters: e.target.value })
-                      }
-                      type="text"
-                    ></Form.Control>
-                  </Form.Group>
-                </Form>
-                <Form>
-                  <Button variant="primary" onClick={() => handleZoom(true)}>
-                    +
-                  </Button>
-                  <Button variant="primary" onClick={() => handleZoom(false)}>
-                    -
-                  </Button>
-                  <Button variant="primary" onClick={() => handlePan("left")}>
-                    left
-                  </Button>
-                  <Button variant="primary" onClick={() => handlePan("right")}>
-                    right
-                  </Button>
-                  <Button variant="primary" onClick={() => handlePan("up")}>
-                    up
-                  </Button>
-                  <Button variant="primary" onClick={() => handlePan("down")}>
-                    down
-                  </Button>
-                </Form>
-              </Col>
-              <Col>
                 <Form id="viewer-form">
                   {backReady ? (
                     <Button variant="primary" onClick={handleBack}>
@@ -447,7 +474,6 @@ function Control({}) {
                   <Form.Group>
                     <Form.Label>Real Axis Min Value</Form.Label>
                     <Form.Control
-                      ref={RealMinRef}
                       type="text"
                       value={tmpParams.realMin}
                       onChange={(e) =>
@@ -456,7 +482,6 @@ function Control({}) {
                     ></Form.Control>
                     <Form.Label>Real Axis Max Value</Form.Label>
                     <Form.Control
-                      ref={RealMaxRef}
                       type="text"
                       value={tmpParams.realMax}
                       onChange={(e) =>
@@ -465,7 +490,6 @@ function Control({}) {
                     ></Form.Control>
                     <Form.Label>Imaginary Axis Min Value</Form.Label>
                     <Form.Control
-                      ref={CpxMinRef}
                       type="text"
                       value={tmpParams.imgMin}
                       onChange={(e) =>
@@ -474,7 +498,6 @@ function Control({}) {
                     ></Form.Control>
                     <Form.Label>Imaginary Axis Max Value</Form.Label>
                     <Form.Control
-                      ref={CpxMaxRef}
                       type="text"
                       value={tmpParams.imgMax}
                       onChange={(e) =>
@@ -483,7 +506,6 @@ function Control({}) {
                     ></Form.Control>
                     <Form.Label>Imaginary Axis Resolution</Form.Label>
                     <Form.Control
-                      ref={yResRef}
                       typ="text"
                       value={tmpParams.imagAxisRes}
                       onChange={(e) =>
@@ -500,12 +522,6 @@ function Control({}) {
                   >
                     Show cpx
                   </Button>
-                </Form>
-                <Form>
-                  <Form.Control placeholder="real part"></Form.Control>
-                  <Form.Control placeholder="imag part"></Form.Control>
-                  <Form.Control placeholder="orbit number"></Form.Control>
-                  <Button variant="primary">Generate Dynaical Space</Button>
                 </Form>
               </Col>
 
