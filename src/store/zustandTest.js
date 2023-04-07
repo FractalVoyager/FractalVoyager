@@ -33,7 +33,11 @@ const useCompileStore = create((set) => ({
 
 const useTermStore = create((set) => ({
   text: null,
-  write: (newText) => set({ text: newText }),
+  color: null,
+  newLine: true,
+  write: (newText, color, newLine) =>
+    set({ text: newText, color: color, newLine: newLine }),
+  quickWrite: (text) => set({ text: text, color: "white", newLine: true }),
 }));
 
 const useColorsStore = create((set) => ({

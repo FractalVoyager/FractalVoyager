@@ -24,6 +24,7 @@ var emception;
 const useInitEmception = () => {
   const setReady = useCompileStore((state) => state.setReady);
   const write = useTermStore((state) => state.write);
+  const quickWrite = useTermStore((state) => state.quickWrite);
   useEffect(() => {
     const initEmception = async () => {
       // maybe useMemo for htis
@@ -34,16 +35,16 @@ const useInitEmception = () => {
       window.emception = emception;
       window.Comlink = Comlink;
 
-      emception.onstdout = Comlink.proxy(write);
-      emception.onstderr = Comlink.proxy(write);
-      emception.onprocessstart = Comlink.proxy(write);
+      emception.onstdout = Comlink.proxy(quickWrite);
+      emception.onstderr = Comlink.proxy(quickWrite);
+      emception.onprocessstart = Comlink.proxy(quickWrite);
       // emception.onprocessstart = Comlink.proxy(addToConsole);
 
-      write("Loading emception...");
+      write("Loading c++ to wasm compiler...", "white", true);
 
       await emception.init();
       setReady();
-      write("emceitpion loaded");
+      write("Compiler loaded", "lightgreen", true);
     };
 
     initEmception();
@@ -56,6 +57,7 @@ const useInitEmception = () => {
 const useCompileCode = (code) => {
   const ready = useCompileStore((state) => state.ready);
   const write = useTermStore((state) => state.write);
+  const quickWrite = useTermStore((state) => state.quickWrite);
   const setContent = useCompileStore((state) => state.setContent);
 
   useEffect(() => {
@@ -64,13 +66,14 @@ const useCompileCode = (code) => {
       // TODO - disallaw another compile - this will end up being on some sort of on click - prob some state might be in componet
       // TODO - button state
       try {
+        quickWrite("Compiling c++ to wasm...<br>Dumping compiler output...");
         await emception.fileSystem.writeFile("/working/main.cpp", code);
 
         // emcc -o mandlebrotCPP.js  main.cpp -O3  -s NO_EXIT_RUNTIME=1 -s "EXPORTED_RUNTIME_METHODS=['ccall','cwrap']" -s "EXPORTED_FUNCTIONS=['_malloc', '_free', _genPixles]" -s MODULARIZE=1 -s "EXPORT_NAME='createModule'" -s ALLOW_MEMORY_GROWTH
         const cmd = `emcc -O3 -sSINGLE_FILE=1 -sNO_EXIT_RUNTIME=1 -sEXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -sEXPORT_ES6=1 -sUSE_ES6_IMPORT_META=0 -sEXPORTED_FUNCTIONS=['_malloc','_free','_genPixles','_orbit','setValue']  -sMODULARIZE=1 -sEXPORT_NAME='createModule' -s ENVIRONMENT='web' -sALLOW_MEMORY_GROWTH main.cpp -o main.mjs`;
         const result = await emception.run(cmd);
         if (result.returncode == 0) {
-          write("compile succesfull");
+          write("Compiled", "lightgreen", true);
 
           // load the js file we compiled
           const content = await emception.fileSystem.readFile(
@@ -80,7 +83,7 @@ const useCompileCode = (code) => {
 
           setContent(content);
         } else {
-          write("Emception compilation failed.");
+          write("Compilation to wasm failed", "red", true);
         }
       } catch (err) {
         console.error(err);
@@ -127,13 +130,12 @@ const useGenPixles = (
   // const genPixles = useRef(null);
 
   const write = useTermStore((state) => state.write);
+  const quickWrite = useTermStore((state) => state.quickWrite);
   useEffect(() => {
     const createMod = async () => {
-      write("loading module");
       const loadModule = (await doimport(new Blob([content]))).default;
 
       loadModule().then((Module) => {
-        write("loaded");
         /*
             int type, int color, double fixed_re, double fixed_im, int maxIters, double iterMult, double minRadius, double maxRadius, double startX, double startY, double newCanWidth, double newCanHeight, int width, int height, double widthScale, double heightScale, uint8_t *ptr
             */
@@ -180,8 +182,6 @@ const useGenPixles = (
       });
     };
     const myGenPixles = async (Module, fcn) => {
-      write("generating pixels");
-
       if (type === 0 || type === 1) {
         let pixlesPtr = Module._malloc(
           arrayLength * Uint8Array.BYTES_PER_ELEMENT
@@ -237,7 +237,7 @@ const useGenPixles = (
           greenPtr,
           bluePtr
         );
-        write("pixel array generated");
+        write("Generated", "lightgreen", true);
 
         // get the result of the function from the dataheap by way of creating a js array
         let pixelArray = new Uint8ClampedArray(
@@ -287,6 +287,8 @@ const useGenPixles = (
           orbitHeap.byteOffset
         );
 
+        write("Generated", "lightgreen", true);
+
         let tmpOrbitArray = new Float64Array(
           orbitHeap.buffer,
           orbitHeap.byteOffset,
@@ -329,6 +331,8 @@ const useGenPixles = (
 
     // might need some stuff like only do if content has changed
     if (content) {
+      console.log("writn1");
+      quickWrite("Generating pixels with wasm...");
       createMod();
     }
 
