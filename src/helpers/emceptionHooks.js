@@ -73,7 +73,11 @@ const useCompileCode = (code) => {
         const cmd = `emcc -O3 -sSINGLE_FILE=1 -sNO_EXIT_RUNTIME=1 -sEXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -sEXPORT_ES6=1 -sUSE_ES6_IMPORT_META=0 -sEXPORTED_FUNCTIONS=['_malloc','_free','_genPixles','_orbit','setValue']  -sMODULARIZE=1 -sEXPORT_NAME='createModule' -s ENVIRONMENT='web' -sALLOW_MEMORY_GROWTH main.cpp -o main.mjs`;
         const result = await emception.run(cmd);
         if (result.returncode == 0) {
-          write("Compiled", "lightgreen", true);
+          write(
+            "Compiled, generating fractal with wasm...",
+            "lightgreen",
+            true
+          );
 
           // load the js file we compiled
           const content = await emception.fileSystem.readFile(
@@ -83,7 +87,11 @@ const useCompileCode = (code) => {
 
           setContent(content);
         } else {
-          write("Compilation to wasm failed", "red", true);
+          write(
+            "Compilation to wasm failed - check above output for more infomation",
+            "red",
+            true
+          );
         }
       } catch (err) {
         console.error(err);
@@ -124,6 +132,7 @@ const useGenPixles = (
   // this triggers a re render of "host" component (viewer) so won't need to even have this anywhere in viewer
   const content = useCompileStore((state) => state.content);
   const [pixels, setPixles] = useState(null);
+  const initialType = useCompileStore((state) => state.initialType);
 
   // these don't even need to be refs
   //const module = useRef(null);
@@ -131,6 +140,7 @@ const useGenPixles = (
 
   const write = useTermStore((state) => state.write);
   const quickWrite = useTermStore((state) => state.quickWrite);
+
   useEffect(() => {
     const createMod = async () => {
       const loadModule = (await doimport(new Blob([content]))).default;
@@ -237,7 +247,46 @@ const useGenPixles = (
           greenPtr,
           bluePtr
         );
-        write("Generated", "lightgreen", true);
+        if (type === 0) {
+          write("Generated paramter space fractal", "lightgreen", true);
+          setTimeout(
+            () =>
+              write(
+                "Click on a point to generate a julia set with that point, or generate julia set with an inputted number and the button",
+                "yellow",
+                true
+              ),
+            1
+          );
+        } else {
+          if (initialType == 1) {
+            write(
+              "Generated dynamic space fractal (julia set) with script",
+              "lightgreen",
+              true
+            );
+          } else {
+            write(
+              "Generated dynamic space fractal (julia set) with " +
+                fixed_re +
+                (fixed_im >= 0
+                  ? "+" + fixed_im
+                  : "-" + fixed_im.toString().slice(1)) +
+                "i ",
+              "lightgreen",
+              true
+            );
+          }
+          setTimeout(
+            () =>
+              write(
+                "Click on a point or set a number to generate an orbit with that number using the selected  color and iterations. It will use the condition for the fractal",
+                "yellow",
+                true
+              ),
+            1
+          );
+        }
 
         // get the result of the function from the dataheap by way of creating a js array
         let pixelArray = new Uint8ClampedArray(
@@ -287,7 +336,20 @@ const useGenPixles = (
           orbitHeap.byteOffset
         );
 
-        write("Generated", "lightgreen", true);
+        write(
+          "Generated orbit for " +
+            clicked_re +
+            (clicked_im >= 0
+              ? "+" + clicked_im
+              : "-" + clicked_im.toString().slice(1)) +
+            "i ",
+          "lightgreen",
+          true
+        );
+        setTimeout(
+          () => quickWrite("outputting orbit (iterations : number)..."),
+          1
+        );
 
         let tmpOrbitArray = new Float64Array(
           orbitHeap.buffer,
@@ -296,16 +358,32 @@ const useGenPixles = (
         );
         Module._free(Module.HEAPF64.buffer);
         let orbitArr = tmpOrbitArray;
-        // // console.log((orbitArr);
+        console.log(orbitArr);
 
         let newOrbit = [[]];
         orbitArr.forEach((val, idx, arr) => {
           if (!(val === 0 && arr[idx + 1] === 0) && idx % 2 === 0) {
+            setTimeout(
+              () =>
+                quickWrite(
+                  idx / 2 +
+                    " : " +
+                    val +
+                    (arr[idx + 1] >= 0
+                      ? "+" + arr[idx + 1]
+                      : "-" + arr[idx + 1].toString().slice(1)) +
+                    "i "
+                ),
+              1
+            );
+
             newOrbit.push(
               complexToCanvas(val, arr[idx + 1], canWidth, canHeight)
             );
           }
         });
+
+        // TODOTODO add output if the max iterations was reached or if the condition was met
         // // console.log((newOrbit);
 
         // let newOrbit = orbitArr.reduce((acc, val, idx, arr) => {
@@ -331,8 +409,6 @@ const useGenPixles = (
 
     // might need some stuff like only do if content has changed
     if (content) {
-      console.log("writn1");
-      quickWrite("Generating pixels with wasm...");
       createMod();
     }
 

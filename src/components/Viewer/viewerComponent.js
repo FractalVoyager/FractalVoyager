@@ -9,7 +9,11 @@ import {
 } from "../../helpers/util";
 import { useBackState, useCompileStore } from "../../store/zustandTest.js";
 import { useGenPixles } from "../../helpers/emceptionHooks";
-import { useColorsStore, useTmpParamsStore } from "../../store/zustandTest.js";
+import {
+  useColorsStore,
+  useTmpParamsStore,
+  useTermStore,
+} from "../../store/zustandTest.js";
 
 /*
 
@@ -51,6 +55,9 @@ const Viewer = ({
   // // // // console.log(initXscale, initYscale);
 
   const wrapperRef = useRef(null);
+
+  const write = useTermStore((state) => state.write);
+  const quickWrite = useTermStore((state) => state.quickWrite);
 
   // const [clearOribt, setClearOrbit] = useState(false);
 
@@ -127,6 +134,7 @@ const Viewer = ({
     // );
     console.log("here, NIM SO", numColors, colors);
     console.log(genPixlesParams);
+
     // this should make it so you can go back from the params set in the control
     // need the check because this runs the first time through
     if (genPixlesParams.type !== null) {
@@ -244,6 +252,7 @@ const Viewer = ({
 
   const interDrawOrbit = (re, im) => {
     console.log("inter draw orbit");
+    quickWrite("Generating orbit...");
     // setClearOrbit(true);
     setParamsStack([...paramsStack, genPixlesParams]);
     setGenPixlesParams({
@@ -256,6 +265,7 @@ const Viewer = ({
   // rioght now, the julia set is drawn with the current zoom in the mandlebrot, but easy fix to not do that
 
   const interDrawJulia = (re, im) => {
+    quickWrite("Generating fractal...");
     setParamsStack([...paramsStack, genPixlesParams]);
     setGenPixlesParams({
       ...genPixlesParams,
@@ -277,6 +287,7 @@ const Viewer = ({
     // console.log(startX, startY, endX, endY);
 
     // add last p to the stack
+    quickWrite("Generating fractal...");
     setParamsStack([...paramsStack, genPixlesParams]);
 
     startX = startX * (xRes / clinetDims.width);
