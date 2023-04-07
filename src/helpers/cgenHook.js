@@ -4,6 +4,7 @@ import { useTermStore, useCompileStore } from "../store/zustandTest.js";
 
 const useCgen = (script) => {
   const write = useTermStore((state) => state.write);
+  const quickWrite = useTermStore((state) => state.quickWrite);
   const setInitialType = useCompileStore((state) => state.setInitialType);
   const myMod = useRef(null);
   // maybe use callback but kinda alreadlly handing unnescarry re runs of this fcn
@@ -14,7 +15,6 @@ const useCgen = (script) => {
     // this is called only once to create the module - should really have this called when app starts, would
     // just have to set global state in that case
     const myCreateModule = async () => {
-      write("creating cgen module");
       createModule().then((Module) => {
         cgen.current = Module.cwrap("cgen", "number", [
           "string", // script
@@ -25,21 +25,46 @@ const useCgen = (script) => {
 
         myMod.current = Module;
       });
-      write("created");
       if (script) {
         myCgen();
       }
     };
 
     const myCgen = async () => {
-      write("running script throught cgen...");
+      quickWrite("Compiling script to c++...");
       // can do some error catching here, assuming it will throw errros if script is malformed
-      let length = await cgen.current(script.toLowerCase());
+      let length;
+      try {
+        length = await cgen.current(script.toLowerCase());
+      } catch (err) {
+        setTimeout(
+          () =>
+            write(
+              "Complication to c++ failed, script is not a proper fractalStream language script.",
+              "red",
+              false
+            ),
+          1
+        );
+
+        // this is annoying
+        setTimeout(
+          () =>
+            quickWrite(
+              " Specific error handling of this type is not currently suppored, please check the language doccumentation."
+            ),
+          1
+        );
+
+        // quickWrite(
+        //   "Specific error handling of this type is not currently suppored, please check the language doccumentation."
+        // );
+      }
       let strPtr = myMod.current.allocateUTF8(length);
       // myMod.current._malloc(strPtr);
       let type = await getCgen.current(strPtr);
       setInitialType(type);
-      write("ran");
+      write("Compiled", "lightgreen", true);
       setCode(myMod.current.UTF8ToString(strPtr).trim());
       myMod.current._free(strPtr);
     };

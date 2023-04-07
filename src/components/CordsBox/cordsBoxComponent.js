@@ -6,7 +6,11 @@ const CordsBox = ({ display, cords: { re, im } }) => {
   return (
     <>
       <div id="cordsBox">
-        {display ? (im >= 0 ? re + "+" + im + "i" : re + " " + im + "i") : ""}
+        {display
+          ? im >= 0
+            ? re + "+" + im + "i"
+            : re + "-" + im.toString().slice(1) + "i"
+          : ""}
         {/* {re}
         {im} */}
       </div>
