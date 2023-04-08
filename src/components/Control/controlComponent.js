@@ -80,6 +80,8 @@ function Control({}) {
     orbitColor: "red",
   });
 
+  const [genVals, setGenVals] = useState([null, null]);
+
   // orginally jsut need this for the axis because I thought thats all that viewer would write to
   // control, but the backs mean that everything must be written back ---- this should take care of it,
   // just need to update the tmpParamsStore on back
@@ -114,8 +116,8 @@ function Control({}) {
       JSON.stringify(tmpParamsStore.colors) !==
         JSON.stringify(tmpParams.colors) ||
       tmpParamsStore.numColors != tmpParams.numColors ||
-      tmpParamsStore.re != tmpParams.re ||
-      tmpParamsStore.im != tmpParams.im ||
+      // tmpParamsStore.re != tmpParams.re ||
+      // tmpParamsStore.im != tmpParams.im ||
       tmpParamsStore.type != tmpParams.type ||
       tmpParamsStore.orbitNum != tmpParams.orbitNum ||
       tmpParamsStore.orbitColor != tmpParams.orbitColor
@@ -172,6 +174,10 @@ function Control({}) {
 
     console.log(tmpParams);
 
+    // for now, appraoch for gen click is to leave it out of this - which makes sesne
+    // becuae it is a different thing, update clicks don't have anything to do with
+    // genning, just weird that for the values, you still need to click update for them to go through
+    // can probably pretty easilly get rid of that
     setParams({
       ...params,
       x: parseInt(Math.round(xRes)),
@@ -186,6 +192,8 @@ function Control({}) {
       maxIters: parseInt(tmpParams.maxIters),
       colors: tmpParams.colors,
       numColors: tmpParams.numColors,
+      orbitColor: tmpParams.orbitColor,
+      orbitNum: tmpParams.orbitNum,
       foo: foo + 1,
     });
     console.log("LLLLLLLL", tmpParams.type);
@@ -220,8 +228,6 @@ function Control({}) {
 
     // // // // console.log((xRes, yRes, xScale, yScale, startX, startY);
   }
-
-  function genClick(julia) {}
 
   function handleBack() {
     setBack((prev) => prev + 1);
@@ -428,7 +434,13 @@ function Control({}) {
                     }
                   ></Form.Control>
                   <Form.Label>Orbit Color</Form.Label>
-                  <Form.Select aria-label="Default select example">
+                  <Form.Select
+                    aria-label="Default select example"
+                    value={tmpParams.orbitColor}
+                    onChange={(e) =>
+                      setTmpParams({ ...tmpParams, orbitColor: e.target.value })
+                    }
+                  >
                     <option value="red">Red</option>
                     <option value="blue">Blue</option>
                     <option value="green">Green</option>
@@ -473,13 +485,23 @@ function Control({}) {
 
                     {tmpParams.type === 0 ? (
                       <>
-                        <Button variant="primary" onClick={genClick(true)}>
+                        <Button
+                          variant="primary"
+                          onClick={() =>
+                            setGenVals([tmpParams.re, tmpParams.im])
+                          }
+                        >
                           Generate Dynamic Space
                         </Button>
                       </>
                     ) : tmpParams.type === 1 || tmpParams.type === 2 ? (
                       <>
-                        <Button variant="primary" onClick={genClick(false)}>
+                        <Button
+                          variant="primary"
+                          onClick={() =>
+                            setGenVals([tmpParams.re, tmpParams.im])
+                          }
+                        >
                           Generate Orbit
                         </Button>
                       </>
@@ -643,8 +665,9 @@ function Control({}) {
           back={back}
           showCords={showCords}
           foo={params.foo}
-          clickGen={[params.re, params.im]}
           orbitNum={params.orbitNum}
+          orbitColor={params.orbitColor}
+          genVals={genVals}
 
           // tmp fix to force renders even when props are the same because they are really different in viewer
         />
