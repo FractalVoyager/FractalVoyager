@@ -34,9 +34,9 @@ const Viewer = ({
   maxIters,
   showCords,
   foo,
-  clickGen,
   orbitNum,
   orbitColor,
+  genVals,
 }) => {
   // const numColors = useColorsStore((state) => state.amt);
   // const colors = useColorsStore((state) => state.colors);
@@ -93,13 +93,14 @@ const Viewer = ({
 
       let params = paramsStack.pop();
 
+      // during an orbit,
+
       setGenPixlesParams(params);
       console.log("setting all params", params);
       // now need to set the tmpParamStore to update the control
       // // console.log("PPPPPPPP", params);
       // console.log("TYEPPPPEPEPE", params.type);
 
-      // stupid fix because I dont feel like cleaning up the clicked vals whe
       setAllTmpParamsStore(
         (params.widthScale * params.canWidth +
           params.startX -
@@ -256,6 +257,17 @@ const Viewer = ({
   useEffect(() => {
     setTypeStore(genPixlesParams.type);
   }, [genPixlesParams.type]);
+
+  useEffect(() => {
+    // check if not null
+    if (genVals) {
+      if (genPixlesParams.type === 0) {
+        interDrawJulia(genVals[0], genVals[1]);
+      } else if (genPixlesParams.type === 1 || genPixlesParams.type === 2) {
+        interDrawOrbit(genVals[0], genVals[1]);
+      }
+    }
+  }, [genVals]);
 
   // // console.log("PPPPPPPPP", p);
 
@@ -531,10 +543,19 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
     lineWidth: xRes * (5 / 3840),
   };
 
-  const orbitOpts = {
-    strokeStyle: "blue",
+  // TODO make this a state so it instantly updates
+  let orbitOpts = {
+    strokeStyle: orbitColor,
     lineWidth: xRes * (5 / 3840),
   };
+
+  // useEffect(() => {
+  //   console.log(orbitColor);
+  //   let orbitOpts = {
+  //     strokeStyle: orbitColor,
+  //     lineWidth: xRes * (5 / 3840),
+  //   };
+  // }, [orbitColor]);
 
   function mouseDown(e) {
     e.preventDefault();
