@@ -76,12 +76,15 @@ function Control({}) {
     maxIters: 64,
     numColors: tmpParamsStore.numColors,
     colors: tmpParamsStore.colors,
+    orbitNum: 64,
+    orbitColor: "red",
   });
 
   // orginally jsut need this for the axis because I thought thats all that viewer would write to
   // control, but the backs mean that everything must be written back ---- this should take care of it,
   // just need to update the tmpParamsStore on back
   useEffect(() => {
+    console.log("HERE TYPE", tmpParamsStore.type);
     setTmpParams(tmpParamsStore);
     // setParams?????
   }, [tmpParamsStore]);
@@ -110,14 +113,19 @@ function Control({}) {
       tmpParamsStore.maxRad != tmpParams.maxRad ||
       JSON.stringify(tmpParamsStore.colors) !==
         JSON.stringify(tmpParams.colors) ||
-      tmpParamsStore.numColors != tmpParams.numColors
+      tmpParamsStore.numColors != tmpParams.numColors ||
+      tmpParamsStore.re != tmpParams.re ||
+      tmpParamsStore.im != tmpParams.im ||
+      tmpParamsStore.type != tmpParams.type ||
+      tmpParamsStore.orbitNum != tmpParams.orbitNum ||
+      tmpParamsStore.orbitColor != tmpParams.orbitColor
     ) {
       console.log("STORE", tmpParamsStore.colors, "HERE", tmpParams.colors);
       // TODO error checking - and if it works out - allow update (ex axeses difference postivie)
       setUpdateOk(true);
     } else {
-      // console.log(("equal");
-      // console.log((tmpParamsStore, tmpParams);
+      console.log("equal");
+      console.log(tmpParamsStore, tmpParams);
       setUpdateOk(false);
     }
   }, [tmpParams]);
@@ -180,6 +188,7 @@ function Control({}) {
       numColors: tmpParams.numColors,
       foo: foo + 1,
     });
+    console.log("LLLLLLLL", tmpParams.type);
     setAlltmpParamsStore(
       tmpParams.realMax,
       tmpParams.realMin,
@@ -191,7 +200,12 @@ function Control({}) {
       tmpParams.maxIters,
       tmpParams.imagAxisRes,
       tmpParams.colors,
-      tmpParams.numColors
+      tmpParams.numColors,
+      tmpParams.re,
+      tmpParams.im,
+      tmpParams.type,
+      tmpParams.orbitNum,
+      tmpParams.orbitColor
     );
     setFoo((prev) => prev + 1);
 
@@ -206,6 +220,8 @@ function Control({}) {
 
     // // // // console.log((xRes, yRes, xScale, yScale, startX, startY);
   }
+
+  function genClick(julia) {}
 
   function handleBack() {
     setBack((prev) => prev + 1);
@@ -326,6 +342,7 @@ function Control({}) {
       );
     }
   }
+  console.log("IMAG RES", tmpParams.imagAxisRes);
 
   codeRef.current = useCgen(script);
   // the retun val is a test~~~!!!!
@@ -347,7 +364,7 @@ function Control({}) {
                       onChange={(e) =>
                         setTmpParams({ ...tmpParams, maxRad: e.target.value })
                       }
-                      type="text"
+                      type="number"
                     ></Form.Control>
                   </Form.Group>
                   <Form.Group>
@@ -357,7 +374,7 @@ function Control({}) {
                       onChange={(e) =>
                         setTmpParams({ ...tmpParams, minRad: e.target.value })
                       }
-                      type="text"
+                      type="number"
                     ></Form.Control>
                   </Form.Group>
                   <Form.Group>
@@ -367,17 +384,17 @@ function Control({}) {
                       onChange={(e) =>
                         setTmpParams({ ...tmpParams, epsilon: e.target.value })
                       }
-                      type="text"
+                      type="number"
                     ></Form.Control>
                   </Form.Group>
                   <Form.Group>
                     <Form.Label>Max Iterations</Form.Label>
                     <Form.Control
+                      type="number"
                       value={tmpParams.maxIters}
                       onChange={(e) =>
                         setTmpParams({ ...tmpParams, maxIters: e.target.value })
                       }
-                      type="text"
                     ></Form.Control>
                   </Form.Group>
                 </Form>
@@ -400,18 +417,79 @@ function Control({}) {
                   <Button variant="primary" onClick={() => handlePan("down")}>
                     down
                   </Button>
-                  <Form>
-                    <Form.Control placeholder="real part"></Form.Control>
-                    <Form.Control placeholder="imag part"></Form.Control>
-                    <Form.Control placeholder="orbit number"></Form.Control>
-                    <Form.Label>Orbit Color</Form.Label>
-                    <Form.Select aria-label="Default select example">
-                      <option value="red">Red</option>
-                      <option value="blue">Blue</option>
-                      <option value="green">Green</option>
-                    </Form.Select>
+                  <Form />
+                  <Form.Label>Orbit Iterations</Form.Label>
+                  <Form.Control
+                    placeholder="orbit number"
+                    type="number"
+                    value={tmpParams.orbitNum}
+                    onChange={(e) =>
+                      setTmpParams({ ...tmpParams, orbitNum: e.target.value })
+                    }
+                  ></Form.Control>
+                  <Form.Label>Orbit Color</Form.Label>
+                  <Form.Select aria-label="Default select example">
+                    <option value="red">Red</option>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                  </Form.Select>
 
-                    <Button variant="primary">Generate Dynaical Space</Button>
+                  <Form>
+                    {tmpParams.type === 0 ||
+                    tmpParams.type === 1 ||
+                    tmpParams.type === 2 ? (
+                      <>
+                        <Form.Control
+                          placeholder="Real Part"
+                          type="number"
+                          value={tmpParams.re == null ? "" : tmpParams.re}
+                          onChange={(e) =>
+                            setTmpParams({ ...tmpParams, re: e.target.value })
+                          }
+                        ></Form.Control>
+                        <Form.Control
+                          placeholder="Imaginary Part"
+                          type="number"
+                          value={tmpParams.im == null ? "" : tmpParams.im}
+                          onChange={(e) => {
+                            setTmpParams({ ...tmpParams, im: e.target.value });
+                          }}
+                        ></Form.Control>
+                      </>
+                    ) : (
+                      <>
+                        <Form.Control
+                          placeholder="Real Part"
+                          disabled
+                          readOnly
+                        ></Form.Control>
+                        <Form.Control
+                          placeholder="Imaginary Part"
+                          disabled
+                          readOnly
+                        ></Form.Control>
+                      </>
+                    )}
+
+                    {tmpParams.type === 0 ? (
+                      <>
+                        <Button variant="primary" onClick={genClick(true)}>
+                          Generate Dynamic Space
+                        </Button>
+                      </>
+                    ) : tmpParams.type === 1 || tmpParams.type === 2 ? (
+                      <>
+                        <Button variant="primary" onClick={genClick(false)}>
+                          Generate Orbit
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button variant="primary" disabled>
+                          Generate Dynamic Space
+                        </Button>
+                      </>
+                    )}
                   </Form>
                 </Form>
               </Col>
@@ -474,7 +552,7 @@ function Control({}) {
                   <Form.Group>
                     <Form.Label>Real Axis Min Value</Form.Label>
                     <Form.Control
-                      type="text"
+                      type="number"
                       value={tmpParams.realMin}
                       onChange={(e) =>
                         setTmpParams({ ...tmpParams, realMin: e.target.value })
@@ -482,7 +560,7 @@ function Control({}) {
                     ></Form.Control>
                     <Form.Label>Real Axis Max Value</Form.Label>
                     <Form.Control
-                      type="text"
+                      type="number"
                       value={tmpParams.realMax}
                       onChange={(e) =>
                         setTmpParams({ ...tmpParams, realMax: e.target.value })
@@ -490,7 +568,7 @@ function Control({}) {
                     ></Form.Control>
                     <Form.Label>Imaginary Axis Min Value</Form.Label>
                     <Form.Control
-                      type="text"
+                      type="number"
                       value={tmpParams.imgMin}
                       onChange={(e) =>
                         setTmpParams({ ...tmpParams, imgMin: e.target.value })
@@ -498,7 +576,7 @@ function Control({}) {
                     ></Form.Control>
                     <Form.Label>Imaginary Axis Max Value</Form.Label>
                     <Form.Control
-                      type="text"
+                      type="number"
                       value={tmpParams.imgMax}
                       onChange={(e) =>
                         setTmpParams({ ...tmpParams, imgMax: e.target.value })
@@ -506,7 +584,7 @@ function Control({}) {
                     ></Form.Control>
                     <Form.Label>Imaginary Axis Resolution</Form.Label>
                     <Form.Control
-                      typ="text"
+                      type="number"
                       value={tmpParams.imagAxisRes}
                       onChange={(e) =>
                         setTmpParams({
@@ -516,12 +594,23 @@ function Control({}) {
                       }
                     ></Form.Control>
                   </Form.Group>
-                  <Button
-                    variant="primary"
-                    onClick={() => setShowCords((prev) => !prev)}
-                  >
-                    Show cpx
-                  </Button>
+                  {showCords ? (
+                    <>
+                      <Button
+                        variant="primary"
+                        onClick={() => setShowCords((prev) => !prev)}
+                      >
+                        Hide Complex Number
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      variant="primary"
+                      onClick={() => setShowCords((prev) => !prev)}
+                    >
+                      Show Complex Number
+                    </Button>
+                  )}
                 </Form>
               </Col>
 
@@ -554,6 +643,9 @@ function Control({}) {
           back={back}
           showCords={showCords}
           foo={params.foo}
+          clickGen={[params.re, params.im]}
+          orbitNum={params.orbitNum}
+
           // tmp fix to force renders even when props are the same because they are really different in viewer
         />
       </div>

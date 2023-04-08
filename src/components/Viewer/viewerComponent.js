@@ -34,7 +34,9 @@ const Viewer = ({
   maxIters,
   showCords,
   foo,
+  clickGen,
   orbitNum,
+  orbitColor,
 }) => {
   // const numColors = useColorsStore((state) => state.amt);
   // const colors = useColorsStore((state) => state.colors);
@@ -50,9 +52,10 @@ const Viewer = ({
   ]);
 
   const setAxises = useTmpParamsStore((state) => state.setAxises);
+  const setGenVals = useTmpParamsStore((state) => state.setGenVals);
   const setAllTmpParamsStore = useTmpParamsStore((state) => state.setAll);
 
-  // // // // console.log(initXscale, initYscale);
+  // // // // // console.log(initXscale, initYscale);
 
   const wrapperRef = useRef(null);
 
@@ -69,6 +72,7 @@ const Viewer = ({
   const setBackOk = useBackState((state) => state.setAllowed);
   // this works but inst going into genPIxlesParams
   const initType = useCompileStore((state) => state.initialType);
+  const setTypeStore = useTmpParamsStore((state) => state.setType);
 
   useEffect(() => {
     if (back !== hereBack) {
@@ -78,20 +82,24 @@ const Viewer = ({
         (paramsStack.at(paramsStack.length - 1).type === 1 &&
           genPixlesParams.type === 1)
       ) {
-        // // // // // // console.log("in if", prevMandCords);
+        // // // // // // // console.log("in if", prevMandCords);
         setPrevMandCords((prevMandCords) => prevMandCords.slice(0, -1));
       }
 
       // if (genPixlesParams.type == 2) {
-      //   // console.log("CONNNNNSSSOOLLLE");
+      //   // // console.log("CONNNNNSSSOOLLLE");
       //   setClearOrbit(true);
       // }
 
       let params = paramsStack.pop();
 
       setGenPixlesParams(params);
+      console.log("setting all params", params);
       // now need to set the tmpParamStore to update the control
-      // console.log("PPPPPPPP", params);
+      // // console.log("PPPPPPPP", params);
+      // console.log("TYEPPPPEPEPE", params.type);
+
+      // stupid fix because I dont feel like cleaning up the clicked vals whe
       setAllTmpParamsStore(
         (params.widthScale * params.canWidth +
           params.startX -
@@ -111,7 +119,11 @@ const Viewer = ({
         params.maxIters,
         params.canHeight,
         params.colors,
-        params.numColors
+        params.numColors,
+        params.clickedVal[0],
+        params.clickedVal[1],
+        params.type,
+        params.orbitNum
       );
 
       // setAllTmpParamsStore();
@@ -121,24 +133,13 @@ const Viewer = ({
 
   // TESTING FOR FIXING ZOOMS
   useEffect(() => {
-    // console.log("HERERERERR");
-    // console.log(
-    //   xRes,
-    //   yRes,
-    //   initXscale,
-    //   initYscale,
-    //   initStartX,
-    //   initStartY,
-    //   colors,
-    //   numColors
-    // );
-    console.log("here, NIM SO", numColors, colors);
-    console.log(genPixlesParams);
+    // console.log("here, NIM SO", numColors, colors);
+    // console.log(genPixlesParams);
 
     // this should make it so you can go back from the params set in the control
     // need the check because this runs the first time through
     if (genPixlesParams.type !== null) {
-      console.log("SETTTING STACK IN USE EFFECT");
+      // console.log("SETTTING STACK IN USE EFFECT");
       setParamsStack([...paramsStack, genPixlesParams]);
     }
     setGenPixlesParams({
@@ -158,6 +159,7 @@ const Viewer = ({
       minRadius: minRad,
       maxRadius: maxRad,
       arrayLength: xRes * yRes * 4,
+      orbitNum: orbitNum,
     });
   }, [
     xRes,
@@ -173,6 +175,7 @@ const Viewer = ({
     epsilon,
     maxIters,
     foo,
+    orbitNum,
   ]);
 
   const [paramsStack, setParamsStack] = useState([]);
@@ -211,18 +214,18 @@ const Viewer = ({
     arrayLength: xRes * yRes * 4,
     colors: colors,
     numColors: numColors,
-    //orbitNum: orbitNum,
+    orbitNum: orbitNum,
   });
 
-  // // // // console.log(genPixlesParams.widthScale);
+  // // // // // console.log(genPixlesParams.widthScale);
 
-  // // // // // // console.log(initType);
+  // // // // // // // console.log(initType);
   // to reset genPIxlesParams with initType
   useEffect(() => {
     setGenPixlesParams({ ...genPixlesParams, type: initType });
   }, [initType]);
-  // // // // // // console.log(genPixlesParams.type);
-  // console.log("PARAMS IN VIEWER", genPixlesParams);
+  // // // // // // // console.log(genPixlesParams.type);
+  // // console.log("PARAMS IN VIEWER", genPixlesParams);
 
   let p = useGenPixles(
     genPixlesParams.type,
@@ -248,10 +251,16 @@ const Viewer = ({
     genPixlesParams.orbitNum
   );
 
-  // console.log("PPPPPPPPP", p);
+  // see if this simple solution of just having one thing here works instead of finding
+  // different parts
+  useEffect(() => {
+    setTypeStore(genPixlesParams.type);
+  }, [genPixlesParams.type]);
+
+  // // console.log("PPPPPPPPP", p);
 
   const interDrawOrbit = (re, im) => {
-    console.log("inter draw orbit");
+    // console.log("inter draw orbit");
     quickWrite("Generating orbit...");
     // setClearOrbit(true);
     setParamsStack([...paramsStack, genPixlesParams]);
@@ -260,6 +269,8 @@ const Viewer = ({
       type: 2,
       clickedVal: [re, im],
     });
+    setTypeStore(2);
+    setGenVals(re, im);
   };
 
   // rioght now, the julia set is drawn with the current zoom in the mandlebrot, but easy fix to not do that
@@ -272,6 +283,8 @@ const Viewer = ({
       type: 1,
       fixedVal: [re, im],
     });
+    setTypeStore(1);
+    setGenVals(re, im);
   };
 
   const interDrawMand = (startX, startY, endX, endY) => {
@@ -280,11 +293,11 @@ const Viewer = ({
     // it is called on mouse up
     // will always be on second iteration
 
-    // // // // // // console.log("inter draw mand");
+    // // // // // // // console.log("inter draw mand");
 
-    // console.log("inter draw mand");
+    // // console.log("inter draw mand");
 
-    // console.log(startX, startY, endX, endY);
+    // // console.log(startX, startY, endX, endY);
 
     // add last p to the stack
     quickWrite("Generating fractal...");
@@ -302,7 +315,7 @@ const Viewer = ({
     let widthScale = width / xRes;
     let heightScale = height / yRes;
 
-    // // // // // // // console.log(prevMandCords);
+    // // // // // // // // console.log(prevMandCords);
 
     startX =
       prevMandCords.at(-1).widthScale * startX + prevMandCords.at(-1).startX;
@@ -384,12 +397,12 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
     if (p === oldOrbit) {
       return;
     }
-    console.log(p);
+    // console.log(p);
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     if (p && !p.data && p.length > 0) {
-      // console.log("HHHHH", p);
+      // // console.log("HHHHH", p);
       let tmp = canvasToPoint(
         p[0][1],
         p[0][1],
@@ -403,7 +416,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
         genPixlesParams.startY
       );
 
-      // // // // // console.log(tmp[0], tmp[1]);
+      // // // // // // console.log(tmp[0], tmp[1]);
       ctx.moveTo(tmp[0], tmp[1]);
       ctx.beginPath();
       // p.shift();
@@ -420,7 +433,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
           genPixlesParams.startX,
           genPixlesParams.startY
         );
-        // // // // console.log(tmp[0], tmp[1]);
+        // // // // // console.log(tmp[0], tmp[1]);
         ctx.lineTo(tmp[0], tmp[1]);
         ctx.stroke();
         ctx.beginPath();
@@ -460,7 +473,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
           ctx.putImageData(p, 0, 0);
         }
 
-        console.log(paramsStack);
+        // console.log(paramsStack);
 
         if (paramsStack.length >= 1) {
           setBackOk(true);
@@ -535,7 +548,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
 
   function mouseMoveCalcCords(e) {
     e.preventDefault();
-    // // // // // // // console.log(clinetDims);
+    // // // // // // // // console.log(clinetDims);
     // (widthScale * x) + startX)
     let canX =
       genPixlesParams.widthScale *
@@ -545,11 +558,11 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
       genPixlesParams.heightScale *
         (e.nativeEvent.offsetY * (yRes / clinetDims.height)) +
       genPixlesParams.startY;
-    //// // // // // console.log("cans, ", canX, canY);
+    //// // // // // // console.log("cans, ", canX, canY);
 
     if (showCords) {
       const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
-      //// // // // // console.log("cords: ", re, im);
+      //// // // // // // console.log("cords: ", re, im);
       setDisplayCords({ re: re, im: im });
     }
   }
@@ -573,7 +586,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
 
     if (showCords) {
       const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
-      // // // // // // console.log("cords: ", re, im);
+      // // // // // // // console.log("cords: ", re, im);
       setDisplayCords({ re: re, im: im });
     }
 
@@ -610,7 +623,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
       endY = tmpStart;
     }
 
-    // console.log("BLAHHHHH", startX, startY, endX, endY);
+    // // console.log("BLAHHHHH", startX, startY, endX, endY);
 
     // instead call a function to with these and set all variables used in genPixles hook at once,
     // make that function dshould be a hook but I don't think it needs to
@@ -644,7 +657,7 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
         interDrawJulia(re, im);
         // click in Julia
       } else if (genPixlesParams.type === 1 || genPixlesParams.type === 2) {
-        console.log("calling inter draw orbit");
+        // console.log("calling inter draw orbit");
         interDrawOrbit(re, im);
         // now orbit
       }
