@@ -5,6 +5,7 @@
 // by calling useCanvas
 
 import useCanvas from "../../helpers/canvasHook";
+import { useMandRefStore } from "../../store/zustandTest";
 
 const Canvas = ({
   draw,
@@ -19,7 +20,16 @@ const Canvas = ({
   mouseMove,
   mouseUp,
 }) => {
+  const updateMandRef = useMandRefStore((state) => state.update);
+
   const canRef = useCanvas(draw, options);
+  // TODOTODOTODOT - make this a forward ref, this is going to cause unneseary
+  // rerenders and is super sloppy
+  if (id === "mandCan") {
+    setTimeout(() => {
+      updateMandRef(canRef);
+    }, 10);
+  }
 
   // console.log(maxWidth, maxHeight, "maxes!");
 
