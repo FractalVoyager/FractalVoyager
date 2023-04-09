@@ -418,6 +418,11 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
   };
 
   const drawOrbit = (ctx) => {
+    if (paramsStack.length >= 1) {
+      setBackOk(true);
+    } else {
+      setBackOk(false);
+    }
     if (p === oldOrbit) {
       return;
     }
