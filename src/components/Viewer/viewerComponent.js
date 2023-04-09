@@ -14,6 +14,7 @@ import {
   useTmpParamsStore,
   useTermStore,
   useMandRefStore,
+  useResetType,
 } from "../../store/zustandTest.js";
 
 /*
@@ -74,6 +75,16 @@ const Viewer = ({
   // this works but inst going into genPIxlesParams
   const initType = useCompileStore((state) => state.initialType);
   const setTypeStore = useTmpParamsStore((state) => state.setType);
+
+  const { resetType, triggerReset } = useResetType((state) => ({
+    resetType: state.type,
+    triggerReset: state.update,
+  }));
+
+  useEffect(() => {
+    console.log("RESETING TPYEEEEEEEEEEEEEEEE");
+    setGenPixlesParams({ ...genPixlesParams, type: resetType });
+  }, [triggerReset]);
 
   useEffect(() => {
     if (back !== hereBack) {

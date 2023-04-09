@@ -238,6 +238,15 @@ const useMandRefStore = create((set) => ({
   update: (ref) => set({ mandRef: ref }),
 }));
 
+// kind of a stupid - this is to make the viewer to know the new type
+// when you tpye a new script, without this - it draws the right type, but then
+// when you zoom or do anything it viewer it reverts back to the old type
+const useResetType = create((set) => ({
+  type: null,
+  update: 0,
+  setType: (type) => set((state) => ({ type: type, update: state.update + 1 })),
+}));
+
 export {
   useDimStore,
   useCompileStore,
@@ -246,6 +255,7 @@ export {
   useBackState,
   useTmpParamsStore,
   useMandRefStore,
+  useResetType,
 };
 
 //const useClickStore = create((set))

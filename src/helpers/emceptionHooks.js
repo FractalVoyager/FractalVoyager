@@ -1,6 +1,6 @@
 import * as Comlink from "https://unpkg.com/comlink/dist/esm/comlink.mjs";
 import { useEffect, useRef, useState } from "react";
-import { useCompileStore } from "../store/zustandTest.js";
+import { useCompileStore, useResetType } from "../store/zustandTest.js";
 import { useTermStore } from "../store/zustandTest.js";
 import { complexToCanvas } from "./util.js";
 
@@ -133,6 +133,13 @@ const useGenPixles = (
   const content = useCompileStore((state) => state.content);
   const [pixels, setPixles] = useState(null);
   const initialType = useCompileStore((state) => state.initialType);
+  const setType = useResetType((state) => state.setType);
+
+  // this should make it so when you type a new script it resets the type
+  useEffect(() => {
+    type = initialType;
+    setType(initialType);
+  }, [content]);
 
   // these don't even need to be refs
   //const module = useRef(null);
@@ -383,7 +390,7 @@ const useGenPixles = (
           }
         });
 
-        // TODOTODO add output if the max iterations was reached or if the condition was met
+        // TODOTODO add output if the max iterations
         // // console.log((newOrbit);
 
         // let newOrbit = orbitArr.reduce((acc, val, idx, arr) => {

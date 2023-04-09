@@ -1,6 +1,10 @@
 import createModule from "../cgen/main.mjs";
 import { useState, useEffect, useRef } from "react";
-import { useTermStore, useCompileStore } from "../store/zustandTest.js";
+import {
+  useTermStore,
+  useCompileStore,
+  useResetType,
+} from "../store/zustandTest.js";
 
 const useCgen = (script) => {
   const write = useTermStore((state) => state.write);
@@ -15,6 +19,8 @@ const useCgen = (script) => {
     // this is called only once to create the module - should really have this called when app starts, would
     // just have to set global state in that case
     const myCreateModule = async () => {
+      console.log("SCRIPT CHNGE1");
+
       createModule().then((Module) => {
         cgen.current = Module.cwrap("cgen", "number", [
           "string", // script
