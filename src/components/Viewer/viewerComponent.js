@@ -13,6 +13,7 @@ import {
   useColorsStore,
   useTmpParamsStore,
   useTermStore,
+  useMandRefStore,
 } from "../../store/zustandTest.js";
 
 /*
@@ -693,6 +694,8 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
     });
   }
 
+  const mandRef = useMandRefStore((state) => state.mandRef);
+
   return (
     <>
       <div id="viewer">
@@ -743,7 +746,29 @@ double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
           )}
         </div>
         <div id="lower-cont">
-          <a href="#" id="down">
+          <a
+            // target="_blank"
+            // href={mandRef ? mandRef.current.toDataURL() : "#"}
+            href="#"
+            id="down"
+            onClick={(e) => {
+              e.preventDefault();
+              var link = document.createElement("a");
+              link.download = "fractal.png";
+              link.href = mandRef.current.toDataURL();
+              link.click();
+
+              // var link = document.createElement("a");
+              // link.download = name;
+              // link.href = uri;
+              // document.body.appendChild(link);
+              // link.click();
+              // document.body.removeChild(link);
+              // // delete link;
+              // console.log(mandRef.current);
+              // console.log(mandRef.current.toDataURL());
+            }}
+          >
             Download
           </a>
           <CordsBox display={showCords} cords={displayCords} id="cords-box" />

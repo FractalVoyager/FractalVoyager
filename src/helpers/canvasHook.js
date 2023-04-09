@@ -5,9 +5,8 @@ import { useRef, useEffect } from "react";
 const useCanvas = (draw, options) => {
   // useRef is a hook that is not recomputed on re renders, so, thiss makes it so
   // the canvas doesn't rebuild every time there is a new draw
-  const canRef = useRef(null);
 
-  //
+  const canRef = useRef(null);
 
   // runs on the first call/ render, and when draw is changed, may want to change this
   // for resizing like going into fullscreen

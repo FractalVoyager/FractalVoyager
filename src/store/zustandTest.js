@@ -233,6 +233,11 @@ const useTmpParamsStore = create((set) => ({
   setGenVals: (re, im) => set({ re: re, im: im }),
 }));
 
+const useMandRefStore = create((set) => ({
+  manRef: null,
+  update: (ref) => set({ mandRef: ref }),
+}));
+
 export {
   useDimStore,
   useCompileStore,
@@ -240,6 +245,7 @@ export {
   useColorsStore,
   useBackState,
   useTmpParamsStore,
+  useMandRefStore,
 };
 
 //const useClickStore = create((set))
