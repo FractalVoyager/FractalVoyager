@@ -233,9 +233,9 @@ const useTmpParamsStore = create((set) => ({
   setGenVals: (re, im) => set({ re: re, im: im }),
 }));
 
-const useMandRefStore = create((set) => ({
-  manRef: null,
-  update: (ref) => set({ mandRef: ref }),
+const useFracRefStore = create((set) => ({
+  fracRef: null,
+  update: (ref) => set({ fracRef: ref }),
 }));
 
 // kind of a stupid - this is to make the viewer to know the new type
@@ -254,8 +254,6 @@ export {
   useColorsStore,
   useBackState,
   useTmpParamsStore,
-  useMandRefStore,
+  useFracRefStore,
   useResetType,
 };
-
-//const useClickStore = create((set))

@@ -1,6 +1,11 @@
 import Card from "react-bootstrap/Card";
 
-const Header = ({}) => {
+/*
+props: none
+returns: header component only
+descripton: simple component just to return header
+*/
+const Header = () => {
   return (
     <>
       <Card id="header">
