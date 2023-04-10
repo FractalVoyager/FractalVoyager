@@ -16,53 +16,53 @@ import ColorPicker from "../Colors/SliderComponent";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { FormLabel } from "react-bootstrap";
 
 /*
 Props: none 
-Returns: header, all buttons and controls for fractal, viewer component
-Description: 
+Returns: header, all buttons and controls for fractal, viewer component (contains canvases and cords box)
+Description: This components has all of the options for the fractal, and passes them as props to the viewer
+component. It uses tmpParamsStore which stores the values for these options that are currently being used
+by the viewer (gets written to by this component and also viewer for back button and box zooms). This component
+holds/controls the state of the options currently, and compares them with the stored options, and if different 
+it allows an update button click, which changes the props, rerendering viewer. The script stuff and generating
+julia set or obit button is also here, but handled differently than above flow
 */
 
 function Control({}) {
   // * refs * //
-  // script
-  const inputRef = useRef(null);
-  // axeses - refs start as the default values set in the component
 
+  // script ref
+  const inputRef = useRef(null);
+  // the cgened code from useCgen that gets passed to emception
   const codeRef = useRef(null);
 
   // * global state * //
 
+  // if back click is allowed
   const backReady = useBackState((state) => state.allowed);
   const compileReady = useCompileStore((state) => state.ready);
-  // const finalNumColors = useColorsStore((state) => state.amt);
-  // const colors = useColorsStore((state) => state.colors);
-
+  // color stuff from color component - way to pass state up
   const { finalNumColors, colors } = useColorsStore((state) => ({
     finalNumColors: state.amt,
     colors: state.colors,
   }));
-
+  // gets all of tmpParamsStore - the current values of options being used in viewer
   const tmpParamsStore = useTmpParamsStore();
-  const resetTmpGlobal = useTmpParamsStore((state) => state.reset);
+  // methods on ^^
   const setAlltmpParamsStore = useTmpParamsStore((state) => state.setAll);
   const setAxises = useTmpParamsStore((state) => state.setAxises);
 
-  // // // console.log((colors);
-  useEffect(() => {
-    setTmpParams({ ...tmpParams, colors: colors, numColors: finalNumColors });
-  }, [colors, finalNumColors]);
-
   // * local state * //
+
+  // back clicks
   const [back, setBack] = useState(0);
+  // cpx number
   const [showCords, setShowCords] = useState(true);
-
+  // silly fix to force SOMETHING
   const [foo, setFoo] = useState(0);
-
+  // current values of options - what is in textboxes - gets set to default vals for tmpParamsStore initially
   const [tmpParams, setTmpParams] = useState(tmpParamsStore);
-
-  // this will replace above
+  // the props that get passed down to viewer - starts as default values as per paramsStore
   const [params, setParams] = useState({
     x: 2160,
     y: 2160,
@@ -79,29 +79,30 @@ function Control({}) {
     orbitNum: 64,
     orbitColor: "red",
   });
-
+  // the values for the generate on click
   const [genVals, setGenVals] = useState([null, null]);
-
-  // orginally jsut need this for the axis because I thought thats all that viewer would write to
-  // control, but the backs mean that everything must be written back ---- this should take care of it,
-  // just need to update the tmpParamsStore on back
-  useEffect(() => {
-    console.log("HERE TYPE", tmpParamsStore.type);
-    setTmpParams(tmpParamsStore);
-    // setParams?????
-  }, [tmpParamsStore]);
-
+  // current script running/ to be run, updates to inputRef when compile and run is clicked
   const [script, setScript] = useState(null);
-
+  // numColors that get passed as prop to color components - could proably merge with numColors in tmpParams
   const [numColors, setNumColors] = useState(50);
-
+  // state if an update is ok
   const [updateOk, setUpdateOk] = useState(false);
 
-  // * on click handlers * //
+  // * useEffects * //
 
-  // could also do one of these for reset - but worry about actually doing reset later
-  // need to reset the type and stuff too, somewhat complicated
+  // update current values in this component when colors change
+  useEffect(() => {
+    setTmpParams({ ...tmpParams, colors: colors, numColors: finalNumColors });
+  }, [colors, finalNumColors]);
 
+  // when the store (options used in fractal) get updated, update the current values to them
+  // happens on box zoom or back
+  useEffect(() => {
+    setTmpParams(tmpParamsStore);
+  }, [tmpParamsStore]);
+
+  // on change of options in this component, check with options currently for viewer
+  // if different: allow update, if the same, don't allow update
   useEffect(() => {
     if (
       tmpParamsStore.realMax != tmpParams.realMax ||
@@ -116,42 +117,27 @@ function Control({}) {
       JSON.stringify(tmpParamsStore.colors) !==
         JSON.stringify(tmpParams.colors) ||
       tmpParamsStore.numColors != tmpParams.numColors ||
-      // tmpParamsStore.re != tmpParams.re ||
-      // tmpParamsStore.im != tmpParams.im ||
       tmpParamsStore.type != tmpParams.type ||
       tmpParamsStore.orbitNum != tmpParams.orbitNum ||
       tmpParamsStore.orbitColor != tmpParams.orbitColor
     ) {
-      console.log("STORE", tmpParamsStore.colors, "HERE", tmpParams.colors);
-      // TODO error checking - and if it works out - allow update (ex axeses difference postivie)
       setUpdateOk(true);
     } else {
-      console.log("equal");
-      console.log(tmpParamsStore, tmpParams);
       setUpdateOk(false);
     }
   }, [tmpParams]);
 
-  // handles
-  function handleUpdate() {
-    // // // // console.log((CpxMaxRef);
-    // TODO think I need to set tmpParamStore
-    // assuming we have all parts of the form,
-    // let height = CpxMaxRef.current.value - CpxMinRef.current.value;
-    // let width = RealMaxRef.current.value - RealMinRef.current.value;
+  // * click handlers * //
 
+  // handles an update, uses the values of tmpParamStore to calculate the params to be passed
+  // as props to viewer, then sets those params, and also sets the tmpParamStore
+  function handleUpdate() {
+    // math to calculate height, width, starts, and scales of canvas from complex number range
     let height = tmpParams.imgMax - tmpParams.imgMin;
     let width = tmpParams.realMax - tmpParams.realMin;
 
     let yRes = tmpParams.imagAxisRes;
-
-    //let yRes = yResRef.current.value;
-    // console.log(("VALS", tmpParams.realMax, tmpParams.realMin);
-
-    // console.log((height, width, "HEIGHT AND WIDTH");
     let xRes = (width / height) * yRes;
-
-    // 2 because the dfeault scale is -1 to 1 on both axises
 
     let xScale = width / 2;
     let yScale = height / 2;
@@ -168,16 +154,7 @@ function Control({}) {
     let startX = -((xRes / 2) * (xScale - 1)) + shiftX;
     let startY = -((yRes / 2) * (yScale - 1)) - shiftY;
 
-    // console.log(("STASRTS", startX, startY, xRes, yRes);
-
-    // // // console.log((xRes, yRes, xScale, yScale, startX, startY);
-
-    console.log(tmpParams);
-
-    // for now, appraoch for gen click is to leave it out of this - which makes sesne
-    // becuae it is a different thing, update clicks don't have anything to do with
-    // genning, just weird that for the values, you still need to click update for them to go through
-    // can probably pretty easilly get rid of that
+    // props for viewer
     setParams({
       ...params,
       x: parseInt(Math.round(xRes)),
@@ -196,7 +173,8 @@ function Control({}) {
       orbitNum: tmpParams.orbitNum,
       foo: foo + 1,
     });
-    console.log("LLLLLLLL", tmpParams.type);
+
+    // tmpParamsStore update (match what to check agianst to what is here now because updated viewer here)
     setAlltmpParamsStore(
       tmpParams.realMax,
       tmpParams.realMin,
@@ -216,24 +194,34 @@ function Control({}) {
       tmpParams.orbitColor
     );
     setFoo((prev) => prev + 1);
-
-    // setRes({
-    //   x: parseInt(Math.round(xRes)),
-    //   y: parseInt(Math.round(yRes)),
-    //   scaleX: parseFloat(xScale),
-    //   scaleY: parseFloat(yScale),
-    //   startX: parseFloat(startX),
-    //   startY: parseFloat(startY),
-    // });
-
-    // // // // console.log((xRes, yRes, xScale, yScale, startX, startY);
   }
 
-  function handleBack() {
-    setBack((prev) => prev + 1);
+  // helper for handlePan that set Axises of tmpParamsStore for one start value
+  function setStart(x, val) {
+    if (x) {
+      setAxises(
+        (val - params.x / 2) / (params.x / 2),
+        (params.scaleX * params.x + val - params.x / 2) / (params.x / 2),
+        -(params.scaleY * params.y + params.startY - params.y / 2) /
+          (params.y / 2),
+        -(params.startY - params.y / 2) / (params.y / 2)
+      );
+    } else {
+      setAxises(
+        (params.startX - params.x / 2) / (params.x / 2),
+        (params.scaleX * params.x + params.startX - params.x / 2) /
+          (params.x / 2),
+        -(params.scaleY * params.y + val - params.y / 2) / (params.y / 2),
+        -(val - params.y / 2) / (params.y / 2)
+      );
+    }
   }
 
+  // handles a pan left/right/up/down
+  // for each case, the new start is calculated, then props updated,
+  // and the tmpParamsStore is updated with setAxises
   function handlePan(direction) {
+    // TODO could work better, needs to be flushed out and tested in terms of how much to move based on zoom
     let startX;
     let startY;
     switch (direction) {
@@ -243,14 +231,7 @@ function Control({}) {
           ...params,
           startX: startX,
         });
-        setAxises(
-          (startX - params.x / 2) / (params.x / 2),
-          (params.scaleX * params.x + startX - params.x / 2) / (params.x / 2),
-          -(params.scaleY * params.y + params.startY - params.y / 2) /
-            (params.y / 2),
-          -(params.startY - params.y / 2) / (params.y / 2)
-        );
-
+        setStart(true, startX);
         break;
 
       case "right":
@@ -259,15 +240,7 @@ function Control({}) {
           ...params,
           startX: startX,
         });
-        // TODO make this a function
-        setAxises(
-          (startX - params.x / 2) / (params.x / 2),
-          (params.scaleX * params.x + startX - params.x / 2) / (params.x / 2),
-          -(params.scaleY * params.y + params.startY - params.y / 2) /
-            (params.y / 2),
-          -(params.startY - params.y / 2) / (params.y / 2)
-        );
-
+        setStart(true, startX);
         break;
 
       case "up":
@@ -276,13 +249,7 @@ function Control({}) {
           ...params,
           startY: startY,
         });
-        setAxises(
-          (params.startX - params.x / 2) / (params.x / 2),
-          (params.scaleX * params.x + params.startX - params.x / 2) /
-            (params.x / 2),
-          -(params.scaleY * params.y + startY - params.y / 2) / (params.y / 2),
-          -(startY - params.y / 2) / (params.y / 2)
-        );
+        setStart(false, startY);
         break;
 
       case "down":
@@ -291,13 +258,7 @@ function Control({}) {
           ...params,
           startY: startY,
         });
-        setAxises(
-          (params.startX - params.x / 2) / (params.x / 2),
-          (params.scaleX * params.x + params.startX - params.x / 2) /
-            (params.x / 2),
-          -(params.scaleY * params.y + startY - params.y / 2) / (params.y / 2),
-          -(startY - params.y / 2) / (params.y / 2)
-        );
+        setStart(false, startY);
         break;
 
       default:
@@ -305,8 +266,11 @@ function Control({}) {
     }
   }
 
+  // handles zooms, sets the params to the new calculated zoom, and updates tmpParamsStore to it as well
   function handleZoom(zoomIn) {
+    // TODO this doesn't work when you are not in the middle
     if (zoomIn) {
+      // math for zooming in
       let scaleX = params.scaleX * 0.5;
       let scaleY = params.scaleY * 0.5;
       let startX = (params.startX + params.x / 2) / 2;
@@ -317,8 +281,6 @@ function Control({}) {
         scaleY: scaleY,
         startX: startX,
         startY: startY,
-        // startX: (startX + (res.x + startX * scaleX * 0.5) / 2) / 2,
-        // startY: (startY + (res.y + startY * scaleY * 0.5) / 2) / 2,
       });
       setAxises(
         (startX - params.x / 2) / (params.x / 2),
@@ -326,9 +288,8 @@ function Control({}) {
         -(scaleY * params.y + startY - params.y / 2) / (params.y / 2),
         -(startY - params.y / 2) / (params.y / 2)
       );
-
-      // this works - ust doest seem like it since scales and stuff in here doesn't get updated after they change in viewer component
     } else {
+      // math for zooming out
       let scaleX = params.scaleX * 2;
       let scaleY = params.scaleY * 2;
       let startX = params.startX * 2 - params.x / 2;
@@ -348,12 +309,18 @@ function Control({}) {
       );
     }
   }
-  console.log("IMAG RES", tmpParams.imagAxisRes);
 
+  // calling hook to set current value of codeRef
+  // * refs don't cause rerenders when they change or update value
   codeRef.current = useCgen(script);
-  // the retun val is a test~~~!!!!
+  // compile - in hook, only runs if script changes - triggers change in state
+  // that useGenPixles is binded to, so this also generates new pixles with useGenPixles
   useCompileCode(codeRef.current);
 
+  // below is the jsx to be returned. It is the header, all of the options, the color components,
+  // and the viewer component inlined styled with bootstrap
+  // in all the forms, the value is hard set to the current options here (tmpParams) and they have
+  // on change handlers which set those tmpParams
   return (
     <>
       <div id="control-viewer">
@@ -446,6 +413,7 @@ function Control({}) {
                     <option value="green">Green</option>
                   </Form.Select>
 
+                  {/* if there is a fractal on the screen, don't grey out boxes */}
                   <Form>
                     {tmpParams.type === 0 ||
                     tmpParams.type === 1 ||
@@ -482,7 +450,8 @@ function Control({}) {
                         ></Form.Control>
                       </>
                     )}
-
+                    {/* gen julia space button if in param (type 0) otherwise orbit, if not fractal gen julia
+                    don't have anything about what type it is here, because that is handled in viewer */}
                     {tmpParams.type === 0 ? (
                       <>
                         <Button
@@ -549,11 +518,18 @@ function Control({}) {
                 </Form>
                 <Form id="viewer-form">
                   {backReady ? (
-                    <Button variant="primary" onClick={handleBack}>
+                    <Button
+                      variant="primary"
+                      onClick={() => setBack((prev) => prev + 1)}
+                    >
                       Back
                     </Button>
                   ) : (
-                    <Button variant="primary" disabled onClick={handleBack}>
+                    <Button
+                      variant="primary"
+                      disabled
+                      onClick={() => setBack((prev) => prev + 1)}
+                    >
                       Back
                     </Button>
                   )}
@@ -647,7 +623,7 @@ function Control({}) {
           </Container>
         </div>
 
-        {/* the key is what triggers a re render type thing, we don't want back there, becuase then the whole thing will start over */}
+        {/* the key is what triggers a full restart???, we don't want back there, becuase then the whole thing will start over */}
         <Viewer
           key={params}
           xRes={params.x}
@@ -668,8 +644,6 @@ function Control({}) {
           orbitNum={params.orbitNum}
           orbitColor={params.orbitColor}
           genVals={genVals}
-
-          // tmp fix to force renders even when props are the same because they are really different in viewer
         />
       </div>
     </>

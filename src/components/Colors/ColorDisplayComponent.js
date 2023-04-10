@@ -4,7 +4,6 @@ import chroma from "chroma-js";
 import { useColorsStore } from "../../store/zustandTest";
 
 function ColorDisplayer({ selectedColor, num, width, height }) {
-  // // // console.log("HERE");
   const [colors, setColors] = useState();
   const set = useColorsStore((state) => state.set);
 
