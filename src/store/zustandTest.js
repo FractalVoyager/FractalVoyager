@@ -247,6 +247,11 @@ const useResetType = create((set) => ({
   setType: (type) => set((state) => ({ type: type, update: state.update + 1 })),
 }));
 
+const useWriteOrbitStore = create((set) => ({
+  write: true,
+  setWrite: (bool) => set({ write: bool }),
+}));
+
 export {
   useDimStore,
   useCompileStore,
@@ -256,4 +261,5 @@ export {
   useTmpParamsStore,
   useFracRefStore,
   useResetType,
+  useWriteOrbitStore,
 };

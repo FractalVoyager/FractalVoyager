@@ -10,6 +10,7 @@ import {
   useTermStore,
   useFracRefStore,
   useResetType,
+  useWriteOrbitStore,
 } from "../../store/zustandTest.js";
 
 /*
@@ -23,7 +24,7 @@ numColors: number of colors
 colors: array of colors to be used
 maxRad, minRad, maxIters, epsilon: program options for c++ code determiined by values in control
 showCords: if the cords box should be shown
-foo: TODO forget why I added this but pretty sure I need it to force a rerender somewher
+foo: TODO forget why I added this but pretty sure I need it to force a rerender somewhere
 orbitNum, orbitColor: the how many numbers to do the orbit, and what color to make the line
 genVals: the values to be passed to julia set or orbit to generate with
 returns: the canvases, the cords box, the download link
@@ -79,6 +80,8 @@ const Viewer = ({
     resetType: state.type,
     triggerReset: state.update,
   }));
+  // thing for dan
+  const writeOrbit = useWriteOrbitStore((state) => state.setWrite);
 
   // * local state * //
 
@@ -148,6 +151,9 @@ const Viewer = ({
   // pretty sure these two can't be combined because of the show cords and julia set and stuff
   const [drawing, setDrawing] = useState(false);
 
+  // test for dans thing
+  const [clearFrac, setClearFrac] = useState(false);
+
   // * useEffects * //
 
   // when a new script is typed in, reset the type in genPixleParams to the inital type of that script
@@ -158,7 +164,13 @@ const Viewer = ({
   // back useEffect, triggers when back is clicked and changes the genParams
   useEffect(() => {
     // shouldn't need this but don't feel like changing it
+
     if (back !== hereBack) {
+      if (clearFrac) {
+        console.log("NO LONGER CLEARING FRAC");
+        setClearFrac(false);
+        writeOrbit(true);
+      }
       // we don't want to reset the previous cords if it is a first drawn julia set with no zooms or a orbit
       if (
         genPixlesParams.type === 0 ||
@@ -263,7 +275,7 @@ const Viewer = ({
       if (genPixlesParams.type === 0) {
         interDrawJulia(genVals[0], genVals[1]);
       } else if (genPixlesParams.type === 1 || genPixlesParams.type === 2) {
-        interDrawOrbit(genVals[0], genVals[1]);
+        interDrawOrbit(genVals[0], genVals[1], true);
       }
     }
   }, [genVals]);
@@ -274,9 +286,12 @@ const Viewer = ({
 
   // when about to draw orbit: write to terminal, set ParamsStack, set genPixles
   // to right stuff, set type in tmpParamsStore, setGenVals in tmpParamsStore
-  const interDrawOrbit = (re, im) => {
+  const interDrawOrbit = (re, im, write) => {
     // console.log("inter draw orbit");
-    quickWrite("Generating orbit...");
+    if (write) {
+      quickWrite("Generating orbit...");
+    }
+
     // setClearOrbit(true);
     setParamsStack([...paramsStack, genPixlesParams]);
     setGenPixlesParams({
@@ -501,7 +516,8 @@ const Viewer = ({
     ctx.strokeRect(realStartX, realStartY, width, height);
   };
 
-  // * helper fcn for mouse events * //
+  // * mouse event fcns * //
+  // these get passed down to the canvases, but once again need state held here so are here
 
   // helper to calculate cpx values after a mouse move for showing them in cords box
   function mouseMoveCalcCords(e) {
@@ -514,15 +530,12 @@ const Viewer = ({
       genPixlesParams.heightScale *
         (e.nativeEvent.offsetY * (yRes / clinetDims.height)) +
       genPixlesParams.startY;
+    const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
     // TODO probably only need to do above in this conditon
     if (showCords) {
-      const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
       setDisplayCords({ re: re, im: im });
     }
   }
-
-  // * mouse event fcns * //
-  // these get passed down to the canvases, but once again need state held here so are here
 
   // this only gets passed down to rectangle canvas - sets the start rect cords
   function mouseDown(e) {
@@ -532,7 +545,12 @@ const Viewer = ({
       y: parseInt(e.nativeEvent.offsetY),
     });
     // only allow box zooms on fractals
-    if (genPixlesParams.type == 0 || genPixlesParams.type == 1) setIsDown(true);
+    if (
+      genPixlesParams.type == 0 ||
+      genPixlesParams.type == 1 ||
+      genPixlesParams.type == 2
+    )
+      setIsDown(true);
   }
 
   // only passed to rectangle canvas
@@ -549,12 +567,19 @@ const Viewer = ({
         (e.nativeEvent.offsetY * (yRes / clinetDims.height)) +
       genPixlesParams.startY;
 
+    const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
+
     if (showCords) {
-      const [re, im] = canvasToComplex(canX, canY, xRes, yRes);
       setDisplayCords({ re: re, im: im });
     }
 
-    setDrawing(true);
+    if (genPixlesParams.type === 2) {
+      setClearFrac(true);
+      writeOrbit(false);
+      interDrawOrbit(re, im, false);
+    } else {
+      setDrawing(true);
+    }
 
     setFinalCords({
       startX: rectStartCords.x,
@@ -588,7 +613,7 @@ const Viewer = ({
     }
 
     // if it is not just a click, call interDrawFrac
-    if (!(startY === endY || startX === endX)) {
+    if (!(startY === endY || startX === endX) && genPixlesParams.type !== 2) {
       interDrawFrac(
         Math.round(startX),
         Math.round(startY),
@@ -614,7 +639,7 @@ const Viewer = ({
         interDrawJulia(re, im);
         // click in julia or orbit - draw orbit
       } else if (genPixlesParams.type === 1 || genPixlesParams.type === 2) {
-        interDrawOrbit(re, im);
+        interDrawOrbit(re, im, true);
       }
     }
     // reset rectangle state
@@ -678,7 +703,7 @@ const Viewer = ({
               {/* three differnet canvases - fractal, box zoom, orbit */}
               <Canvas
                 className="can"
-                draw={drawFrac}
+                draw={clearFrac ? clearRect : drawFrac}
                 xRes={xRes}
                 yRes={yRes}
                 maxWidth={wrapperRef.current.clientWidth}

@@ -1,6 +1,10 @@
 import * as Comlink from "https://unpkg.com/comlink/dist/esm/comlink.mjs";
 import { useEffect, useRef, useState } from "react";
-import { useCompileStore, useResetType } from "../store/zustandTest.js";
+import {
+  useCompileStore,
+  useResetType,
+  useWriteOrbitStore,
+} from "../store/zustandTest.js";
 import { useTermStore } from "../store/zustandTest.js";
 import { complexToCanvas } from "./util.js";
 
@@ -134,6 +138,7 @@ const useGenPixles = (
   const [pixels, setPixles] = useState(null);
   const initialType = useCompileStore((state) => state.initialType);
   const setType = useResetType((state) => state.setType);
+  const writeOrbit = useWriteOrbitStore((state) => state.write);
 
   // this should make it so when you type a new script it resets the type
   useEffect(() => {
@@ -343,20 +348,22 @@ const useGenPixles = (
           orbitHeap.byteOffset
         );
 
-        write(
-          "Generated orbit for " +
-            clicked_re +
-            (clicked_im >= 0
-              ? "+" + clicked_im
-              : "-" + clicked_im.toString().slice(1)) +
-            "i ",
-          "lightgreen",
-          true
-        );
-        setTimeout(
-          () => quickWrite("outputting orbit (iterations : number)..."),
-          1
-        );
+        if (writeOrbit) {
+          write(
+            "Generated orbit for " +
+              clicked_re +
+              (clicked_im >= 0
+                ? "+" + clicked_im
+                : "-" + clicked_im.toString().slice(1)) +
+              "i ",
+            "lightgreen",
+            true
+          );
+          setTimeout(
+            () => quickWrite("outputting orbit (iterations : number)..."),
+            1
+          );
+        }
 
         let tmpOrbitArray = new Float64Array(
           orbitHeap.buffer,
@@ -365,30 +372,40 @@ const useGenPixles = (
         );
         Module._free(Module.HEAPF64.buffer);
         let orbitArr = tmpOrbitArray;
-        console.log(orbitArr);
 
         let newOrbit = [[]];
-        orbitArr.forEach((val, idx, arr) => {
-          if (!(val === 0 && arr[idx + 1] === 0) && idx % 2 === 0) {
-            setTimeout(
-              () =>
-                quickWrite(
-                  idx / 2 +
-                    " : " +
-                    val +
-                    (arr[idx + 1] >= 0
-                      ? "+" + arr[idx + 1]
-                      : "-" + arr[idx + 1].toString().slice(1)) +
-                    "i "
-                ),
-              1
-            );
 
-            newOrbit.push(
-              complexToCanvas(val, arr[idx + 1], canWidth, canHeight)
-            );
-          }
-        });
+        if (writeOrbit) {
+          orbitArr.forEach((val, idx, arr) => {
+            if (!(val === 0 && arr[idx + 1] === 0) && idx % 2 === 0) {
+              setTimeout(
+                () =>
+                  quickWrite(
+                    idx / 2 +
+                      " : " +
+                      val +
+                      (arr[idx + 1] >= 0
+                        ? "+" + arr[idx + 1]
+                        : "-" + arr[idx + 1].toString().slice(1)) +
+                      "i "
+                  ),
+                1
+              );
+
+              newOrbit.push(
+                complexToCanvas(val, arr[idx + 1], canWidth, canHeight)
+              );
+            }
+          });
+        } else {
+          orbitArr.forEach((val, idx, arr) => {
+            if (!(val === 0 && arr[idx + 1] === 0) && idx % 2 === 0) {
+              newOrbit.push(
+                complexToCanvas(val, arr[idx + 1], canWidth, canHeight)
+              );
+            }
+          });
+        }
 
         // TODOTODO add output if the max iterations
         // // console.log((newOrbit);
