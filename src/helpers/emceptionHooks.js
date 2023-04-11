@@ -1,5 +1,5 @@
 import * as Comlink from "https://unpkg.com/comlink/dist/esm/comlink.mjs";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useCompileStore,
   useResetType,
@@ -8,33 +8,42 @@ import {
 import { useTermStore } from "../store/zustandTest.js";
 import { complexToCanvas } from "./util.js";
 
+/*
+description: this is a collection of three hooks that interact with emception (the in browser c++ to wasm compiler) 
+that uses emscripten all at runtime. They are to initialize it, compile code with it, and running that compiled code
+*/
+
+// fcn to "import" string as module using blobs
 function doimport(str) {
   const blob = new Blob([str], { type: "text/javascript" });
   const url = URL.createObjectURL(blob);
-  // neeed this to tell webpack to take this as a normal import() and not do anything speical with it
+  // need this to tell webpack to take this as a normal import() and not do anything speical with it
   const module = import(/* webpackIgnore: true */ url);
 
   URL.revokeObjectURL(url); // GC objectURLs
-
   return module;
 }
 
-// maybe??? should really be ref - could set it up like gen Pixel hooks with two functions in one hook - could also make htis
-// global state variuables in zustand - but try this until it doesn't work anytmore (maybe on multiple hits)
+// variable for emception - TODO - should probably be a ref
 var emception;
 
-// this is loading emception that we only want to do once when the app first loads,
-// once emception is loaded we don't need to
+/*
+this hook initializes emception - it works as a web worker
+*/
 const useInitEmception = () => {
+  // global state to allow the compile button to be pressed
   const setReady = useCompileStore((state) => state.setReady);
   const write = useTermStore((state) => state.write);
   const quickWrite = useTermStore((state) => state.quickWrite);
+  // runs the first time this is called only b/c empty array
   useEffect(() => {
+    // fcn to initialize emception
     const initEmception = async () => {
-      // maybe useMemo for htis
+      // make worker
       const worker = new Worker(
         "./emception/emception.worker.bundle.worker.js"
       );
+      // comlink wrap to get logging - passing quickwrite fcn so emception logging goes to terminal on screen
       emception = Comlink.wrap(worker);
       window.emception = emception;
       window.Comlink = Comlink;
@@ -42,7 +51,6 @@ const useInitEmception = () => {
       emception.onstdout = Comlink.proxy(quickWrite);
       emception.onstderr = Comlink.proxy(quickWrite);
       emception.onprocessstart = Comlink.proxy(quickWrite);
-      // emception.onprocessstart = Comlink.proxy(addToConsole);
 
       write("Loading c++ to wasm compiler...", "white", true);
 
@@ -52,30 +60,35 @@ const useInitEmception = () => {
     };
 
     initEmception();
-
-    // TODO - maybe figure out how to deal with only reutirn this after this is done, think it does that anyway - using async in genPixles
-    // acutally could prob just have this trigger state that allows the user to compile code - check if having this flow is bad
   }, []);
 };
 
+/*
+this hook uses the initialized emception to compile code with it all in the browser
+takes code which is the code to be compiled
+*/
 const useCompileCode = (code) => {
+  // global state to know if it is okay to compile code
   const ready = useCompileStore((state) => state.ready);
   const write = useTermStore((state) => state.write);
   const quickWrite = useTermStore((state) => state.quickWrite);
+  // content is the string that is the wasm compiled c++ code
   const setContent = useCompileStore((state) => state.setContent);
 
+  // useEffect runs on change of code (code to be compiled)
   useEffect(() => {
+    // fcn to compile code
     const compileCode = async () => {
       // TODO clear console because about to re run (could have it be new or something like htat)
-      // TODO - disallaw another compile - this will end up being on some sort of on click - prob some state might be in componet
-      // TODO - button state
       try {
         quickWrite("Compiling c++ to wasm...<br>Dumping compiler output...");
+        // creates a file on the emception virtual file system that is the c++ code passed
         await emception.fileSystem.writeFile("/working/main.cpp", code);
-
-        // emcc -o mandlebrotCPP.js  main.cpp -O3  -s NO_EXIT_RUNTIME=1 -s "EXPORTED_RUNTIME_METHODS=['ccall','cwrap']" -s "EXPORTED_FUNCTIONS=['_malloc', '_free', _genPixles]" -s MODULARIZE=1 -s "EXPORT_NAME='createModule'" -s ALLOW_MEMORY_GROWTH
+        // emscripten commands that emception will use to compile with - just as if we were compiling using emscripten normally not during run time
         const cmd = `emcc -O3 -sSINGLE_FILE=1 -sNO_EXIT_RUNTIME=1 -sEXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -sEXPORT_ES6=1 -sUSE_ES6_IMPORT_META=0 -sEXPORTED_FUNCTIONS=['_malloc','_free','_genPixles','_orbit','setValue']  -sMODULARIZE=1 -sEXPORT_NAME='createModule' -s ENVIRONMENT='web' -sALLOW_MEMORY_GROWTH main.cpp -o main.mjs`;
+        // tell emception to compile and get exit code?
         const result = await emception.run(cmd);
+        // worked
         if (result.returncode == 0) {
           write(
             "Compiled, generating fractal with wasm...",
@@ -88,7 +101,7 @@ const useCompileCode = (code) => {
             "/working/main.mjs",
             { encoding: "utf8" }
           );
-
+          // set the content (string representing module) as the compiled wasm
           setContent(content);
         } else {
           write(
@@ -100,45 +113,62 @@ const useCompileCode = (code) => {
       } catch (err) {
         console.error(err);
       } finally {
-        // deal with state here? or just return - might be able to do this with the return state cleanup
       }
     };
+    // only attempt if ready
     if (ready) {
       compileCode();
     }
   }, [code]);
 };
 
+/*
+useGenPixles hook - this takes all of the paramters needed to run the fractal program, and imports the string module as a real module,
+and uses it to create fractals with all the paramters needed by running the wasm compiled code
+parameters: * commented below *
+*/
 const useGenPixles = (
-  type,
-  fixed_re, // for initial 0 then 1
-  fixed_im, // for inital 0 then 1
-  clicked_re, // for orbit
-  clicked_im,
-  maxIters,
-  epsilon,
-  minRadius,
-  maxRadius,
-  startX,
-  startY,
-  newCanWidth,
-  newCanHeight,
-  canWidth,
-  canHeight,
-  widthScale,
-  heightScale,
-  arrayLength,
-  colors,
-  numColors,
-  orbitNum
+  type, // 0 - param, 1 - dyn, 2 - orbit
+  fixed_re, // value to be used in clicked dyn space, and still that value for generating an orbit with dyn space - re part
+  fixed_im, // ^^ im part
+  clicked_re, // value to pass through dyn fractal fcn that was clicked for an orbit, uses the ^^ vals for the dyn fcn - re part
+  clicked_im, // ^^ im part
+  maxIters, // maximum iterations that the prgram and run for one point (cpx val)
+  epsilon, // when to call two numbers the same modulus(z1) - modulus(z2) < epsilon = same
+  minRadius, // when to call a number zero modulus(z) < minRadius = z is zero
+  maxRadius, // when to say the fcn will escape/ a number infintately modulus(z) > maxRadius = z will escape - break out of loop
+  // the point will be colored based on this value
+  startX, // start val used in conversion between loop and cpx number in program
+  startY, // ^^
+  newCanWidth, // the width of canvas which will actaully have a fractal drawn on it
+  newCanHeight, // ^^ for height
+  canWidth, // total width of entire canvas
+  canHeight, // ^^ for height
+  widthScale, // used in conversion between loop and cpx number in program
+  heightScale, // ^^ height
+  arrayLength, // length of pixle array
+  colors, // array of colors that will be used
+  numColors, // number of those colors
+  orbitNum // how many iterations to do orbit
 ) => {
-  // state and such here
+  // pixle array - only local state
+  const [pixels, setPixles] = useState(null);
+
+  // * global state * //
+
+  // this is the module string, on change, this hook will rerender b/c it is binded to it here
   // this triggers a re render of "host" component (viewer) so won't need to even have this anywhere in viewer
   const content = useCompileStore((state) => state.content);
-  const [pixels, setPixles] = useState(null);
+  // initial type from script (if no c - 1, if c - 0)
   const initialType = useCompileStore((state) => state.initialType);
+  // needed to make retying a script work
   const setType = useResetType((state) => state.setType);
+  // if we should write output about orbit
   const writeOrbit = useWriteOrbitStore((state) => state.write);
+  const write = useTermStore((state) => state.write);
+  const quickWrite = useTermStore((state) => state.quickWrite);
+
+  // * useEffects * //
 
   // this should make it so when you type a new script it resets the type
   useEffect(() => {
@@ -146,23 +176,16 @@ const useGenPixles = (
     setType(initialType);
   }, [content]);
 
-  // these don't even need to be refs
-  //const module = useRef(null);
-  // const genPixles = useRef(null);
-
-  const write = useTermStore((state) => state.write);
-  const quickWrite = useTermStore((state) => state.quickWrite);
-
+  // runs on change of parameters
   useEffect(() => {
+    // fcn to create module and fcns - shoudln't have to do this everytime but do for now - unmeasureable time add
     const createMod = async () => {
+      // calls fcn to make string content to a "real" wasm/emscripten module
       const loadModule = (await doimport(new Blob([content]))).default;
-
+      // call it
       loadModule().then((Module) => {
-        /*
-            int type, int color, double fixed_re, double fixed_im, int maxIters, double iterMult, double minRadius, double maxRadius, double startX, double startY, double newCanWidth, double newCanHeight, int width, int height, double widthScale, double heightScale, uint8_t *ptr
-            */
-        // let genPixles = Module.cwrap("genPixles", "null", [
-
+        // create genPixles fcn with params if it is a fractal type
+        // this fcn takes and the params and a pointer and writes the array to that pointer on wasm memory
         if (type === 0 || type === 1) {
           let genPixles = Module.cwrap("genPixles", "null", [
             "number",
@@ -186,9 +209,12 @@ const useGenPixles = (
             "number",
             "number",
           ]);
+          // call the fcn to genPixles with the module created and this fcn created
           myGenPixles(Module, genPixles);
+          // orbit type
         } else {
-          // double fixed_re, double fixed_im, double clicked_re, clicked_im, int maxIters, double minRadius, double maxRadius, double_t *p
+          // orbit fcn takes params and a pointer to wasm memory and writes orbit to it
+          // in form [z1re, z1im, z2re, z2im, ...]
           let orbit = Module.cwrap("orbit", "null", [
             "number",
             "number",
@@ -199,12 +225,16 @@ const useGenPixles = (
             "number",
             "number",
           ]);
+          // call fcn that calls this created fcn
           myGenPixles(Module, orbit);
         }
       });
     };
+    // fcn to run the created fcns - takes the module and the fcn to be run
     const myGenPixles = async (Module, fcn) => {
+      // if pixle gen type
       if (type === 0 || type === 1) {
+        // create the pointer
         let pixlesPtr = Module._malloc(
           arrayLength * Uint8Array.BYTES_PER_ELEMENT
         );
@@ -214,22 +244,23 @@ const useGenPixles = (
           pixlesPtr,
           arrayLength * Uint8Array.BYTES_PER_ELEMENT
         );
-
+        // make arrays of reds greens and blues of the colors to be used
         let reds = [];
         let greens = [];
         let blues = [];
-        // console.log((colors);
-
         colors.forEach((color) => {
           reds.push(color[0]);
           greens.push(color[1]);
           blues.push(color[2]);
         });
-
+        // make pointers for those arrays
         let redPtr = Module._malloc(numColors * Uint8Array.BYTES_PER_ELEMENT);
         let bluePtr = Module._malloc(numColors * Uint8Array.BYTES_PER_ELEMENT);
         let greenPtr = Module._malloc(numColors * Uint8Array.BYTES_PER_ELEMENT);
 
+        // this goes through the colors, and sets the values of them
+        // as far as I know, this is the only way to write values on the wasm memory
+        // with emscripten in js to be read by c++
         for (let i = 0; i < numColors; i++) {
           Module.setValue(redPtr + i, reds[i], "i8");
           Module.setValue(bluePtr + i, blues[i], "i8");
@@ -259,6 +290,7 @@ const useGenPixles = (
           greenPtr,
           bluePtr
         );
+        // write output
         if (type === 0) {
           write("Generated paramter space fractal", "lightgreen", true);
           setTimeout(
@@ -307,16 +339,7 @@ const useGenPixles = (
           arrayLength
         );
 
-        ///// can also do above as below --- same result //////
-
-        // let pixelArray = new Uint8ClampedArray(
-        //   Module.HEAPU8.buffer,
-        //   pixlesPtr,
-        //   arrayLength
-        // );
-
         // free the memory
-        // Module._free(Module.HEAPU8.buffer);
         Module._free(Module.HEAPU8.buffer);
         Module._free(redPtr);
         Module._free(greenPtr);
@@ -324,19 +347,21 @@ const useGenPixles = (
 
         // create the image
         let data = new ImageData(pixelArray, canWidth, canHeight);
-
+        // set the image to the pixle state
         setPixles(data);
+        // orbit
       } else {
+        // create pointer
         let orbitPtr = Module._malloc(
           maxIters * 2 * Float64Array.BYTES_PER_ELEMENT
         );
-
+        // put on wasm heap
         let orbitHeap = new Float64Array(
           Module.HEAPF64.buffer,
           orbitPtr,
           maxIters * 2 * Float64Array.BYTES_PER_ELEMENT
         );
-        // // double fixed_re, double fixed_im, double clicked_re, clicked_im, int maxIters, double minRadius, double maxRadius, double_t *p
+        // call fcn
         await fcn(
           fixed_re,
           fixed_im,
@@ -348,6 +373,7 @@ const useGenPixles = (
           orbitHeap.byteOffset
         );
 
+        // write stuff to terminal
         if (writeOrbit) {
           write(
             "Generated orbit for " +
@@ -355,7 +381,7 @@ const useGenPixles = (
               (clicked_im >= 0
                 ? "+" + clicked_im
                 : "-" + clicked_im.toString().slice(1)) +
-              "i ",
+              "i. Click for another orbit, or click and drag for the fractal to go away and see only the orbits.",
             "lightgreen",
             true
           );
@@ -365,6 +391,7 @@ const useGenPixles = (
           );
         }
 
+        // get data off wasm memory and free the memory
         let tmpOrbitArray = new Float64Array(
           orbitHeap.buffer,
           orbitHeap.byteOffset,
@@ -372,9 +399,8 @@ const useGenPixles = (
         );
         Module._free(Module.HEAPF64.buffer);
         let orbitArr = tmpOrbitArray;
-
+        // get the orbit as canvas points instead of complex values, and print complex values as it goes if that is set
         let newOrbit = [[]];
-
         if (writeOrbit) {
           orbitArr.forEach((val, idx, arr) => {
             if (!(val === 0 && arr[idx + 1] === 0) && idx % 2 === 0) {
@@ -406,37 +432,14 @@ const useGenPixles = (
             }
           });
         }
-
-        // TODOTODO add output if the max iterations
-        // // console.log((newOrbit);
-
-        // let newOrbit = orbitArr.reduce((acc, val, idx, arr) => {
-        //   // // console.log((acc);
-        //   if (val === 0 && arr[idx + 1] === 0) {
-        //     return acc;
-        //   }
-        //   if (idx % 2 === 0) {
-        //     acc.push(
-        //       complexToCanvas(val, arr[idx + 1], newCanWidth, newCanHeight)
-        //     );
-        //     return acc;
-        //   } else {
-        //     return acc;
-        //   }
-        // }, []);
-        // // // console.log((newOrbit);
-
+        // set the "pixles" as the new orbit
         setPixles(newOrbit);
-        console.log(newOrbit);
       }
     };
-
-    // might need some stuff like only do if content has changed
+    // if we have content, do all of above
     if (content) {
       createMod();
     }
-
-    // could have it return pixels, maybe the pixles getting set is cauing rerenders of viewer
   }, [
     type,
     fixed_re,
@@ -460,6 +463,7 @@ const useGenPixles = (
     colors,
     numColors,
   ]);
+  // return the "pxiles"
   return pixels;
 };
 

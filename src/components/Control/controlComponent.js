@@ -313,7 +313,7 @@ function Control({}) {
   // calling hook to set current value of codeRef
   // * refs don't cause rerenders when they change or update value
   codeRef.current = useCgen(script);
-  // compile - in hook, only runs if script changes - triggers change in state
+  // compile - in hook, only runs if code changes - triggers change in state
   // that useGenPixles is binded to, so this also generates new pixles with useGenPixles
   useCompileCode(codeRef.current);
 
