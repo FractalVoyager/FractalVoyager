@@ -151,7 +151,7 @@ const Viewer = ({
   // pretty sure these two can't be combined because of the show cords and julia set and stuff
   const [drawing, setDrawing] = useState(false);
 
-  // test for dans thing
+  // wether to clear the fractal or not (when dragging orbit - feature Dan wanted)
   const [clearFrac, setClearFrac] = useState(false);
 
   // * useEffects * //
@@ -579,6 +579,8 @@ const Viewer = ({
       setDisplayCords({ re: re, im: im });
     }
 
+    // if click and drag in orbit, clear fractal and no longer write to console so it doesn't lag
+    // this is a feature dan wanted
     if (genPixlesParams.type === 2) {
       setClearFrac(true);
       writeOrbit(false);
@@ -618,7 +620,7 @@ const Viewer = ({
       endY = tmpStart;
     }
 
-    // if it is not just a click, call interDrawFrac
+    // if it is not just a click (and we weren't just dragging orbits), call interDrawFrac
     if (!(startY === endY || startX === endX) && genPixlesParams.type !== 2) {
       interDrawFrac(
         Math.round(startX),
