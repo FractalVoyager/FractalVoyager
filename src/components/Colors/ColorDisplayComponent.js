@@ -40,7 +40,7 @@ function ColorDisplayer({ selectedColor, num, wrapper }) {
   if (wrapper && colors) {
     wStr =
       Math.floor(wrapper.current.clientWidth / colors.length).toString() + "px";
-    hStr = Math.floor(wrapper.current.clientHeight * 3).toString() + "px";
+    hStr = Math.floor(wrapper.current.clientHeight * 2.5).toString() + "px";
   }
   // also if we have colors and wrapper, we're good to return component, otherwise, return nothing
   if (colors && wrapper) {
