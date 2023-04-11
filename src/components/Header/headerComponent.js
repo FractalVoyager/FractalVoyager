@@ -10,9 +10,9 @@ const Header = () => {
     <>
       <Card id="header">
         <Card.Body>
-          <Card.Title>Fractal Stream</Card.Title>
+          <Card.Title>Fractal Script</Card.Title>
           <Card.Subtitle>
-            Online fractal generator using the fractal stream language
+            Online fractal generator using a fractal scripting language
           </Card.Subtitle>
           <Card.Text>
             Enter a script in the text box and press "compile and run". To alter
