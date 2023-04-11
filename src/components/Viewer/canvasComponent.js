@@ -33,7 +33,7 @@ const Canvas = ({
   // gets the ref for can and calls draws on the canvas with useCanvas
   const canRef = useCanvas(draw, options);
 
-  // silly fix to set a ref for the canvas which is drawing the fractals - uses global store
+  // silly fix to set a ref for the canvas which is drawing the fractals - uses global store - can use forward ref instead
   const updateFracRef = useFracRefStore((state) => state.update);
   if (id === "fracCan") {
     setTimeout(() => {
