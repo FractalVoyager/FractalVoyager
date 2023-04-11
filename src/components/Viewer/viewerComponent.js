@@ -166,11 +166,6 @@ const Viewer = ({
     // shouldn't need this but don't feel like changing it
 
     if (back !== hereBack) {
-      if (clearFrac) {
-        console.log("NO LONGER CLEARING FRAC");
-        setClearFrac(false);
-        writeOrbit(true);
-      }
       // we don't want to reset the previous cords if it is a first drawn julia set with no zooms or a orbit
       if (
         genPixlesParams.type === 0 ||
@@ -179,8 +174,19 @@ const Viewer = ({
       ) {
         setPrevFracCords((prevFracCords) => prevFracCords.slice(0, -1));
       }
+      let params;
+      if (clearFrac) {
+        setClearFrac(false);
+        writeOrbit(true);
+        // now want this back to go to the julia set (only way to recover it being there is to get rid of all orbits)
+        params = paramsStack.pop();
+        while (params.type === 2) {
+          params = paramsStack.pop();
+        }
+      }
       // old params
-      let params = paramsStack.pop();
+      else params = paramsStack.pop();
+
       // set them as current
       setGenPixlesParams(params);
       // set the store of options to those which would have been used for the old params
