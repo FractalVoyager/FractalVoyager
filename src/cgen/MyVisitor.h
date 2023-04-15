@@ -385,6 +385,53 @@ public:
     // DO THESE LATER -- HARD 
     virtual antlrcpp::Any visitCPX_FCN_EXP(FractalParser::CPX_FCN_EXPContext *ctx) override {
       // https://en.cppreference.com/w/c/numeric/complex
+
+
+
+      if(ctx->cpx_function()->EXP()) {
+        output << "exp(";
+
+      } else if(ctx->cpx_function()->COS()) {
+        output << "cos(";
+
+
+      } else if(ctx->cpx_function()->SIN()) {
+        output << "sin(";
+
+      } else if(ctx->cpx_function()->TAN()) {
+        output << "tan(";
+
+      } else if(ctx->cpx_function()->COSH()) {
+        output << "cosh(";
+
+      } else if(ctx->cpx_function()->SINH()) {
+        output << "sinh(";
+        
+      } else if(ctx->cpx_function()->TANH()) {
+        output << "tanh(";
+
+      } else if(ctx->cpx_function()->RE()) {
+        output << "real(";
+
+      } else if(ctx->cpx_function()->IM()) {
+        output << "imag(";
+
+      } else if(ctx->cpx_function()->BAR()) {
+        output << "conj(";
+
+      } else if(ctx->cpx_function()->ARG()) {
+        output << "arg(";
+
+      } else if(ctx->cpx_function()->LOG()) {
+        output << "log(";
+        
+      } else if(ctx->cpx_function()->SQRT()) {
+        output << "sqrt(";
+
+      }
+      visit(ctx->expression()); 
+      output << ")";
+
     return ctx; // visitChildren(ctx);
   }
 
@@ -685,10 +732,10 @@ public:
     virtual antlrcpp::Any visitLoopRepeat(FractalParser::LoopRepeatContext *ctx) override {
       return ctx;
       // std:cout << "in loop reapeat\n";
-      int n = stoi(ctx->n()->getText());
-      for(int i = 0; i < n; i++) {
-        visit(ctx->command());
-      }
+      // int n = stoi(ctx->n()->getText());
+      // for(int i = 0; i < n; i++) {
+      //   visit(ctx->command());
+      // }
       return ctx;
     }
 
@@ -705,12 +752,12 @@ public:
 
   virtual antlrcpp::Any visitIF_THEN(FractalParser::IF_THENContext *ctx) override {
     return ctx;
-    // std:cout << "in if then\n";
-    bool cond = visit(ctx->condition());
-    if(cond) {
-      // std:cout << "VISITED!!!!\n";
-      visit(ctx->command());
-    }
+    // // std:cout << "in if then\n";
+    // bool cond = visit(ctx->condition());
+    // if(cond) {
+    //   // std:cout << "VISITED!!!!\n";
+    //   visit(ctx->command());
+    // }
 
     return ctx;
   }
@@ -719,12 +766,12 @@ public:
   virtual antlrcpp::Any visitIF_THEN_ELSE(FractalParser::IF_THEN_ELSEContext *ctx) override {
     return ctx;
     // std:cout << "in if else\n";
-    bool cond = visit(ctx->condition());
-    if(cond) {
-      visit(ctx->command(0));
-    } else {
-      visit(ctx->command(1));
-    }
+    // bool cond = visit(ctx->condition());
+    // if(cond) {
+    //   visit(ctx->command(0));
+    // } else {
+    //   visit(ctx->command(1));
+    // }
     return ctx;
   }
 
