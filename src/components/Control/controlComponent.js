@@ -58,6 +58,8 @@ function Control({}) {
   const [back, setBack] = useState(0);
   // cpx number
   const [showCords, setShowCords] = useState(true);
+  // if we should clear fractal on orbit drag
+  const [showFrac, setShowFrac] = useState(true);
   // silly fix to force SOMETHING
   const [foo, setFoo] = useState(0);
   // current values of options - what is in textboxes - gets set to default vals for tmpParamsStore initially
@@ -71,7 +73,7 @@ function Control({}) {
     startX: -1080,
     startY: -1080,
     maxRad: 4,
-    minRad: 0.001,
+    minRad: 0.1,
     epsilon: 0.000001,
     maxIters: 64,
     numColors: tmpParamsStore.numColors,
@@ -609,6 +611,25 @@ function Control({}) {
                       Show Complex Number
                     </Button>
                   )}
+                  {showFrac ? (
+                    <>
+                      <Button
+                        variant="primary"
+                        onClick={() => setShowFrac((prev) => !prev)}
+                      >
+                        Hide Fractal on Orbit Drag
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        variant="primary"
+                        onClick={() => setShowFrac((prev) => !prev)}
+                      >
+                        Show Fractal on Orbit Drag
+                      </Button>
+                    </>
+                  )}
                 </Form>
               </Col>
 
@@ -644,6 +665,7 @@ function Control({}) {
           orbitNum={params.orbitNum}
           orbitColor={params.orbitColor}
           genVals={genVals}
+          showFrac={showFrac}
         />
       </div>
     </>

@@ -99,6 +99,7 @@ const useCgen = (script) => {
     myCreateModule();
   }, [script]);
   // return the code
+  console.log(code);
   return code;
 };
 
