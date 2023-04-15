@@ -51,7 +51,7 @@ public:
       std::stringstream orbitdef;
       
       // math for im, re values is done in js, so just need the two values
-      orbitdef << "EMSCRIPTEN_KEEPALIVE void orbit(double fixed_re, double fixed_im, double clicked_re, double clicked_im, int maxIters, double minRadius, double maxRadius, double_t *ptr){\n";
+      orbitdef << "EMSCRIPTEN_KEEPALIVE void orbit(double fixed_re, double fixed_im, double clicked_re, double clicked_im, int maxIters, double minRadius, double maxRadius, double_t *ptr, double epsilon, int orbitNum){\n";
       // adds to output 
       visitScript(tree);
 
@@ -83,7 +83,7 @@ public:
     
     std::stringstream fcndef; 
 
-    fcndef << "int calcPixel(double z_re, double z_im, double c_re, double c_im, int maxIters, double minRadius, double maxRadius, int type) {\n";
+    fcndef << "int calcPixel(double z_re, double z_im, double c_re, double c_im, int maxIters, double minRadius, double maxRadius, int type, double epsilon) {\n";
 
     // add to output
 
@@ -453,7 +453,7 @@ public:
       // first pass
       output << "abs(abs(prev) - abs( ";
       visit(ctx->expression());
-      output << ")) < 0.0000001";
+      output << ")) < epsilon";
     } else {
       visit(ctx->expression());
     }

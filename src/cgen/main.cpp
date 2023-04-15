@@ -90,7 +90,7 @@ extern "C" {
     // if starting as dyn fcn, will only need 
     std::stringstream defns;
     // onle need one because z is always set to 0 unless there is a set in script (may need to handle this additionally)
-    defns << "int calcPixel(double z_re, double z_im, double c_re, double c_im, int maxIters, double minRadius, double maxRadius, int type);\n";
+    defns << "int calcPixel(double z_re, double z_im, double c_re, double c_im, int maxIters, double minRadius, double maxRadius, int type, double epsilon);\n";
     defns << "int getIdx(int x, int y, int width, int color);\n" ;// gonna wanna change this when I have more complex coloring
 
     // "main" (big loops) fcn 
@@ -99,7 +99,7 @@ extern "C" {
                                                                       // only need these fixed vars for clicked on dyn
     bigLoops << "EMSCRIPTEN_KEEPALIVE void genPixles(int type, double fixed_re, double fixed_im, int maxIters, double epsilon, double minRadius, double maxRadius, double startX, double startY, double newCanWidth, double newCanHeight, int width, int height, double widthScale, double heightScale, uint8_t *ptr, int numColors, uint8_t *redPtr, uint8_t *greenPtr, uint8_t *bluePtr)\n{\n";
     bigLoops << "for (int x = 0; x < floor(newCanWidth); x++){\nfor (int y = 0; y < floor(newCanHeight); y++){\n double screen_re = (((widthScale * x) + startX) - width / 2.) / (width  /2.);\ndouble screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);\n";
-    bigLoops << "int iterations;\nif(type == 0) {\niterations = calcPixel(0.,0.,screen_re,screen_im, maxIters, minRadius, maxRadius, type);\n} else if(type == 1) {\niterations = calcPixel(screen_re, screen_im, fixed_re, fixed_im, maxIters, minRadius, maxRadius, type);\n}\n";
+    bigLoops << "int iterations;\nif(type == 0) {\niterations = calcPixel(0.,0.,screen_re,screen_im, maxIters, minRadius, maxRadius, type, epsilon);\n} else if(type == 1) {\niterations = calcPixel(screen_re, screen_im, fixed_re, fixed_im, maxIters, minRadius, maxRadius, type, epsilon);\n}\n";
 
     bigLoops << "int color = ceil((double)iterations*numColors/maxIters);\n";
     bigLoops << "ptr[getIdx(x, y, width, 0)] = redPtr[color];\nptr[getIdx(x, y, width, 1)] = greenPtr[color];\nptr[getIdx(x, y, width, 2)] = bluePtr[color]; \nptr[getIdx(x, y, width, 3)] = 255;\n}\n}\n}\n";
