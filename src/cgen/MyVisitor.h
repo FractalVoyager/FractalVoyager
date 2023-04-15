@@ -153,12 +153,35 @@ public:
     return ctx; // visitChildren(ctx);
   }
 
-  // only evalute if drawing paramter space - TODO - maybe make two functions so no need for if in calcPixles
+  // only evalute if drawing paramter space - TODO - maybe make two functions so no need for if in calcPixles - for now just pass type to calcPixles
   virtual antlrcpp::Any visitPAR_COM(FractalParser::PAR_COMContext *ctx) override {
+
+    if(orbit) {
+      return ctx;
+    }
+    
+    output << "if (type == 0) {\n";
+    visit(ctx->command());
+    output << "}\n";
+
+    
     return ctx; // visitChildren(ctx);
   }
-  // only evalte if drawing dynamic space - TODO - maybe make two functions so no need for if in calcPixles
+  // only evalte if drawing dynamic space - TODO - maybe make two functions so no need for if in calcPixles ^^
   virtual antlrcpp::Any visitDYN_COM(FractalParser::DYN_COMContext *ctx) override {
+
+    if(orbit) {
+      visit(ctx->command());
+      return ctx;
+    }
+
+    output << "if (type == 1) {\n";
+    visit(ctx->command());
+    output << "}\n";
+
+
+
+    
     return ctx; //visitChildren(ctx);
   }
 
