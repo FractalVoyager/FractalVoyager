@@ -185,6 +185,8 @@ public:
     return ctx; //visitChildren(ctx);
   }
 
+  // block just works because it will visit all children
+
   // don't think I'll need to override any of the other ones 
 
 
@@ -602,6 +604,88 @@ public:
     // DONE
     virtual antlrcpp::Any visitLoopDo(FractalParser::LoopDoContext *ctx) override {
 
+
+            // copy output and delete current 
+      std::stringstream oldOut;
+      oldOut << output.str();
+      output.str("");
+
+      // create tmp string stream
+      std::stringstream tmp;
+
+
+      // FOR THIS NEED THE FIRST SET TO BE the one we are iterating - FIX LATER TODO TODO TODO
+      // std::string var = ctx->command(0)->variable()->getText();
+
+
+      // old stuff
+      tmp << "for(int i = 1; i < maxIters; i++) {\n";
+      if(orbit) {
+        // TODO probably wrong but I think this will always be z
+        tmp << "ptr[i*2-2] = real(z);\nptr[i*2-1] = imag(z);\n";
+      }
+      // tmp << var << " = ";
+
+      int i = 0;
+      while(ctx->command(i)){
+        visit(ctx->command(i));
+        i++;
+      }
+      tmp << output.str();
+      output.str("");
+
+      tmp << ";\n";
+      tmp << "if(";
+
+      // get if it is a stops 
+      bool stops = visit(ctx->condition());
+      // save output and delete 
+      tmp << output.str();
+      tmp << ") {\n";
+      output.str("");
+
+
+      // deal with the nested for loops later TODO
+      if(orbit) {
+        tmp << "break;\n}\n";
+      } else {
+        tmp << "return i;\n}\n";
+      }
+
+            // if it is a stops - do stops stuff
+      if(stops) {
+        stopsSecond = true;
+        tmp << "prev = ";
+        visit(ctx->condition());
+        tmp << output.str() << ";\n";
+        output.str("");
+      }
+
+
+
+    
+      tmp << "}\n";
+
+
+      if(stops) {
+
+        output << "std::complex<double>prev(";
+        visit(ctx->condition());
+        output << ");\n";
+        oldOut << output.str();
+        output.str("");
+      }
+
+      oldOut << tmp.str();
+
+      output << oldOut.str();
+
+      return ctx;
+
+
+
+
+
       // std:cout << "in loopdo\n";
 
       return ctx;
@@ -809,6 +893,9 @@ public:
 
     // reapeat n times command - n must be positivie integer  TODO
     virtual antlrcpp::Any visitLoopRepeat(FractalParser::LoopRepeatContext *ctx) override {
+
+
+      
       return ctx;
       // std:cout << "in loop reapeat\n";
       // int n = stoi(ctx->n()->getText());
