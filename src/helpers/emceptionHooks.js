@@ -363,15 +363,19 @@ const useGenPixles = (
           maxIters * 2 * Float64Array.BYTES_PER_ELEMENT
         );
         // call fcn
+        // replace maxIters with orbitNum
+        let realOrbitIts = parseInt(orbitNum) + 1;
+        console.log(orbitNum);
         await fcn(
           fixed_re,
           fixed_im,
           clicked_re,
           clicked_im,
-          maxIters,
+          realOrbitIts,
           minRadius,
           maxRadius,
-          orbitHeap.byteOffset
+          orbitHeap.byteOffset,
+          epsilon
         );
 
         // write stuff to terminal

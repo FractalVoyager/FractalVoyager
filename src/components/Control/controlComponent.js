@@ -462,7 +462,7 @@ function Control({}) {
                             setGenVals([tmpParams.re, tmpParams.im])
                           }
                         >
-                          Generate Dynamic Space
+                          Generate Dynamical System
                         </Button>
                       </>
                     ) : tmpParams.type === 1 || tmpParams.type === 2 ? (

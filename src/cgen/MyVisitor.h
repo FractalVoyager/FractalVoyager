@@ -484,6 +484,7 @@ public:
     } else if(ctx->LT()) {
       output << "<";
     } else if(ctx->EQUALS()) {
+      // for this - want it be be less than epsilon - not just equals
       output << "==";
     } else {
       // std:cout << "------- ERROR ------ couldn't find token for comp command\n";

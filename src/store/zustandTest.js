@@ -1,56 +1,48 @@
 import create from "zustand";
+/*
+this is a store for global state used throughout app
+zustand is an npm package that "replaces" react context or redux
+*/
 
-const useDimStore = create((set) => ({
-  startX: 0,
-  startY: 0,
-  endX: 0,
-  endY: 0,
-}));
-
+// store for state of compiling
 const useCompileStore = create((set) => ({
+  // wether emception has been loaded
   ready: false,
-  compile: false,
   setReady: () => set({ ready: true }),
-  // might want to store genPixles and orbit together in a set
-  // to avoid unnessarcy re renders
-  genPixles: null,
-  setGenPixles: (fcn) => set({ genPixles: fcn }),
-  orbit: null,
-  setOrbit: (fcn) => set({ orbit: fcn }),
-  module: null,
-  setModule: (mod) => set({ module: mod }),
+  // initial type returned from cgen
   initialType: null,
   setInitialType: (type) => set({ initialType: type }),
-  malloc: null,
-  free: null,
-  setMalloc: (fcn) => set({ malloc: fcn }),
-  setFree: (free) => set({ free: free }),
-  u8buff: null,
-  setU8buff: (buff) => set({ u8buff: buff }),
+  // the module text returned from emcpetion compiling
   content: null,
   setContent: (cont) => set({ content: cont }),
 }));
 
+// store for writing to the terminal, overridden each time
 const useTermStore = create((set) => ({
   text: null,
   color: null,
   newLine: true,
+  // longer fcn where you can change color and newline option
   write: (newText, color, newLine) =>
     set({ text: newText, color: color, newLine: newLine }),
   quickWrite: (text) => set({ text: text, color: "white", newLine: true }),
 }));
 
+// tmp store for colors set by color component, global store to pass up components
 const useColorsStore = create((set) => ({
   amt: null,
   colors: null,
   set: (colors, len) => set({ amt: len, colors: colors }),
 }));
 
+// wether back is allowed or not
 const useBackState = create((set) => ({
   allowed: false,
   setAllowed: (bool) => set({ allowed: bool }),
 }));
 
+// the tmp params (options in control component) that are what the viewer is currently runnign with
+// written to by both control component and viewer component
 const useTmpParamsStore = create((set) => ({
   realMin: -2,
   realMax: 2,
@@ -233,13 +225,13 @@ const useTmpParamsStore = create((set) => ({
   setGenVals: (re, im) => set({ re: re, im: im }),
 }));
 
+// store a ref for downloading
 const useFracRefStore = create((set) => ({
   fracRef: null,
   update: (ref) => set({ fracRef: ref }),
 }));
 
-// kind of a stupid - this is to make the viewer to know the new type
-// when you tpye a new script, without this - it draws the right type, but then
+// to make the viewer to know the new type when you tpye a new script, without this - it draws the right type, but then
 // when you zoom or do anything it viewer it reverts back to the old type
 const useResetType = create((set) => ({
   type: null,
@@ -247,13 +239,13 @@ const useResetType = create((set) => ({
   setType: (type) => set((state) => ({ type: type, update: state.update + 1 })),
 }));
 
+// wether we should delete the fractal when dragging orbit
 const useWriteOrbitStore = create((set) => ({
   write: true,
   setWrite: (bool) => set({ write: bool }),
 }));
 
 export {
-  useDimStore,
   useCompileStore,
   useTermStore,
   useColorsStore,
