@@ -465,8 +465,29 @@ public:
   // DONE
   virtual bool visitCOMP_COND(FractalParser::COMP_CONDContext *ctx) override {
     // get awhat type it is, do thing for each one
+
+    if(ctx->EQUALS()) {
+    output << "abs(";
+
+    output << "abs(";
+    visit(ctx->expression(0));
+    output << ")";
+
+
+    output << "-abs(";
+    visit(ctx->expression(1));
+    output << "))";
+
+    output << " < epsilon";
+
+    return false;
+
+
+
+    }
     
 
+    
     output << "abs(";
     visit(ctx->expression(0));
     output << ")";
@@ -483,9 +504,6 @@ public:
       output << ">";
     } else if(ctx->LT()) {
       output << "<";
-    } else if(ctx->EQUALS()) {
-      // for this - want it be be less than epsilon - not just equals
-      output << "==";
     } else {
       // std:cout << "------- ERROR ------ couldn't find token for comp command\n";
       
