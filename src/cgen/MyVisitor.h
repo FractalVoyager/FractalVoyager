@@ -534,27 +534,8 @@ public:
   // DONE
   virtual bool visitCOMB_COND(FractalParser::COMB_CONDContext *ctx) override {
 
-    // // std:cout << "in comb cond\n";
-    // bool left = visit(ctx->condition(0));
-    // bool right = visit(ctx->condition(1));
-
-    // if(ctx->XOR()) {
-    //   return ((left || right) && !(left && right));
-    // } else if(ctx->OR()) {
-    //   return left || right;
-    // } else if(ctx->AND()) {
-    //   return left && right;
-    // } else {
-    //   // std:cout << "------ERROR------- comb cond no tokens found\n";
-    //   return false;
-    // }
-
-    // TODO - change this to setting variables left and right to save time (only have to do once) - might be werid with what it is inside though
-
-        // std:cout << "in comb cond\n";
-    // bool left = visit(ctx->condition(0));
-    // bool right = visit(ctx->condition(1));
-
+   
+   
     if(ctx->XOR()) {
       output << "((";
       visit(ctx->condition(0));
@@ -603,7 +584,10 @@ public:
     virtual antlrcpp::Any visitLoopDo(FractalParser::LoopDoContext *ctx) override {
 
       // std:cout << "in loopdo\n";
+
       return ctx;
+
+
 
       // not using this anymore but would rather
       // antlrcpp::Any condit = ctx->condition();
@@ -628,6 +612,82 @@ public:
 
   // iterate expr on var until comd DONE 
   virtual antlrcpp::Any  visitLoopIterateOn(FractalParser::LoopIterateOnContext *ctx) override {
+
+          // variable is taken to be z - (the one to iterate)
+      // not sure wether to start at 1 or 0 - ask dan
+
+      // copy output and delete current 
+      std::stringstream oldOut;
+      oldOut << output.str();
+      output.str("");
+
+      // create tmp string stream
+      std::stringstream tmp;
+
+
+      std::string var = ctx->variable()->getText();
+
+
+      // old stuff
+      tmp << "for(int i = 1; i < maxIters; i++) {\n";
+      if(orbit) {
+        tmp << "ptr[i*2-2] = real(" << var << ");\nptr[i*2-1] = imag(" << var << ");\n";
+      }
+      tmp << var << " = ";
+      visit(ctx->expression());
+      // take out putput and clear
+      tmp << output.str();
+      output.str("");
+
+      tmp << ";\n";
+      tmp << "if(";
+
+      // get if it is a stops 
+      bool stops = visit(ctx->condition());
+      // save output and delete 
+      tmp << output.str();
+      tmp << ") {\n";
+      output.str("");
+
+
+      // deal with the nested for loops later TODO
+      if(orbit) {
+        tmp << "break;\n}\n";
+      } else {
+        tmp << "return i;\n}\n";
+      }
+
+            // if it is a stops - do stops stuff
+      if(stops) {
+        stopsSecond = true;
+        tmp << "prev = ";
+        visit(ctx->condition());
+        tmp << output.str() << ";\n";
+        output.str("");
+      }
+
+
+
+    
+      tmp << "}\n";
+
+
+      if(stops) {
+
+        output << "std::complex<double>prev(";
+        visit(ctx->condition());
+        output << ");\n";
+        oldOut << output.str();
+        output.str("");
+      }
+
+      oldOut << tmp.str();
+
+      output << oldOut.str();
+
+      return ctx;
+
+
     // std:cout << "in loop iterate on\n";
     // antlrcpp::Any expr = ctx->expression();
     return ctx; 
@@ -728,7 +788,7 @@ public:
       
     }
 
-    // reapeat n times command - n must be positivie integer  DONE 
+    // reapeat n times command - n must be positivie integer  TODO
     virtual antlrcpp::Any visitLoopRepeat(FractalParser::LoopRepeatContext *ctx) override {
       return ctx;
       // std:cout << "in loop reapeat\n";
@@ -751,6 +811,14 @@ public:
   //////////////////////////////////////
 
   virtual antlrcpp::Any visitIF_THEN(FractalParser::IF_THENContext *ctx) override {
+
+    output << "if(";
+    visit(ctx->condition());
+    output << ") {\n";
+    visit(ctx->command());
+    output << "}\n";
+
+
     return ctx;
     // // std:cout << "in if then\n";
     // bool cond = visit(ctx->condition());
@@ -765,6 +833,14 @@ public:
 
   virtual antlrcpp::Any visitIF_THEN_ELSE(FractalParser::IF_THEN_ELSEContext *ctx) override {
     return ctx;
+
+        output << "if(";
+    visit(ctx->condition());
+    output << ") {\n";
+    visit(ctx->command(0));
+    output << "} else {\n";
+    visit(ctx->command(1));
+    output << "}\n";
     // std:cout << "in if else\n";
     // bool cond = visit(ctx->condition());
     // if(cond) {
