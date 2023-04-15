@@ -50,6 +50,7 @@ const Viewer = ({
   orbitNum,
   orbitColor,
   genVals,
+  showFrac,
 }) => {
   // * useRefs * //
 
@@ -80,8 +81,10 @@ const Viewer = ({
     resetType: state.type,
     triggerReset: state.update,
   }));
-  // thing for dan
+  // on drags, this will make it so you don't write the orbirts to the terminal
   const writeOrbit = useWriteOrbitStore((state) => state.setWrite);
+  // the value of wetehr write orbit is
+  const writeOrbitValue = useWriteOrbitStore((state) => state.write);
 
   // * local state * //
 
@@ -175,7 +178,7 @@ const Viewer = ({
         setPrevFracCords((prevFracCords) => prevFracCords.slice(0, -1));
       }
       let params;
-      if (clearFrac) {
+      if (!writeOrbitValue) {
         setClearFrac(false);
         writeOrbit(true);
         // now want this back to go to the julia set (only way to recover it being there is to get rid of all orbits)
@@ -582,7 +585,11 @@ const Viewer = ({
     // if click and drag in orbit, clear fractal and no longer write to console so it doesn't lag
     // this is a feature dan wanted
     if (genPixlesParams.type === 2) {
-      setClearFrac(true);
+      // this makes the frac go away
+      if (!showFrac) {
+        setClearFrac(true);
+      }
+      //  setClearFrac(true);
       writeOrbit(false);
       interDrawOrbit(re, im, false);
     } else {
@@ -648,6 +655,7 @@ const Viewer = ({
         // click in julia or orbit - draw orbit
       } else if (genPixlesParams.type === 1 || genPixlesParams.type === 2) {
         interDrawOrbit(re, im, true);
+        // writeOrbit(true);
       }
     }
     // reset rectangle state

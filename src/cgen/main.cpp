@@ -57,7 +57,6 @@ extern "C" {
 
 
 
-    std::cout << stream << "\n";
 
     // turn the input into antlr format 
     antlr4::ANTLRInputStream input(stream);
@@ -91,7 +90,7 @@ extern "C" {
     // if starting as dyn fcn, will only need 
     std::stringstream defns;
     // onle need one because z is always set to 0 unless there is a set in script (may need to handle this additionally)
-    defns << "int calcPixel(double z_re, double z_im, double c_re, double c_im, int maxIters, int minRadius, int maxRadius, int type);\n";
+    defns << "int calcPixel(double z_re, double z_im, double c_re, double c_im, int maxIters, double minRadius, double maxRadius, int type);\n";
     defns << "int getIdx(int x, int y, int width, int color);\n" ;// gonna wanna change this when I have more complex coloring
 
     // "main" (big loops) fcn 
@@ -109,9 +108,7 @@ extern "C" {
     std::stringstream getIdx;
     getIdx << "int getIdx(int x, int y, int width, int color){\nint red = y * (width * 4) + x * 4;\nreturn red + color;\n}\n";
 
-    std::cout << "here in c\n";
     std::string codeBody = visitor.cgen(tree);
-    std::cout << "here in c\n";
 
     std::string orbit = visitor.cgenOrbit(tree);
 
@@ -145,7 +142,6 @@ extern "C" {
 
 
 
-    std::cout << type << "\n";
 
 
 

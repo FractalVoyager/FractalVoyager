@@ -83,7 +83,7 @@ public:
     
     std::stringstream fcndef; 
 
-    fcndef << "int calcPixel(double z_re, double z_im, double c_re, double c_im, int maxIters, int minRadius, int maxRadius, int type) {\n";
+    fcndef << "int calcPixel(double z_re, double z_im, double c_re, double c_im, int maxIters, double minRadius, double maxRadius, int type) {\n";
 
     // add to output
 
@@ -93,6 +93,7 @@ public:
 
     std::stringstream initdefns; 
     initdefns << "std::complex<double> z(z_re, z_im);\n";
+
 
     // means there is a c val
     if(param) {
@@ -127,10 +128,20 @@ public:
   virtual antlrcpp::Any visitSET_TO_COM(FractalParser::SET_TO_COMContext *ctx) override {
     // // std::cout<< "in settocom\n";
     // std::complex<double> res = visit(ctx->expression());
+    std::string name = ctx->variable()->getText();
+    if(name == "z") {
+      output << name << " = ";
+      visit(ctx->expression());
+      output << ";\n";
+
+    } else {
     output << "std::complex<double> " << ctx->variable()->getText() << "(";
     // adds to output
     visit(ctx->expression());
     output << ");\n";
+
+    }
+
     return  ctx;
   }
   
