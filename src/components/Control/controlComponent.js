@@ -462,7 +462,7 @@ function Control({}) {
                             setGenVals([tmpParams.re, tmpParams.im])
                           }
                         >
-                          Generate Dynamical System
+                          Generate Dynamical Plane
                         </Button>
                       </>
                     ) : tmpParams.type === 1 || tmpParams.type === 2 ? (
@@ -479,7 +479,7 @@ function Control({}) {
                     ) : (
                       <>
                         <Button variant="primary" disabled>
-                          Generate Dynamic Space
+                          Generate Dynamical Plane
                         </Button>
                       </>
                     )}
