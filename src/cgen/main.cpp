@@ -13,9 +13,6 @@ to build the main.mjs and main.wasm files that are a compilation of these files 
 path to the build of the correct version of antlr4 
 */
 
-// not including the runtime - is in demo, difference with the ex from gtihub, probablty needed
-// for wasm - understand this more
-
 #include <iostream>
 #include <stdio.h>
 #include "FractalParser.h"
