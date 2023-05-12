@@ -266,8 +266,6 @@ const useGenPixles = (
           Module.setValue(bluePtr + i, blues[i], "i8");
           Module.setValue(greenPtr + i, greens[i], "i8");
         }
-        console.log(minRadius);
-
         /////// CALL FCN ///////
         await fcn(
           type,
