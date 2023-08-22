@@ -607,6 +607,9 @@ const Viewer = ({
   // only passed to rectangle canvas
   function mouseUp(e) {
     e.preventDefault();
+    if (!isDown) {
+      return;
+    }
     setIsDown(false);
     setDrawing(false);
 
