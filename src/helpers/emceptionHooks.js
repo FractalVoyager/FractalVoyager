@@ -1,4 +1,4 @@
-import * as Comlink from "https://unpkg.com/comlink/dist/esm/comlink.mjs";
+import * as Comlink from "comlink";
 import { useEffect, useState } from "react";
 import {
   useCompileStore,
