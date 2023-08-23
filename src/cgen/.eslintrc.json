@@ -1,0 +1,7 @@
+{
+  "rules": {
+      "no-restricted-globals": ["warn"],
+      "no-undef": ["warn"],
+      "no-unused-expressions": ["warn"]
+  }
+}
