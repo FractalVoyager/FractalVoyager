@@ -19,7 +19,8 @@ refer to SYE final paper section 6 for further explanations (p. 55)
 
 - panning and zooming bug fixes (2)
   - after box zoom still pan and zoom correctly
-  - zoom correctly when not centered at the origin
+  - zoom correctly when not centered at the origin check
+  - panning always consistent, go across halfway
 - terminal output consistency (3)
   - log everything
   - log at the correct time
