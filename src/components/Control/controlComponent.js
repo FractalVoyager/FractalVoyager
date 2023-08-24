@@ -81,6 +81,13 @@ function Control({}) {
     orbitNum: 64,
     orbitColor: "red",
   });
+
+  // for (int x = 0; x < floor(newCanWidth); x++){
+  //   for (int y = 0; y < floor(newCanHeight); y++){
+  //    double screen_re = (((widthScale * x) + startX) - width / 2.) / (width  /2.);
+  //   double screen_im = -(((heightScale * y) + startY) - height /2.) / (height /2.);
+  //   }
+  // }
   // the values for the generate on click
   const [genVals, setGenVals] = useState([null, null]);
   // current script running/ to be run, updates to inputRef when compile and run is clicked
@@ -228,7 +235,7 @@ function Control({}) {
     let startY;
     switch (direction) {
       case "left":
-        startX = params.startX - (params.x / 2) * params.scaleX;
+        startX = params.startX - params.x / 2; //* params.scaleX;
         setParams({
           ...params,
           startX: startX,
@@ -237,7 +244,7 @@ function Control({}) {
         break;
 
       case "right":
-        startX = params.startX + (params.x / 2) * params.scaleX;
+        startX = params.startX + params.x / 2; //* params.scaleX;
         setParams({
           ...params,
           startX: startX,
@@ -270,13 +277,27 @@ function Control({}) {
 
   // handles zooms, sets the params to the new calculated zoom, and updates tmpParamsStore to it as well
   function handleZoom(zoomIn) {
-    // TODO this doesn't work when you are not in the middle
     if (zoomIn) {
-      // math for zooming in
-      let scaleX = params.scaleX * 0.5;
-      let scaleY = params.scaleY * 0.5;
-      let startX = (params.startX + params.x / 2) / 2;
-      let startY = (params.startY + params.y / 2) / 2;
+      let height = (tmpParams.imgMax - tmpParams.imgMin) / 2;
+      let width = (tmpParams.realMax - tmpParams.realMin) / 2;
+
+      // should be the same
+      // let scaleX = params.scaleX * 0.5;
+      // let scaleY = params.scaleY * 0.5;
+      let scaleX = width / 2;
+      let scaleY = height / 2;
+
+      let midX =
+        (parseFloat(tmpParams.realMin) + parseFloat(tmpParams.realMax)) / 2;
+      let midY =
+        (parseFloat(tmpParams.imgMin) + parseFloat(tmpParams.imgMax)) / 2;
+
+      let shiftX = (midX - 0) * (params.x / 2);
+      let shiftY = (midY - 0) * (params.y / 2);
+
+      let startX = -((params.x / 2) * (scaleX - 1)) + shiftX;
+      let startY = -((params.y / 2) * (scaleY - 1)) - shiftY;
+
       setParams({
         ...params,
         scaleX: scaleX,
@@ -284,18 +305,40 @@ function Control({}) {
         startX: startX,
         startY: startY,
       });
+
       setAxises(
-        (startX - params.x / 2) / (params.x / 2),
-        (scaleX * params.x + startX - params.x / 2) / (params.x / 2),
-        -(scaleY * params.y + startY - params.y / 2) / (params.y / 2),
-        -(startY - params.y / 2) / (params.y / 2)
+        midX - width / 2,
+        midX + width / 2,
+        midY - height / 2,
+        midY + height / 2
       );
+
+      // TODO FIX
     } else {
       // math for zooming out
+      // let height = (tmpParams.imgMax - tmpParams.imgMin) * 2;
+      // let width = (tmpParams.realMax - tmpParams.realMin) * 2;
+
+      // should be the same --- aren't here
       let scaleX = params.scaleX * 2;
       let scaleY = params.scaleY * 2;
-      let startX = params.startX * 2 - params.x / 2;
-      let startY = params.startY * 2 - params.y / 2;
+      // let scaleX = width * 2;
+      // let scaleY = height * 2;
+
+      let midX =
+        (parseFloat(tmpParams.realMin) + parseFloat(tmpParams.realMax)) / 2;
+      let midY =
+        (parseFloat(tmpParams.imgMin) + parseFloat(tmpParams.imgMax)) / 2;
+
+      let shiftX = (midX - 0) * (params.x / 2);
+      let shiftY = (midY - 0) * (params.y / 2);
+
+      let startX = -((params.x / 2) * (scaleX - 1)) + shiftX;
+      let startY = -((params.y / 2) * (scaleY - 1)) - shiftY;
+      // let scaleX = params.scaleX * 2;
+      // let scaleY = params.scaleY * 2;
+      // let startX = params.startX * 2 - params.x / 2;
+      // let startY = params.startY * 2 - params.y / 2;
       setParams({
         ...params,
         scaleX: scaleX,
@@ -303,6 +346,12 @@ function Control({}) {
         startX: startX,
         startY: startY,
       });
+      // setAxises(
+      //   midX - width * 2,
+      //   midX + width * 2,
+      //   midY - height * 2,
+      //   midY + height * 2
+      // );
       setAxises(
         (startX - params.x / 2) / (params.x / 2),
         (scaleX * params.x + startX - params.x / 2) / (params.x / 2),
