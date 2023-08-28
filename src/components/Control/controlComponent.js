@@ -16,6 +16,7 @@ import ColorPicker from "../Colors/SliderComponent";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { axesToParams } from "../../helpers/util";
 
 /*
 Props: none 
@@ -230,49 +231,104 @@ function Control({}) {
   // for each case, the new start is calculated, then props updated,
   // and the tmpParamsStore is updated with setAxises
   function handlePan(direction) {
-    // TODO could work better, needs to be flushed out and tested in terms of how much to move based on zoom
-    let startX;
-    let startY;
+    console.log("HANDLING PAN", direction);
+    let height = tmpParams.imgMax - tmpParams.imgMin;
+    let width = tmpParams.realMax - tmpParams.realMin;
+    let newRealMax = tmpParams.realMax;
+    let newRealMin = tmpParams.realMin;
+    let newImgMax = tmpParams.imgMax;
+    let newImgMin = tmpParams.imgMin;
+
     switch (direction) {
       case "left":
-        startX = params.startX - params.x / 2; //* params.scaleX;
-        setParams({
-          ...params,
-          startX: startX,
-        });
-        setStart(true, startX);
+        console.log("in left");
+        newRealMax = tmpParams.realMax - width / 2;
+        newRealMin = tmpParams.realMin - width / 2;
+        // TODO - -- check params.x and params.y are right
+        // let { scaleX, scaleY, startX, startY } = axesToParams(
+        //   tmpParams.imgMax,
+        //   tmpParams.imgMin,
+        //   newRealMax,
+        //   newRealMin,
+        //   params.x,
+        //   params.y
+        // );
+        // //startX = params.startX - params.x / 2; //* params.scaleX;
+        // setParams({
+        //   ...params,
+        //   startX: startX,
+        // });
+        // setAxises(newRealMin, newRealMax, tmpParams.imgMin, tmpParams.imgMax);
         break;
 
       case "right":
-        startX = params.startX + params.x / 2; //* params.scaleX;
-        setParams({
-          ...params,
-          startX: startX,
-        });
-        setStart(true, startX);
+        newRealMax = tmpParams.realMax + width / 2;
+        newRealMin = tmpParams.realMin + width / 2;
+        // let {scaleX}
+        // setParams({
+        //   ...params,
+        //   startX: startX,
+        // });
+        // setStart(true, startX);
         break;
 
       case "up":
-        startY = params.startY - (params.y / 2) * params.scaleY;
-        setParams({
-          ...params,
-          startY: startY,
-        });
-        setStart(false, startY);
+        newImgMax = tmpParams.imgMax + height / 2;
+        newImgMin = tmpParams.imgMin + height / 2;
+        // startY = params.startY - (params.y / 2) * params.scaleY;
+        // setParams({
+        //   ...params,
+        //   startY: startY,
+        // });
+        // setStart(false, startY);
         break;
 
       case "down":
-        startY = params.startY + (params.y / 2) * params.scaleY;
-        setParams({
-          ...params,
-          startY: startY,
-        });
-        setStart(false, startY);
+        newImgMax = tmpParams.imgMax - height / 2;
+        newImgMin = tmpParams.imgMin - height / 2;
+        // startY = params.startY + (params.y / 2) * params.scaleY;
+        // setParams({
+        //   ...params,
+        //   startY: startY,
+        // });
+        // setStart(false, startY);
         break;
 
       default:
         return;
     }
+
+    let { scaleX, scaleY, startX, startY } = axesToParams(
+      newImgMax,
+      newImgMin,
+      newRealMax,
+      newRealMin,
+      params.x,
+      params.y
+    );
+    console.log("setting params", newRealMax, newRealMin, newImgMax, newImgMin);
+    setParams({
+      ...params,
+      startX: startX,
+      startY: startY,
+    });
+    setAxises(newRealMin, newRealMax, newImgMin, newImgMax);
+    return;
+
+    // let { scaleX, scaleY, startX, startY } = axesToParams(
+    //   tmpParams.imgMax,
+    //   tmpParams.imgMin,
+    //   newRealMax,
+    //   newRealMin,
+    //   params.x,
+    //   params.y
+    // );
+    // //startX = params.startX - params.x / 2; //* params.scaleX;
+    // setParams({
+    //   ...params,
+    //   startX: startX,
+    // });
+    // setAxises(newRealMin, newRealMax, tmpParams.imgMin, tmpParams.imgMax);
   }
 
   // handles zooms, sets the params to the new calculated zoom, and updates tmpParamsStore to it as well
