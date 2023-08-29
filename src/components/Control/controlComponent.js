@@ -149,28 +149,22 @@ function Control({}) {
     let yRes = tmpParams.imagAxisRes;
     let xRes = (width / height) * yRes;
 
-    let xScale = width / 2;
-    let yScale = height / 2;
-
-    let midX =
-      (parseFloat(tmpParams.realMin) + parseFloat(tmpParams.realMax)) / 2;
-    let midY =
-      (parseFloat(tmpParams.imgMin) + parseFloat(tmpParams.imgMax)) / 2;
-
-    // difference between middle and zero * res/2
-    let shiftX = (midX - 0) * (xRes / 2);
-    let shiftY = (midY - 0) * (yRes / 2);
-
-    let startX = -((xRes / 2) * (xScale - 1)) + shiftX;
-    let startY = -((yRes / 2) * (yScale - 1)) - shiftY;
+    let { scaleX, scaleY, startX, startY } = axesToParams(
+      tmpParams.imgMax,
+      tmpParams.imgMin,
+      tmpParams.realMax,
+      tmpParams.realMin,
+      xRes,
+      yRes
+    );
 
     // props for viewer
     setParams({
       ...params,
       x: parseInt(Math.round(xRes)),
       y: parseInt(Math.round(yRes)),
-      scaleX: parseFloat(xScale),
-      scaleY: parseFloat(yScale),
+      scaleX: parseFloat(scaleX),
+      scaleY: parseFloat(scaleY),
       startX: parseFloat(startX),
       startY: parseFloat(startY),
       maxRad: parseFloat(tmpParams.maxRad),
@@ -204,27 +198,6 @@ function Control({}) {
       tmpParams.orbitColor
     );
     setFoo((prev) => prev + 1);
-  }
-
-  // helper for handlePan that set Axises of tmpParamsStore for one start value
-  function setStart(x, val) {
-    if (x) {
-      setAxises(
-        (val - params.x / 2) / (params.x / 2),
-        (params.scaleX * params.x + val - params.x / 2) / (params.x / 2),
-        -(params.scaleY * params.y + params.startY - params.y / 2) /
-          (params.y / 2),
-        -(params.startY - params.y / 2) / (params.y / 2)
-      );
-    } else {
-      setAxises(
-        (params.startX - params.x / 2) / (params.x / 2),
-        (params.scaleX * params.x + params.startX - params.x / 2) /
-          (params.x / 2),
-        -(params.scaleY * params.y + val - params.y / 2) / (params.y / 2),
-        -(val - params.y / 2) / (params.y / 2)
-      );
-    }
   }
 
   // handles a pan left/right/up/down
@@ -283,6 +256,12 @@ function Control({}) {
 
   // handles zooms, sets the params to the new calculated zoom, and updates tmpParamsStore to it as well
   function handleZoom(zoomIn) {
+    console.log(
+      tmpParams.realMax,
+      tmpParams.realMin,
+      tmpParams.imgMax,
+      tmpParams.imgMin
+    );
     let height;
     let width;
     let newRealMax;
@@ -569,44 +548,61 @@ function Control({}) {
                     <Form.Control
                       type="number"
                       value={tmpParams.realMin}
-                      onChange={(e) =>
-                        setTmpParams({ ...tmpParams, realMin: e.target.value })
-                      }
+                      onChange={(e) => {
+                        let num = e.target.value;
+                        setTmpParams({
+                          ...tmpParams,
+                          realMin: num !== "" ? Number(num) : "",
+                        });
+                      }}
                     ></Form.Control>
                     <Form.Label>Real Axis Max Value</Form.Label>
                     <Form.Control
                       type="number"
                       value={tmpParams.realMax}
-                      onChange={(e) =>
-                        setTmpParams({ ...tmpParams, realMax: e.target.value })
-                      }
+                      onChange={(e) => {
+                        let num = e.target.value;
+                        setTmpParams({
+                          ...tmpParams,
+                          realMax: num !== "" ? Number(num) : "",
+                        });
+                      }}
                     ></Form.Control>
                     <Form.Label>Imaginary Axis Min Value</Form.Label>
                     <Form.Control
                       type="number"
                       value={tmpParams.imgMin}
-                      onChange={(e) =>
-                        setTmpParams({ ...tmpParams, imgMin: e.target.value })
-                      }
+                      onChange={(e) => {
+                        let num = e.target.value;
+                        setTmpParams({
+                          ...tmpParams,
+                          imgMin: num !== "" ? Number(num) : "",
+                        });
+                      }}
                     ></Form.Control>
                     <Form.Label>Imaginary Axis Max Value</Form.Label>
                     <Form.Control
                       type="number"
                       value={tmpParams.imgMax}
-                      onChange={(e) =>
-                        setTmpParams({ ...tmpParams, imgMax: e.target.value })
-                      }
+                      onChange={(e) => {
+                        let num = e.target.value;
+                        setTmpParams({
+                          ...tmpParams,
+                          imgMax: num !== "" ? Number(num) : "",
+                        });
+                      }}
                     ></Form.Control>
                     <Form.Label>Imaginary Axis Resolution</Form.Label>
                     <Form.Control
                       type="number"
                       value={tmpParams.imagAxisRes}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        let num = e.target.value;
                         setTmpParams({
                           ...tmpParams,
-                          imagAxisRes: e.target.value,
-                        })
-                      }
+                          imagAxisRes: num !== "" ? Number(num) : "",
+                        });
+                      }}
                     ></Form.Control>
                   </Form.Group>
                   {showCords ? (

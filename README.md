@@ -18,9 +18,12 @@ To run the app, run "npm start" it may not work the first time if cgen was fresh
 refer to SYE final paper section 6 for further explanations (p. 55)
 
 - panning and zooming bug fixes (2)
-  - after box zoom still pan and zoom correctly
-  - zoom correctly when not centered at the origin check
+
+  - after box zoom still pan and zoom correctly ONLY ONE NOT DONE
+  - zoom correctly when not centered at the origin
   - panning always consistent, go across halfway
+  - zoom doesnt work after entered numbers
+
 - terminal output consistency (3)
   - log everything
   - log at the correct time
