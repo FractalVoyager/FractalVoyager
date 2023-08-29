@@ -231,7 +231,6 @@ function Control({}) {
   // for each case, the new start is calculated, then props updated,
   // and the tmpParamsStore is updated with setAxises
   function handlePan(direction) {
-    console.log("HANDLING PAN", direction);
     let height = tmpParams.imgMax - tmpParams.imgMin;
     let width = tmpParams.realMax - tmpParams.realMin;
     let newRealMax = tmpParams.realMax;
@@ -244,54 +243,21 @@ function Control({}) {
         console.log("in left");
         newRealMax = tmpParams.realMax - width / 2;
         newRealMin = tmpParams.realMin - width / 2;
-        // TODO - -- check params.x and params.y are right
-        // let { scaleX, scaleY, startX, startY } = axesToParams(
-        //   tmpParams.imgMax,
-        //   tmpParams.imgMin,
-        //   newRealMax,
-        //   newRealMin,
-        //   params.x,
-        //   params.y
-        // );
-        // //startX = params.startX - params.x / 2; //* params.scaleX;
-        // setParams({
-        //   ...params,
-        //   startX: startX,
-        // });
-        // setAxises(newRealMin, newRealMax, tmpParams.imgMin, tmpParams.imgMax);
         break;
 
       case "right":
         newRealMax = tmpParams.realMax + width / 2;
         newRealMin = tmpParams.realMin + width / 2;
-        // let {scaleX}
-        // setParams({
-        //   ...params,
-        //   startX: startX,
-        // });
-        // setStart(true, startX);
         break;
 
       case "up":
         newImgMax = tmpParams.imgMax + height / 2;
         newImgMin = tmpParams.imgMin + height / 2;
-        // startY = params.startY - (params.y / 2) * params.scaleY;
-        // setParams({
-        //   ...params,
-        //   startY: startY,
-        // });
-        // setStart(false, startY);
         break;
 
       case "down":
         newImgMax = tmpParams.imgMax - height / 2;
         newImgMin = tmpParams.imgMin - height / 2;
-        // startY = params.startY + (params.y / 2) * params.scaleY;
-        // setParams({
-        //   ...params,
-        //   startY: startY,
-        // });
-        // setStart(false, startY);
         break;
 
       default:
@@ -306,7 +272,6 @@ function Control({}) {
       params.x,
       params.y
     );
-    console.log("setting params", newRealMax, newRealMin, newImgMax, newImgMin);
     setParams({
       ...params,
       startX: startX,
@@ -314,107 +279,52 @@ function Control({}) {
     });
     setAxises(newRealMin, newRealMax, newImgMin, newImgMax);
     return;
-
-    // let { scaleX, scaleY, startX, startY } = axesToParams(
-    //   tmpParams.imgMax,
-    //   tmpParams.imgMin,
-    //   newRealMax,
-    //   newRealMin,
-    //   params.x,
-    //   params.y
-    // );
-    // //startX = params.startX - params.x / 2; //* params.scaleX;
-    // setParams({
-    //   ...params,
-    //   startX: startX,
-    // });
-    // setAxises(newRealMin, newRealMax, tmpParams.imgMin, tmpParams.imgMax);
   }
 
   // handles zooms, sets the params to the new calculated zoom, and updates tmpParamsStore to it as well
   function handleZoom(zoomIn) {
+    let height;
+    let width;
+    let newRealMax;
+    let newRealMin;
+    let newImgMax;
+    let newImgMin;
+
     if (zoomIn) {
-      let height = (tmpParams.imgMax - tmpParams.imgMin) / 2;
-      let width = (tmpParams.realMax - tmpParams.realMin) / 2;
-
-      // should be the same
-      // let scaleX = params.scaleX * 0.5;
-      // let scaleY = params.scaleY * 0.5;
-      let scaleX = width / 2;
-      let scaleY = height / 2;
-
-      let midX =
-        (parseFloat(tmpParams.realMin) + parseFloat(tmpParams.realMax)) / 2;
-      let midY =
-        (parseFloat(tmpParams.imgMin) + parseFloat(tmpParams.imgMax)) / 2;
-
-      let shiftX = (midX - 0) * (params.x / 2);
-      let shiftY = (midY - 0) * (params.y / 2);
-
-      let startX = -((params.x / 2) * (scaleX - 1)) + shiftX;
-      let startY = -((params.y / 2) * (scaleY - 1)) - shiftY;
-
-      setParams({
-        ...params,
-        scaleX: scaleX,
-        scaleY: scaleY,
-        startX: startX,
-        startY: startY,
-      });
-
-      setAxises(
-        midX - width / 2,
-        midX + width / 2,
-        midY - height / 2,
-        midY + height / 2
-      );
-
-      // TODO FIX
+      height = (tmpParams.imgMax - tmpParams.imgMin) / 2;
+      width = (tmpParams.realMax - tmpParams.realMin) / 2;
+      newRealMax = tmpParams.realMax - width / 2;
+      newRealMin = tmpParams.realMin + width / 2;
+      newImgMax = tmpParams.imgMax - height / 2;
+      newImgMin = tmpParams.imgMin + height / 2;
     } else {
       // math for zooming out
-      // let height = (tmpParams.imgMax - tmpParams.imgMin) * 2;
-      // let width = (tmpParams.realMax - tmpParams.realMin) * 2;
-
-      // should be the same --- aren't here
-      let scaleX = params.scaleX * 2;
-      let scaleY = params.scaleY * 2;
-      // let scaleX = width * 2;
-      // let scaleY = height * 2;
-
-      let midX =
-        (parseFloat(tmpParams.realMin) + parseFloat(tmpParams.realMax)) / 2;
-      let midY =
-        (parseFloat(tmpParams.imgMin) + parseFloat(tmpParams.imgMax)) / 2;
-
-      let shiftX = (midX - 0) * (params.x / 2);
-      let shiftY = (midY - 0) * (params.y / 2);
-
-      let startX = -((params.x / 2) * (scaleX - 1)) + shiftX;
-      let startY = -((params.y / 2) * (scaleY - 1)) - shiftY;
-      // let scaleX = params.scaleX * 2;
-      // let scaleY = params.scaleY * 2;
-      // let startX = params.startX * 2 - params.x / 2;
-      // let startY = params.startY * 2 - params.y / 2;
-      setParams({
-        ...params,
-        scaleX: scaleX,
-        scaleY: scaleY,
-        startX: startX,
-        startY: startY,
-      });
-      // setAxises(
-      //   midX - width * 2,
-      //   midX + width * 2,
-      //   midY - height * 2,
-      //   midY + height * 2
-      // );
-      setAxises(
-        (startX - params.x / 2) / (params.x / 2),
-        (scaleX * params.x + startX - params.x / 2) / (params.x / 2),
-        -(scaleY * params.y + startY - params.y / 2) / (params.y / 2),
-        -(startY - params.y / 2) / (params.y / 2)
-      );
+      height = (tmpParams.imgMax - tmpParams.imgMin) * 2;
+      width = (tmpParams.realMax - tmpParams.realMin) * 2;
+      newRealMax = tmpParams.realMax + width / 4;
+      newRealMin = tmpParams.realMin - width / 4;
+      newImgMax = tmpParams.imgMax + height / 4;
+      newImgMin = tmpParams.imgMin - height / 4;
     }
+
+    let { scaleX, scaleY, startX, startY } = axesToParams(
+      newImgMax,
+      newImgMin,
+      newRealMax,
+      newRealMin,
+      params.x,
+      params.y
+    );
+
+    setParams({
+      ...params,
+      scaleX: scaleX,
+      scaleY: scaleY,
+      startX: startX,
+      startY: startY,
+    });
+
+    setAxises(newRealMin, newRealMax, newImgMin, newImgMax);
   }
 
   // calling hook to set current value of codeRef
