@@ -19,7 +19,7 @@ const Header = () => {
             the paramters passed to the program, edit the options then click
             update.
           </Card.Text>
-          <Card.Link href="#">Language Doccumentation</Card.Link>
+          {/* <Card.Link href="#">Language Doccumentation</Card.Link> */}
         </Card.Body>
       </Card>
     </>
