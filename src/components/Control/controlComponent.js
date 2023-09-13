@@ -213,7 +213,6 @@ function Control({}) {
 
     switch (direction) {
       case "left":
-        console.log("in left");
         newRealMax = tmpParams.realMax - width / 2;
         newRealMin = tmpParams.realMin - width / 2;
         break;
@@ -251,17 +250,12 @@ function Control({}) {
       startY: startY,
     });
     setAxises(newRealMin, newRealMax, newImgMin, newImgMax);
+
     return;
   }
 
   // handles zooms, sets the params to the new calculated zoom, and updates tmpParamsStore to it as well
   function handleZoom(zoomIn) {
-    console.log(
-      tmpParams.realMax,
-      tmpParams.realMin,
-      tmpParams.imgMax,
-      tmpParams.imgMin
-    );
     let height;
     let width;
     let newRealMax;
@@ -655,9 +649,11 @@ function Control({}) {
           </Container>
         </div>
 
-        {/* the key is what triggers a full restart???, we don't want back there, becuase then the whole thing will start over */}
         <Viewer
-          key={params}
+          // this actually does nothing, for the params to really be the key do below, but that kinda messes it up, we really don't want duplicate componets
+          // it makes it so the screen goes white, and you can't go back if you change one of the controls
+          //key={params}
+          //key={Object.entries(params)}
           xRes={params.x}
           yRes={params.y}
           initXscale={params.scaleX}
