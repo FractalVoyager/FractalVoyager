@@ -17,10 +17,6 @@ To run the app, run "npm start" it may not work the first time if cgen was fresh
 
 refer to SYE final paper section 6 for further explanations (p. 55)
 
-- click and drag outside of fractal registers as click on fractal (1)
-- panning and zooming bug fixes (2)
-  - after box zoom still pan and zoom correctly
-  - zoom correctly when not centered at the origin
 - terminal output consistency (3)
   - log everything
   - log at the correct time
@@ -44,3 +40,12 @@ refer to SYE final paper section 6 for further explanations (p. 55)
 - draw a line across canvas in paramter plane... get julia set fractals out of it (12)
 
 ## Done
+
+- click and drag outside of fractal registers as click on fractal (1)
+- panning and zooming bug fixes (2)
+
+  - after box zoom still pan and zoom correctly and vise versa DONE
+  - after pan or zoom, box zoom correctly DONE
+  - zoom correctly when not centered at the origin DONE
+  - panning always consistent, go across halfway DONE
+  - zoom doesnt work after entered numbers DONE
