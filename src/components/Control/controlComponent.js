@@ -244,11 +244,15 @@ function Control({}) {
       params.x,
       params.y
     );
+
     setParams({
       ...params,
       startX: startX,
       startY: startY,
+      scaleX: scaleX,
+      scaleY: scaleY,
     });
+
     setAxises(newRealMin, newRealMax, newImgMin, newImgMax);
 
     return;
