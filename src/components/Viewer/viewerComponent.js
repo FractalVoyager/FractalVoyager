@@ -230,6 +230,19 @@ const Viewer = ({
 
   // on change of props, update genPixlesParams
   useEffect(() => {
+    ////// TRYING FIX HERE
+    // TODO need to update prevfraccords
+    setPrevFracCords([
+      ...prevFracCords,
+      {
+        startX: initStartX,
+        startY: initStartY,
+        widthScale: initXscale,
+        heightScale: initYscale,
+      },
+    ]);
+
+    /////
     // if this isn't first draw, add to paramStack
     if (genPixlesParams.type !== null) {
       setParamsStack([...paramsStack, genPixlesParams]);
@@ -344,7 +357,6 @@ const Viewer = ({
 
     let widthScale = width / xRes;
     let heightScale = height / yRes;
-
     startX =
       prevFracCords.at(-1).widthScale * startX + prevFracCords.at(-1).startX;
     startY =

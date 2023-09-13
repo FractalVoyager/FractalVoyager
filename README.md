@@ -19,10 +19,11 @@ refer to SYE final paper section 6 for further explanations (p. 55)
 
 - panning and zooming bug fixes (2)
 
-  - after box zoom still pan and zoom correctly ONLY ONE NOT DONE
-  - zoom correctly when not centered at the origin
-  - panning always consistent, go across halfway
-  - zoom doesnt work after entered numbers
+  - after box zoom still pan and zoom correctly and vise versa NOT DONE
+  - after pan or zoom, box zoom correctly DONE
+  - zoom correctly when not centered at the origin DONE
+  - panning always consistent, go across halfway DONE
+  - zoom doesnt work after entered numbers DONE
 
 - terminal output consistency (3)
   - log everything
