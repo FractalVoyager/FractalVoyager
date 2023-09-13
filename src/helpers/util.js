@@ -24,4 +24,28 @@ const canvasToPoint = (
   return [(canX - startX) / wScale, (canY - startY) / hScale];
 };
 
-export { canvasToComplex, complexToCanvas, canvasToPoint };
+// TODO - takes stuff and returns params
+const axesToParams = (imgMax, imgMin, realMax, realMin, xRes, yRes) => {
+  let height = imgMax - imgMin;
+  let width = realMax - realMin;
+
+  let xScale = width / 2;
+  let yScale = height / 2;
+
+  let midX = (parseFloat(realMin) + parseFloat(realMax)) / 2;
+  let midY = (parseFloat(imgMin) + parseFloat(imgMax)) / 2;
+
+  let shiftX = (midX - 0) * (xRes / 2);
+  let shiftY = (midY - 0) * (yRes / 2);
+
+  let startX = -((xRes / 2) * (xScale - 1)) + shiftX;
+  let startY = -((yRes / 2) * (yScale - 1)) - shiftY;
+
+  return {
+    scaleX: xScale,
+    scaleY: yScale,
+    startX: startX,
+    startY: startY,
+  };
+};
+export { canvasToComplex, complexToCanvas, canvasToPoint, axesToParams };
