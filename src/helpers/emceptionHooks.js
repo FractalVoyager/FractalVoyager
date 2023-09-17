@@ -363,7 +363,6 @@ const useGenPixles = (
         // call fcn
         // replace maxIters with orbitNum
         let realOrbitIts = parseInt(orbitNum) + 1;
-        console.log(orbitNum);
         await fcn(
           fixed_re,
           fixed_im,

@@ -24,12 +24,10 @@ refer to SYE final paper section 6 for further explanations (p. 55)
   - on options overflow (height or width - 50%)... popup modal instead
   - options and header not expanding with screen size
   - re render page on screen resize
-- once orbit is drawn, cannot pan or anything like that (5)
-  - either disallow these, or make them work (seperate state)
 - stuff starts to break after lots of actions (6)
   - cleanup useffects??? ... research
-- host somewhere (7)
-  - github pages?
+- seperate state for orbits from pixles (7)
+  - would make updates work when in orbit, (weird because some stuff is for orbit)
 
 # features
 
@@ -43,9 +41,12 @@ refer to SYE final paper section 6 for further explanations (p. 55)
 
 - click and drag outside of fractal registers as click on fractal (1)
 - panning and zooming bug fixes (2)
-
   - after box zoom still pan and zoom correctly and vise versa DONE
   - after pan or zoom, box zoom correctly DONE
   - zoom correctly when not centered at the origin DONE
   - panning always consistent, go across halfway DONE
   - zoom doesnt work after entered numbers DONE
+- host somewhere (7)
+  - github pages?
+- once orbit is drawn, cannot pan or anything like that (5)
+  - disallow these

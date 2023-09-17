@@ -309,7 +309,6 @@ const Viewer = ({
   // when about to draw orbit: write to terminal, set ParamsStack, set genPixles
   // to right stuff, set type in tmpParamsStore, setGenVals in tmpParamsStore
   const interDrawOrbit = (re, im, write) => {
-    // console.log("inter draw orbit");
     if (write) {
       quickWrite("Generating orbit...");
     }
