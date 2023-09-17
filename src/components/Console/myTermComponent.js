@@ -1,18 +1,24 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useTermStore } from "../../store/zustandTest";
 import "./terminal.css";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+
 /*
 props: none
 returns: the terminal component which displays helpful messages and functions 
 description: takes text from global store and writes it to the "terminal"
 */
 const Terminal = () => {
+  const [termMaxed, setTermMaxed] = useState(true);
   // get text, color, and bool if there should be a newline from store
   const { text, color, newLine } = useTermStore((state) => ({
     text: state.text,
     color: state.color,
     newLine: state.newLine,
   }));
+
+  const handleMaxMin = () => {};
 
   // ref to div which is terminal
   const termRef = useRef(null);
@@ -34,7 +40,26 @@ const Terminal = () => {
     }
   }, [text, color, newLine]);
 
-  return <>{<div id="terminal" ref={termRef}></div>}</>;
+  return (
+    <>
+      <div
+        id="outer-terminal"
+        className={termMaxed ? "termMaxed" : "termMined"}
+      >
+        <Form>
+          <Button
+            variant="secondary"
+            size="sm"
+            id="termMinMax"
+            onClick={() => setTermMaxed((prev) => !prev)}
+          >
+            {termMaxed ? "-" : "+"}
+          </Button>
+        </Form>
+        <div id="inner-terminal" ref={termRef}></div>
+      </div>
+    </>
+  );
 };
 
 export default Terminal;

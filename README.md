@@ -13,6 +13,16 @@ To run the app, run "npm start" it may not work the first time if cgen was fresh
 
 ## TODO
 
+what to do to fix styling:
+
+- terminal
+  - minimize option
+  - set a max height
+- when extra vertical space.... extra space should be inbetwen controls and terminal, not headeer and controls
+- when extra horizontal space... either max options longer, or keep download button to the left
+- re render page on screen resize (lowest propority)
+- when height or width of options are over 50% of screen size.... popup modals
+
 # bug fixes
 
 refer to SYE final paper section 6 for further explanations (p. 55)
@@ -21,6 +31,7 @@ refer to SYE final paper section 6 for further explanations (p. 55)
   - log everything
   - log at the correct time
 - stlying (4)
+  - minimize terminal option
   - on options overflow (height or width - 50%)... popup modal instead
   - options and header not expanding with screen size
   - re render page on screen resize

@@ -1,10 +1,26 @@
-#terminal {
-  /* flex-grow: 2; */
-  /* flex-basis: 100%; */
-  /* margin-bottom: 5px; */
-  min-height: 0;
-  flex-basis: 15vh;
+#outer-terminal {
+  min-height: 1.9em;
+  max-height: 6em;
   color: white;
   background-color: black;
+  overflow-y: hidden;
+}
+
+.termMaxed {
+  height: 6em;
+}
+.termMined {
+  height: 1.9em;
+}
+
+#inner-terminal {
+  height: 100% !important;
+  /* width: 100% !important; */
+
   overflow-y: scroll;
+}
+
+#termMinMax {
+  float: right;
+  border-top-right-radius: 0rem;
 }
