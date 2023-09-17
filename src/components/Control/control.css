@@ -1,8 +1,8 @@
 #controls {
   /* float: right; */
-  flex-basis: 50%;
-  /* flex-grow: 1; */
+  flex-basis: 45%;
   /* flex-shrink: 1; */
+  flex-grow: 6;
   margin-left: 5px;
   display: flex;
   flex-direction: column;
@@ -28,9 +28,6 @@
 
 #viewer-form {
   padding: 5px;
-}
-
-#header {
 }
 
 #slider {
