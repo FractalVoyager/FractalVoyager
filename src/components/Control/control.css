@@ -11,7 +11,7 @@
   align-items: center;
 }
 #control-viewer {
-  flex-basis: 85vh;
+  flex-basis: 100vh;
   padding-bottom: 10px;
   display: flex;
   flex-direction: row-reverse;

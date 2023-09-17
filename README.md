@@ -15,9 +15,10 @@ To run the app, run "npm start" it may not work the first time if cgen was fresh
 
 what to do to fix styling:
 
-- terminal
-  - minimize option
-  - set a max height
+- terminal DONE
+  - minimize option DONE
+  - set a max height DONE
+- shrink text boxes horizontally
 - when extra vertical space.... extra space should be inbetwen controls and terminal, not headeer and controls
 - when extra horizontal space... either max options longer, or keep download button to the left
 - re render page on screen resize (lowest propority)
