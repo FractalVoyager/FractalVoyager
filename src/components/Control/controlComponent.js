@@ -354,10 +354,12 @@ function Control({}) {
                       type="number"
                     ></Form.Control>
                   </Form.Group>
+
                   <Form.Group>
                     <Form.Label>Max Iterations</Form.Label>
                     <Form.Control
                       type="number"
+                      disabled={tmpParams.type === 2}
                       value={tmpParams.maxIters}
                       onChange={(e) =>
                         setTmpParams({ ...tmpParams, maxIters: e.target.value })
@@ -366,22 +368,46 @@ function Control({}) {
                   </Form.Group>
                 </Form>
                 <Form>
-                  <Button variant="primary" onClick={() => handleZoom(true)}>
+                  <Button
+                    disabled={tmpParams.type === 2}
+                    variant="primary"
+                    onClick={() => handleZoom(true)}
+                  >
                     +
                   </Button>
-                  <Button variant="primary" onClick={() => handleZoom(false)}>
+                  <Button
+                    disabled={tmpParams.type === 2}
+                    variant="primary"
+                    onClick={() => handleZoom(false)}
+                  >
                     -
                   </Button>
-                  <Button variant="primary" onClick={() => handlePan("left")}>
+                  <Button
+                    disabled={tmpParams.type === 2}
+                    variant="primary"
+                    onClick={() => handlePan("left")}
+                  >
                     left
                   </Button>
-                  <Button variant="primary" onClick={() => handlePan("right")}>
+                  <Button
+                    disabled={tmpParams.type === 2}
+                    variant="primary"
+                    onClick={() => handlePan("right")}
+                  >
                     right
                   </Button>
-                  <Button variant="primary" onClick={() => handlePan("up")}>
+                  <Button
+                    disabled={tmpParams.type === 2}
+                    variant="primary"
+                    onClick={() => handlePan("up")}
+                  >
                     up
                   </Button>
-                  <Button variant="primary" onClick={() => handlePan("down")}>
+                  <Button
+                    disabled={tmpParams.type === 2}
+                    variant="primary"
+                    onClick={() => handlePan("down")}
+                  >
                     down
                   </Button>
                   <Form />
@@ -546,6 +572,7 @@ function Control({}) {
                     <Form.Control
                       type="number"
                       value={tmpParams.realMin}
+                      disabled={tmpParams.type === 2}
                       onChange={(e) => {
                         let num = e.target.value;
                         setTmpParams({
@@ -558,6 +585,7 @@ function Control({}) {
                     <Form.Control
                       type="number"
                       value={tmpParams.realMax}
+                      disabled={tmpParams.type === 2}
                       onChange={(e) => {
                         let num = e.target.value;
                         setTmpParams({
@@ -570,6 +598,7 @@ function Control({}) {
                     <Form.Control
                       type="number"
                       value={tmpParams.imgMin}
+                      disabled={tmpParams.type === 2}
                       onChange={(e) => {
                         let num = e.target.value;
                         setTmpParams({
@@ -582,6 +611,7 @@ function Control({}) {
                     <Form.Control
                       type="number"
                       value={tmpParams.imgMax}
+                      disabled={tmpParams.type === 2}
                       onChange={(e) => {
                         let num = e.target.value;
                         setTmpParams({
@@ -593,6 +623,7 @@ function Control({}) {
                     <Form.Label>Imaginary Axis Resolution</Form.Label>
                     <Form.Control
                       type="number"
+                      disabled={tmpParams.type === 2}
                       value={tmpParams.imagAxisRes}
                       onChange={(e) => {
                         let num = e.target.value;
