@@ -11,6 +11,7 @@ import {
   useFracRefStore,
   useResetType,
   useWriteOrbitStore,
+  useCanStyleStore,
 } from "../../store/zustandTest.js";
 
 /*
@@ -73,6 +74,7 @@ const Viewer = ({
   const setBackOk = useBackState((state) => state.setAllowed);
   // the value of initial type (the type that the script produces)
   const initType = useCompileStore((state) => state.initialType);
+  const canWidthStore = useCanStyleStore((state) => state.width);
   // silly fix to the viewer not reverting back to the initial type when the script changes
   // say you type a param space, switch to julia in viewer, then type another param space,
   // intial type didn't change, so nothing updates, so this is just a number that triggers
@@ -726,7 +728,8 @@ const Viewer = ({
 
   return (
     <>
-      <div id="viewer">
+      <div id="viewer" style={{ width: canWidthStore + "px" }}>
+        {console.log(canWidthStore + "px")}
         <div id="outer-cans" ref={wrapperRef}>
           {wrapperRef.current ? (
             <>

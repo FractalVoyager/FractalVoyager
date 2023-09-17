@@ -4,7 +4,8 @@
 // by calling useCanvas
 
 import useCanvas from "../../helpers/canvasHook";
-import { useFracRefStore } from "../../store/zustandTest";
+import { useFracRefStore, useCanStyleStore } from "../../store/zustandTest";
+
 /*
 props:
 draw: function to be drawn on canvas
@@ -41,6 +42,8 @@ const Canvas = ({
     }, 10);
   }
 
+  const setWidth = useCanStyleStore((state) => state.setWidth);
+
   // math for css size of canvas
   // NOTE: these will only change when xRes/yRes change, so when we just box zoom,
   // it doesn't change those values, so the actaul size of the canvas doesn't update,
@@ -54,6 +57,7 @@ const Canvas = ({
     styHeight = (styWidth * yRes) / xRes;
   }
   const style = { width: styWidth, height: styHeight };
+  setWidth(styWidth);
 
   // the ref will have the drawn fractal
   return (

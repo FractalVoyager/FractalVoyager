@@ -245,6 +245,11 @@ const useWriteOrbitStore = create((set) => ({
   setWrite: (bool) => set({ write: bool }),
 }));
 
+const useCanStyleStore = create((set) => ({
+  width: null,
+  setWidth: (width) => set({ width: width }),
+}));
+
 export {
   useCompileStore,
   useTermStore,
@@ -254,4 +259,5 @@ export {
   useFracRefStore,
   useResetType,
   useWriteOrbitStore,
+  useCanStyleStore,
 };
