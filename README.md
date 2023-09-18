@@ -20,8 +20,9 @@ what to do to fix styling:
   - set a max height DONE
 - make it so viewer container is the width of the calcuated width of the pixle area DONE
   - then make it so the controls take the rest of the possible width DONE
-- on terminal resize (or screen resize)... update sizes of cans DONE - not window resize
+- on terminal resize (or screen resize)... update sizes of cans DONE
 - shrink text boxes horizontally DONE
+- fix error that everything fails if screen is a square "or less" canvcomponent line 54
 - when extra vertical space.... extra space should be inbetwen controls and terminal, not headeer and controls, or increasing all spacing
 - when extra horizontal space... either max options longer, or keep download button to the left DONE
 - when height of options will overflow screen size.... popup modals
