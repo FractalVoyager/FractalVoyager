@@ -34,6 +34,8 @@ const Canvas = ({
   // gets the ref for can and calls draws on the canvas with useCanvas
   const canRef = useCanvas(draw, options);
 
+  console.log("in can component", maxHeight);
+
   // silly fix to set a ref for the canvas which is drawing the fractals - uses global store - can use forward ref instead
   const updateFracRef = useFracRefStore((state) => state.update);
   if (id === "fracCan") {
@@ -51,11 +53,11 @@ const Canvas = ({
   // so the ratio size of the actual canvas changes here
   let styWidth = maxWidth;
   let styHeight = maxHeight;
-  if (styWidth / styHeight > xRes / yRes) {
-    styWidth = (styHeight * xRes) / yRes;
-  } else if (styWidth / styHeight < xRes / yRes) {
-    styHeight = (styWidth * yRes) / xRes;
-  }
+  // if (styWidth / styHeight > xRes / yRes) {
+  styWidth = (styHeight * xRes) / yRes;
+  // } else if (styWidth / styHeight < xRes / yRes) {
+  //   styHeight = (styWidth * yRes) / xRes;
+  // }
   const style = { width: styWidth, height: styHeight };
   setWidth(styWidth);
 

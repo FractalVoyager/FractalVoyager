@@ -728,12 +728,23 @@ const Viewer = ({
 
   return (
     <>
-      <div id="viewer" style={{ width: canWidthStore + "px" }}>
-        {console.log(canWidthStore + "px")}
-        <div id="outer-cans" ref={wrapperRef}>
+      <div
+        id="viewer"
+        // setting width of container based on (possibly new) width of canvas
+        style={{
+          width: canWidthStore ? canWidthStore - 5 + "px" : "",
+        }}
+      >
+        <div
+          id="outer-cans"
+          ref={wrapperRef}
+          // fixes issue of not updating controls but adds more issues
+          // style={{ width: canWidthStore + "px" }}
+        >
           {wrapperRef.current ? (
             <>
               {/* three differnet canvases - fractal, box zoom, orbit */}
+              {console.log("max height...." + wrapperRef.current.clientHeight)}
               <Canvas
                 className="can"
                 draw={clearFrac ? clearRect : drawFrac}

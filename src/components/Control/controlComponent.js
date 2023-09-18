@@ -7,6 +7,7 @@ import {
   useCompileStore,
   useColorsStore,
   useTmpParamsStore,
+  useCanStyleStore,
 } from "../../store/zustandTest.js";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
@@ -52,6 +53,8 @@ function Control({}) {
   // methods on ^^
   const setAlltmpParamsStore = useTmpParamsStore((state) => state.setAll);
   const setAxises = useTmpParamsStore((state) => state.setAxises);
+
+  const canWidthStore = useCanStyleStore((state) => state.width);
 
   // * local state * //
 
@@ -318,7 +321,18 @@ function Control({}) {
   return (
     <>
       <div id="control-viewer">
-        <div id="controls">
+        {console.log("controls can width", canWidthStore)}
+        <div
+          id="controls"
+          // -5 makes it works with global padding
+          // here is hard setting width of control container based on the calculated width
+          // just doing it for the viewer container doesn't quite work fully, this addition makes it
+          style={{
+            width: canWidthStore
+              ? document.documentElement.clientWidth - canWidthStore - 5 + "px"
+              : "",
+          }}
+        >
           <Header />
           <Container fluid>
             <Row>

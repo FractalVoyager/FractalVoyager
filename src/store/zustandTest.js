@@ -247,7 +247,9 @@ const useWriteOrbitStore = create((set) => ({
 
 const useCanStyleStore = create((set) => ({
   width: null,
+  maxWidth: null,
   setWidth: (width) => set({ width: width }),
+  setMaxWidth: (width) => set({ maxWidth: width }),
 }));
 
 export {
