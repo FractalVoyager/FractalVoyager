@@ -22,7 +22,7 @@ what to do to fix styling:
   - then make it so the controls take the rest of the possible width DONE
 - on terminal resize (or screen resize)... update sizes of cans DONE
 - shrink text boxes horizontally DONE
-- fix error that everything fails if screen is a square "or less" canvcomponent line 54
+- fix error that everything fails if screen is a square "or less" canvcomponent line 54 DOING
 - when extra vertical space.... extra space should be inbetwen controls and terminal, not headeer and controls, or increasing all spacing
 - when extra horizontal space... either max options longer, or keep download button to the left DONE
 - when height of options will overflow screen size.... popup modals
@@ -36,10 +36,7 @@ refer to SYE final paper section 6 for further explanations (p. 55)
   - log everything
   - log at the correct time
 - stlying (4)
-  - minimize terminal option
-  - on options overflow (height or width - 50%)... popup modal instead
-  - options and header not expanding with screen size
-  - re render page on screen resize
+
 - stuff starts to break after lots of actions (6)
   - cleanup useffects??? ... research
 - seperate state for orbits from pixles (7)

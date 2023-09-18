@@ -55,7 +55,9 @@ function Control({}) {
   const setAxises = useTmpParamsStore((state) => state.setAxises);
 
   const canWidthStore = useCanStyleStore((state) => state.width);
-
+  // need to add this one simply for reclacuating the total screen width... could do it a different way with local state for screen width but this works too
+  // becuae this gets updated every time the screen is resized
+  const trigger = useCanStyleStore((state) => state.reCalc);
   // * local state * //
 
   // back clicks
@@ -326,6 +328,7 @@ function Control({}) {
           // -5 makes it works with global padding
           // here is hard setting width of control container based on the calculated width
           // just doing it for the viewer container doesn't quite work fully, this addition makes it
+
           style={{
             width: canWidthStore
               ? document.documentElement.clientWidth - canWidthStore - 5 + "px"
