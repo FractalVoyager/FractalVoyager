@@ -75,8 +75,12 @@ const Viewer = ({
   // the value of initial type (the type that the script produces)
   const initType = useCompileStore((state) => state.initialType);
   const canWidthStore = useCanStyleStore((state) => state.width);
-  // see if just having this here works
+  // see if just having this here works - it does
   const canWidthReset = useCanStyleStore((state) => state.reCalc);
+  // could use local state here but alreadly have this one so doing global to not have two vars
+  const triggerCanWidthReCalc = useCanStyleStore(
+    (state) => state.triggerReCalc
+  );
   // silly fix to the viewer not reverting back to the initial type when the script changes
   // say you type a param space, switch to julia in viewer, then type another param space,
   // intial type didn't change, so nothing updates, so this is just a number that triggers
@@ -162,6 +166,16 @@ const Viewer = ({
   const [clearFrac, setClearFrac] = useState(false);
 
   // * useEffects * //
+
+  useEffect(() => {
+    window.addEventListener("resize", () => {
+      triggerCanWidthReCalc();
+    });
+
+    return () => {
+      window.removeEventListener("resize", triggerCanWidthReCalc());
+    };
+  }, []);
 
   // when a new script is typed in, reset the type in genPixleParams to the inital type of that script
   useEffect(() => {
@@ -741,7 +755,6 @@ const Viewer = ({
           {wrapperRef.current ? (
             <>
               {/* three differnet canvases - fractal, box zoom, orbit */}
-              {console.log("max height...." + wrapperRef.current.clientHeight)}
               <Canvas
                 className="can"
                 draw={clearFrac ? clearRect : drawFrac}

@@ -321,7 +321,6 @@ function Control({}) {
   return (
     <>
       <div id="control-viewer">
-        {console.log("controls can width", canWidthStore)}
         <div
           id="controls"
           // -5 makes it works with global padding
