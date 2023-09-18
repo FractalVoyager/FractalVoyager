@@ -20,11 +20,12 @@ what to do to fix styling:
   - set a max height DONE
 - make it so viewer container is the width of the calcuated width of the pixle area DONE
   - then make it so the controls take the rest of the possible width DONE
-- shrink text boxes horizontally
-- when extra vertical space.... extra space should be inbetwen controls and terminal, not headeer and controls
-- when extra horizontal space... either max options longer, or keep download button to the left
-- re render page on screen resize (lowest propority)
-- when height or width of options are over 50% of screen size.... popup modals
+- on terminal resize (or screen resize)... update sizes of cans
+- shrink text boxes horizontally DONE
+- when extra vertical space.... extra space should be inbetwen controls and terminal, not headeer and controls, or increasing all spacing
+- when extra horizontal space... either max options longer, or keep download button to the left DONE
+- when height of options will overflow screen size.... popup modals
+- for the width... when the min width is reached, they start pushing up the viewer, at this point, make pop up modals so viewer never gets pushed up
 
 # bug fixes
 

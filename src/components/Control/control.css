@@ -1,7 +1,7 @@
 #controls {
   /* float: right; */
-  flex-basis: 45%;
-  /* flex-shrink: 1; */
+  /* this baiscally sets the width that will start pushing up the pixles... making it really low becuase now, the lixels will start pushing up when the "natural" min width is hit */
+  flex-basis: 10%;
   flex-grow: 6;
   margin-left: 5px;
   display: flex;
@@ -10,6 +10,7 @@
   justify-content: space-between;
   align-items: center;
 }
+
 #control-viewer {
   flex-basis: 100vh;
   padding-bottom: 10px;
