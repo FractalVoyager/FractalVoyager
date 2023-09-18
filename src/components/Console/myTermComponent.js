@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import { useTermStore } from "../../store/zustandTest";
+import { useTermStore, useCanStyleStore } from "../../store/zustandTest";
 import "./terminal.css";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -18,7 +18,7 @@ const Terminal = () => {
     newLine: state.newLine,
   }));
 
-  const handleMaxMin = () => {};
+  const triggerReStyle = useCanStyleStore((state) => state.triggerReCalc);
 
   // ref to div which is terminal
   const termRef = useRef(null);
@@ -51,7 +51,10 @@ const Terminal = () => {
             variant="secondary"
             size="sm"
             id="termMinMax"
-            onClick={() => setTermMaxed((prev) => !prev)}
+            onClick={() => {
+              setTermMaxed((prev) => !prev);
+              triggerReStyle();
+            }}
           >
             {termMaxed ? "-" : "+"}
           </Button>

@@ -20,7 +20,7 @@ what to do to fix styling:
   - set a max height DONE
 - make it so viewer container is the width of the calcuated width of the pixle area DONE
   - then make it so the controls take the rest of the possible width DONE
-- on terminal resize (or screen resize)... update sizes of cans
+- on terminal resize (or screen resize)... update sizes of cans DONE - not window resize
 - shrink text boxes horizontally DONE
 - when extra vertical space.... extra space should be inbetwen controls and terminal, not headeer and controls, or increasing all spacing
 - when extra horizontal space... either max options longer, or keep download button to the left DONE
