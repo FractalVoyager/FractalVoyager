@@ -53,7 +53,9 @@ const Terminal = () => {
             id="termMinMax"
             onClick={() => {
               setTermMaxed((prev) => !prev);
-              triggerReStyle();
+              setTimeout(() => {
+                triggerReStyle();
+              }, 5);
             }}
           >
             {termMaxed ? "-" : "+"}
