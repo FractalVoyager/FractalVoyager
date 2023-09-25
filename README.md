@@ -15,18 +15,6 @@ To run the app, run "npm start" it may not work the first time if cgen was fresh
 
 what to do to fix styling:
 
-- terminal DONE
-  - minimize option DONE
-  - set a max height DONE
-- make it so viewer container is the width of the calcuated width of the pixle area DONE
-  - then make it so the controls take the rest of the possible width DONE
-- on terminal resize (or screen resize)... update sizes of cans DONE
-- shrink text boxes horizontally DONE
-- fix error that everything fails if screen is a square "or less" canvcomponent line 54 DONE
-- when extra horizontal space... either max options longer, or keep download button to the left DONE
-- when height of options will overflow screen size.... popup modals SORTA DONE, just need to amke the buttons actualyl do things
-- for the width... when the min width is reached, they start pushing up the viewer, at this point, make pop up modals so viewer never gets pushed up DONE
-
 # bug fixes
 
 refer to SYE final paper section 6 for further explanations (p. 55)
@@ -34,8 +22,6 @@ refer to SYE final paper section 6 for further explanations (p. 55)
 - terminal output consistency (3)
   - log everything
   - log at the correct time
-- stlying (4)
-
 - stuff starts to break after lots of actions (6)
   - cleanup useffects??? ... research
 - seperate state for orbits from pixles (7)
@@ -66,3 +52,15 @@ refer to SYE final paper section 6 for further explanations (p. 55)
   - github pages?
 - once orbit is drawn, cannot pan or anything like that (5)
   - disallow these
+- styling (4)
+  - terminal
+    - minimize option
+    - set a max height
+  - make it so viewer container is the width of the calcuated width of the pixle area
+    - then make it so the controls take the rest of the possible width
+  - on terminal resize (or screen resize)... update sizes of cans
+  - shrink text boxes horizontally
+  - fix error that everything fails if screen is a square "or less" canvcomponent line 54
+  - when extra horizontal space... either max options longer, or keep download button to the left
+  - when height of options will overflow screen size.... popup modals S
+  - for the width... when the min width is reached, they start pushing up the viewer, at this point, make pop up modals so viewer never gets pushed up
