@@ -48,6 +48,8 @@ function Control({}) {
         0
       );
 
+      console.log(width);
+
       let difference = height - occupiedHeight;
       // TODO refactor to clean code and readable
       if (difference <= 3 && styleType === 0) {
@@ -60,9 +62,9 @@ function Control({}) {
         setStyleType(2);
       } else if (difference > 139 && styleType === 2) {
         setStyleType(1);
-      } else if (difference <= 2 && styleType === 2) {
+      } else if ((difference <= 2 && styleType === 2) || width < 300) {
         setStyleType(3);
-      } else if (difference > 400 && styleType === 3) {
+      } else if (difference > 500 && styleType === 3 && width >= 300) {
         setStyleType(1);
       } else if (difference > 150 && styleType === 4) {
         setStyleType(3);
