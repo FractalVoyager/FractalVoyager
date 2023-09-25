@@ -1,4 +1,4 @@
-## Fractal Voyager v0.0.0
+## Fractal Voyager
 
 To regenerate ANTLR parser/grammar (and associated files), run the following commands after antlr v4.7.1 is installed:
 export CLASSPATH=".:/usr/local/lib/antlr-4.7.1-complete.jar:$CLASSPATH"
