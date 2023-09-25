@@ -42,6 +42,8 @@ function Control({}) {
 
   // modal states
   const [colorModalOpen, setColorModalOpen] = useState(false);
+  const [programModalOpen, setProgramModalOpen] = useState(false);
+  const [optsModalOpen, setOptsModalOpen] = useState(false);
 
   useEffect(() => {
     if (wrapperRef.current && childrenRefs.current) {
@@ -754,7 +756,394 @@ function Control({}) {
                       )}
                       {styleType === 3 || styleType === 4 ? (
                         <>
-                          <Button variant="primary">Other Options</Button>
+                          <Button
+                            variant="primary"
+                            onClick={() => setOptsModalOpen(true)}
+                          >
+                            Other Options
+                          </Button>
+                          <Modal
+                            show={optsModalOpen}
+                            onHide={() => setOptsModalOpen(false)}
+                            size="xl"
+                          >
+                            <Modal.Header closeButton>Options</Modal.Header>
+                            <Modal.Body>
+                              <Container>
+                                <Row>
+                                  <Col>
+                                    <Form>
+                                      <Form.Group>
+                                        <Form.Label>Max Radius</Form.Label>
+                                        <Form.Control
+                                          value={tmpParams.maxRad}
+                                          onChange={(e) =>
+                                            setTmpParams({
+                                              ...tmpParams,
+                                              maxRad: e.target.value,
+                                            })
+                                          }
+                                          type="number"
+                                        ></Form.Control>
+                                      </Form.Group>
+                                      <Form.Group>
+                                        <Form.Label>Min Radius</Form.Label>
+                                        <Form.Control
+                                          value={tmpParams.minRad}
+                                          onChange={(e) =>
+                                            setTmpParams({
+                                              ...tmpParams,
+                                              minRad: e.target.value,
+                                            })
+                                          }
+                                          type="number"
+                                        ></Form.Control>
+                                      </Form.Group>
+                                      <Form.Group>
+                                        <Form.Label>Epsilon</Form.Label>
+                                        <Form.Control
+                                          value={tmpParams.epsilon}
+                                          onChange={(e) =>
+                                            setTmpParams({
+                                              ...tmpParams,
+                                              epsilon: e.target.value,
+                                            })
+                                          }
+                                          type="number"
+                                        ></Form.Control>
+                                      </Form.Group>
+
+                                      <Form.Group>
+                                        <Form.Label>Max Iterations</Form.Label>
+                                        <Form.Control
+                                          type="number"
+                                          disabled={tmpParams.type === 2}
+                                          value={tmpParams.maxIters}
+                                          onChange={(e) =>
+                                            setTmpParams({
+                                              ...tmpParams,
+                                              maxIters: e.target.value,
+                                            })
+                                          }
+                                        ></Form.Control>
+                                      </Form.Group>
+                                    </Form>
+                                    <Form>
+                                      <Button
+                                        disabled={tmpParams.type === 2}
+                                        variant="primary"
+                                        onClick={() => handleZoom(true)}
+                                      >
+                                        +
+                                      </Button>
+                                      <Button
+                                        disabled={tmpParams.type === 2}
+                                        variant="primary"
+                                        onClick={() => handleZoom(false)}
+                                      >
+                                        -
+                                      </Button>
+                                      <Button
+                                        disabled={tmpParams.type === 2}
+                                        variant="primary"
+                                        onClick={() => handlePan("left")}
+                                      >
+                                        left
+                                      </Button>
+                                      <Button
+                                        disabled={tmpParams.type === 2}
+                                        variant="primary"
+                                        onClick={() => handlePan("right")}
+                                      >
+                                        right
+                                      </Button>
+                                      <Button
+                                        disabled={tmpParams.type === 2}
+                                        variant="primary"
+                                        onClick={() => handlePan("up")}
+                                      >
+                                        up
+                                      </Button>
+                                      <Button
+                                        disabled={tmpParams.type === 2}
+                                        variant="primary"
+                                        onClick={() => handlePan("down")}
+                                      >
+                                        down
+                                      </Button>
+                                      <Form />
+                                      <Form.Label>Orbit Iterations</Form.Label>
+                                      <Form.Control
+                                        placeholder="orbit number"
+                                        type="number"
+                                        value={tmpParams.orbitNum}
+                                        onChange={(e) =>
+                                          setTmpParams({
+                                            ...tmpParams,
+                                            orbitNum: e.target.value,
+                                          })
+                                        }
+                                      ></Form.Control>
+                                      <Form.Label>Orbit Color</Form.Label>
+                                      <Form.Select
+                                        aria-label="Default select example"
+                                        value={tmpParams.orbitColor}
+                                        onChange={(e) =>
+                                          setTmpParams({
+                                            ...tmpParams,
+                                            orbitColor: e.target.value,
+                                          })
+                                        }
+                                      >
+                                        <option value="red">Red</option>
+                                        <option value="blue">Blue</option>
+                                        <option value="green">Green</option>
+                                      </Form.Select>
+                                    </Form>
+                                  </Col>
+                                  <Col>
+                                    <Form>
+                                      {/* if there is a fractal on the screen, don't grey out boxes */}
+                                      <Form>
+                                        {tmpParams.type === 0 ||
+                                        tmpParams.type === 1 ||
+                                        tmpParams.type === 2 ? (
+                                          <>
+                                            <Form.Control
+                                              placeholder="Real Part"
+                                              type="number"
+                                              value={
+                                                tmpParams.re == null
+                                                  ? ""
+                                                  : tmpParams.re
+                                              }
+                                              onChange={(e) =>
+                                                setTmpParams({
+                                                  ...tmpParams,
+                                                  re: e.target.value,
+                                                })
+                                              }
+                                            ></Form.Control>
+                                            <Form.Control
+                                              placeholder="Imaginary Part"
+                                              type="number"
+                                              value={
+                                                tmpParams.im == null
+                                                  ? ""
+                                                  : tmpParams.im
+                                              }
+                                              onChange={(e) => {
+                                                setTmpParams({
+                                                  ...tmpParams,
+                                                  im: e.target.value,
+                                                });
+                                              }}
+                                            ></Form.Control>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <Form.Control
+                                              placeholder="Real Part"
+                                              disabled
+                                              readOnly
+                                            ></Form.Control>
+                                            <Form.Control
+                                              placeholder="Imaginary Part"
+                                              disabled
+                                              readOnly
+                                            ></Form.Control>
+                                          </>
+                                        )}
+                                        {/* gen julia space button if in param (type 0) otherwise orbit, if not fractal gen julia
+                    don't have anything about what type it is here, because that is handled in viewer */}
+                                        {tmpParams.type === 0 ? (
+                                          <>
+                                            <Button
+                                              variant="primary"
+                                              onClick={() =>
+                                                setGenVals([
+                                                  tmpParams.re,
+                                                  tmpParams.im,
+                                                ])
+                                              }
+                                            >
+                                              Generate Dynamical Plane
+                                            </Button>
+                                          </>
+                                        ) : tmpParams.type === 1 ||
+                                          tmpParams.type === 2 ? (
+                                          <>
+                                            <Button
+                                              variant="primary"
+                                              onClick={() =>
+                                                setGenVals([
+                                                  tmpParams.re,
+                                                  tmpParams.im,
+                                                ])
+                                              }
+                                            >
+                                              Generate Orbit
+                                            </Button>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <Button variant="primary" disabled>
+                                              Generate Dynamical Plane
+                                            </Button>
+                                          </>
+                                        )}
+                                      </Form>
+                                    </Form>
+                                    <Form>
+                                      <Form.Group>
+                                        <Form.Label>
+                                          Real Axis Min Value
+                                        </Form.Label>
+                                        <Form.Control
+                                          type="number"
+                                          value={tmpParams.realMin}
+                                          disabled={tmpParams.type === 2}
+                                          onChange={(e) => {
+                                            let num = e.target.value;
+                                            setTmpParams({
+                                              ...tmpParams,
+                                              realMin:
+                                                num !== "" ? Number(num) : "",
+                                            });
+                                          }}
+                                        ></Form.Control>
+                                        <Form.Label>
+                                          Real Axis Max Value
+                                        </Form.Label>
+                                        <Form.Control
+                                          type="number"
+                                          value={tmpParams.realMax}
+                                          disabled={tmpParams.type === 2}
+                                          onChange={(e) => {
+                                            let num = e.target.value;
+                                            setTmpParams({
+                                              ...tmpParams,
+                                              realMax:
+                                                num !== "" ? Number(num) : "",
+                                            });
+                                          }}
+                                        ></Form.Control>
+                                        <Form.Label>
+                                          Imaginary Axis Min Value
+                                        </Form.Label>
+                                        <Form.Control
+                                          type="number"
+                                          value={tmpParams.imgMin}
+                                          disabled={tmpParams.type === 2}
+                                          onChange={(e) => {
+                                            let num = e.target.value;
+                                            setTmpParams({
+                                              ...tmpParams,
+                                              imgMin:
+                                                num !== "" ? Number(num) : "",
+                                            });
+                                          }}
+                                        ></Form.Control>
+                                        <Form.Label>
+                                          Imaginary Axis Max Value
+                                        </Form.Label>
+                                        <Form.Control
+                                          type="number"
+                                          value={tmpParams.imgMax}
+                                          disabled={tmpParams.type === 2}
+                                          onChange={(e) => {
+                                            let num = e.target.value;
+                                            setTmpParams({
+                                              ...tmpParams,
+                                              imgMax:
+                                                num !== "" ? Number(num) : "",
+                                            });
+                                          }}
+                                        ></Form.Control>
+                                        <Form.Label>
+                                          Imaginary Axis Resolution
+                                        </Form.Label>
+                                        <Form.Control
+                                          type="number"
+                                          disabled={tmpParams.type === 2}
+                                          value={tmpParams.imagAxisRes}
+                                          onChange={(e) => {
+                                            let num = e.target.value;
+                                            setTmpParams({
+                                              ...tmpParams,
+                                              imagAxisRes:
+                                                num !== "" ? Number(num) : "",
+                                            });
+                                          }}
+                                        ></Form.Control>
+                                      </Form.Group>
+                                      {showCords ? (
+                                        <>
+                                          <Button
+                                            variant="primary"
+                                            onClick={() =>
+                                              setShowCords((prev) => !prev)
+                                            }
+                                          >
+                                            Hide Complex Number
+                                          </Button>
+                                        </>
+                                      ) : (
+                                        <Button
+                                          variant="primary"
+                                          onClick={() =>
+                                            setShowCords((prev) => !prev)
+                                          }
+                                        >
+                                          Show Complex Number
+                                        </Button>
+                                      )}
+                                      {showFrac ? (
+                                        <>
+                                          <Button
+                                            variant="primary"
+                                            onClick={() =>
+                                              setShowFrac((prev) => !prev)
+                                            }
+                                          >
+                                            Hide Fractal on Orbit Drag
+                                          </Button>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Button
+                                            variant="primary"
+                                            onClick={() =>
+                                              setShowFrac((prev) => !prev)
+                                            }
+                                          >
+                                            Show Fractal on Orbit Drag
+                                          </Button>
+                                        </>
+                                      )}
+                                    </Form>
+                                  </Col>
+                                </Row>
+                                {styleType === 4 ? (
+                                  <>
+                                    <Row>
+                                      <Form.Control
+                                        onChange={(evt) =>
+                                          setNumColors(evt.target.value)
+                                        }
+                                        type="number"
+                                        defaultValue={numColors}
+                                        placeholder="Enter number of colors"
+                                      ></Form.Control>
+                                      <ColorPicker num={numColors} />
+                                    </Row>
+                                  </>
+                                ) : (
+                                  ""
+                                )}
+                              </Container>
+                            </Modal.Body>
+                          </Modal>
                         </>
                       ) : (
                         ""
@@ -877,9 +1266,79 @@ function Control({}) {
                 <Row>
                   {styleType > 1 && styleType < 3 ? (
                     <Col>
-                      <Button variant="primary" style={{ width: "100%" }}>
+                      <Button
+                        variant="primary"
+                        style={{ width: "100%" }}
+                        onClick={() => setProgramModalOpen(true)}
+                      >
                         Edit Program Paramaters
                       </Button>
+                      <Modal
+                        show={programModalOpen}
+                        onHide={() => setProgramModalOpen(false)}
+                      >
+                        <Modal.Header closeButton>
+                          Edit program paramters, close, then presss update
+                        </Modal.Header>
+                        <Modal.Body>
+                          <Form>
+                            <Form.Group>
+                              <Form.Label>Max Radius</Form.Label>
+                              <Form.Control
+                                value={tmpParams.maxRad}
+                                onChange={(e) =>
+                                  setTmpParams({
+                                    ...tmpParams,
+                                    maxRad: e.target.value,
+                                  })
+                                }
+                                type="number"
+                              ></Form.Control>
+                            </Form.Group>
+                            <Form.Group>
+                              <Form.Label>Min Radius</Form.Label>
+                              <Form.Control
+                                value={tmpParams.minRad}
+                                onChange={(e) =>
+                                  setTmpParams({
+                                    ...tmpParams,
+                                    minRad: e.target.value,
+                                  })
+                                }
+                                type="number"
+                              ></Form.Control>
+                            </Form.Group>
+                            <Form.Group>
+                              <Form.Label>Epsilon</Form.Label>
+                              <Form.Control
+                                value={tmpParams.epsilon}
+                                onChange={(e) =>
+                                  setTmpParams({
+                                    ...tmpParams,
+                                    epsilon: e.target.value,
+                                  })
+                                }
+                                type="number"
+                              ></Form.Control>
+                            </Form.Group>
+
+                            <Form.Group>
+                              <Form.Label>Max Iterations</Form.Label>
+                              <Form.Control
+                                type="number"
+                                disabled={tmpParams.type === 2}
+                                value={tmpParams.maxIters}
+                                onChange={(e) =>
+                                  setTmpParams({
+                                    ...tmpParams,
+                                    maxIters: e.target.value,
+                                  })
+                                }
+                              ></Form.Control>
+                            </Form.Group>
+                          </Form>
+                        </Modal.Body>
+                      </Modal>
                     </Col>
                   ) : (
                     ""
@@ -898,7 +1357,6 @@ function Control({}) {
                         <Modal
                           show={colorModalOpen}
                           onHide={() => setColorModalOpen(false)}
-                          //onHide={setColorModalOpen(false)}
                         >
                           <Modal.Header closeButton>
                             Select a color, close, then press update
