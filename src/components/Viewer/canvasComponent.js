@@ -70,7 +70,6 @@ const Canvas = ({
     styHeight = (styWidth * yRes) / xRes;
   }
 
-  console.log("ending w,h", styWidth, styHeight);
   // }
   const style = { width: styWidth, height: styHeight };
 
