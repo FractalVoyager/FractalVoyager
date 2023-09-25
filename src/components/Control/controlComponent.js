@@ -16,6 +16,8 @@ import Header from "../Header/headerComponent";
 import ColorPicker from "../Colors/SliderComponent";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
+import Modal from "react-bootstrap/Modal";
+
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 
@@ -37,6 +39,9 @@ function Control({}) {
   const wrapperRef = useRef(null);
   const childrenRefs = useRef([]);
   const [styleType, setStyleType] = useState(0);
+
+  // modal states
+  const [colorModalOpen, setColorModalOpen] = useState(false);
 
   useEffect(() => {
     if (wrapperRef.current && childrenRefs.current) {
@@ -884,9 +889,31 @@ function Control({}) {
                   {(styleType === 1) | (styleType === 2) ? (
                     <>
                       <Col>
-                        <Button variant="primary" style={{ width: "100%" }}>
+                        <Button
+                          variant="primary"
+                          style={{ width: "100%" }}
+                          onClick={() => setColorModalOpen(true)}
+                        >
                           Open Color Select
                         </Button>
+                        <Modal
+                          show={colorModalOpen}
+                          onHide={() => setColorModalOpen(false)}
+                          //onHide={setColorModalOpen(false)}
+                        >
+                          <Modal.Header closeButton>
+                            Select a color, close, then press update
+                          </Modal.Header>
+                          <Modal.Body>
+                            <Form.Control
+                              onChange={(evt) => setNumColors(evt.target.value)}
+                              type="number"
+                              defaultValue={numColors}
+                              placeholder="Enter number of colors"
+                            ></Form.Control>
+                            <ColorPicker num={numColors} />
+                          </Modal.Body>
+                        </Modal>
                       </Col>
                     </>
                   ) : styleType === 4 ? (
