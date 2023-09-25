@@ -129,7 +129,6 @@ function Control({}) {
   const setAxises = useTmpParamsStore((state) => state.setAxises);
 
   const canWidthStore = useCanStyleStore((state) => state.width);
-  console.log(canWidthStore);
   // need to add this one simply for reclacuating the total screen width... could do it a different way with local state for screen width but this works too
   // becuae this gets updated every time the screen is resized
   const trigger = useCanStyleStore((state) => state.reCalc);
