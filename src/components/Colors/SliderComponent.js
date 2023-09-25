@@ -5,6 +5,12 @@ import "./colors.css";
 import { useColorsStore } from "../../store/zustandTest";
 
 /*
+
+
+
+*/
+
+/*
 props: num, the number the user picked from the input box for how many colors
 returns: the slider (hue picker), and the color displayer which is all the colors displayed
 descripion: this is the color picker, it uses a hue picker slider from a npm package 
