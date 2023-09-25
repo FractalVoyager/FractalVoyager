@@ -41,6 +41,9 @@ refer to SYE final paper section 6 for further explanations (p. 55)
 - seperate state for orbits from pixles (7)
   - would make updates work when in orbit, (weird because some stuff is for orbit)
 - make the chunks of the controls componenets - can pass down setStates (8)
+- fix small styling issues, all in the controls componenet (9)
+  - the color displayer updates late or not at all sometimes on resize (ex. terminal minimize), causing a scroll bar
+  - the whole control component container doesn't quite go over far enough sometimes, this is related to above, for both, when you do an action in control component it rerenders and fixes
 
 # features
 

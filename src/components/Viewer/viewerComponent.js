@@ -78,7 +78,6 @@ const Viewer = ({
   const [widthState, setWidthState] = useState(null);
   useEffect(() => {
     setWidthState(canWidthStore);
-    console.log(canWidthStore);
   }, [canWidthStore]);
   // see if just having this here works - it does
   const canWidthReset = useCanStyleStore((state) => state.reCalc);

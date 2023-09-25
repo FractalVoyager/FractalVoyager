@@ -41,11 +41,14 @@ function ColorDisplayer({ selectedColor, num, wrapper }) {
     wStr =
       Math.floor(wrapper.current.clientWidth / colors.length).toString() + "px";
     hStr = Math.floor(wrapper.current.clientHeight * 2.5).toString() + "px";
+    console.log(wrapper.current.clientWidth);
   }
+
   // also if we have colors and wrapper, we're good to return component, otherwise, return nothing
   if (colors && wrapper) {
     return (
       <div id="colors-cont">
+        {console.log("rendering", wStr)}
         {/* map the colors to div elements with key of they're color */}
         {colors.map((color) => {
           let str = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
