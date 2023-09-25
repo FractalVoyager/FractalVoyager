@@ -77,9 +77,9 @@ const Canvas = ({
   // the app just imediately crashed, this fixes it for some odd reason
   // this also brakes the terminal expanding and collapsing chagning the size of the canvas
   // setTimeout(() => {
-  useEffect(() => {
-    setWidth(styWidth);
-  }, [styWidth]);
+  // useEffect(() => {
+  setWidth(styWidth);
+  // }, [styWidth]);
   // }, 1);
 
   // the ref will have the drawn fractal
