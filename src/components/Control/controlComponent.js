@@ -62,9 +62,9 @@ function Control({}) {
         setStyleType(1);
       } else if (difference <= 2 && styleType === 2) {
         setStyleType(3);
-      } else if (difference > 300 && styleType === 3) {
+      } else if (difference > 400 && styleType === 3) {
         setStyleType(1);
-      } else if (difference > 131 && styleType === 4) {
+      } else if (difference > 150 && styleType === 4) {
         setStyleType(3);
       } else if (difference <= 2 && styleType === 3) {
         setStyleType(4);

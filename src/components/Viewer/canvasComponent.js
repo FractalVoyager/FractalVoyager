@@ -3,6 +3,7 @@
 // this should just be for creating the canvas and updating it with state in viewComponent
 // by calling useCanvas
 
+import { useEffect } from "react";
 import useCanvas from "../../helpers/canvasHook";
 import { useFracRefStore, useCanStyleStore } from "../../store/zustandTest";
 
@@ -75,8 +76,11 @@ const Canvas = ({
 
   // for some random but consistent values for height and width...
   // the app just imediately crashed, this fixes it for some odd reason
+  // this also brakes the terminal expanding and collapsing chagning the size of the canvas
   // setTimeout(() => {
-  setWidth(styWidth);
+  useEffect(() => {
+    setWidth(styWidth);
+  }, [styWidth]);
   // }, 1);
 
   // the ref will have the drawn fractal
