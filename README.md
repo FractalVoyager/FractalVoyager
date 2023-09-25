@@ -11,10 +11,6 @@ To compile the cgen to wasm, run "make" in the root of the cgen folder.
 
 To run the app, run "npm start" it may not work the first time if cgen was freshly compiled, but will eventually.
 
-## TODO
-
-what to do to fix styling:
-
 # bug fixes
 
 refer to SYE final paper section 6 for further explanations (p. 55)
