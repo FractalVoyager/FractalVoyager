@@ -75,6 +75,10 @@ const Viewer = ({
   // the value of initial type (the type that the script produces)
   const initType = useCompileStore((state) => state.initialType);
   const canWidthStore = useCanStyleStore((state) => state.width);
+  const [widthState, setWidthState] = useState(null);
+  useEffect(() => {
+    setWidthState(canWidthStore);
+  }, [canWidthStore]);
   // see if just having this here works - it does
   const canWidthReset = useCanStyleStore((state) => state.reCalc);
   // could use local state here but alreadly have this one so doing global to not have two vars
@@ -748,7 +752,7 @@ const Viewer = ({
         id="viewer"
         // setting width of container based on (possibly new) width of canvas
         style={{
-          width: canWidthStore ? canWidthStore - 5 + "px" : "",
+          width: widthState ? widthState - 5 + "px" : "",
         }}
       >
         <div id="outer-cans" ref={wrapperRef}>
