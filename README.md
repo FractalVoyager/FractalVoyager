@@ -22,11 +22,10 @@ what to do to fix styling:
   - then make it so the controls take the rest of the possible width DONE
 - on terminal resize (or screen resize)... update sizes of cans DONE
 - shrink text boxes horizontally DONE
-- fix error that everything fails if screen is a square "or less" canvcomponent line 54 DOING
-- when extra vertical space.... extra space should be inbetwen controls and terminal, not headeer and controls, or increasing all spacing
+- fix error that everything fails if screen is a square "or less" canvcomponent line 54 DONE
 - when extra horizontal space... either max options longer, or keep download button to the left DONE
-- when height of options will overflow screen size.... popup modals
-- for the width... when the min width is reached, they start pushing up the viewer, at this point, make pop up modals so viewer never gets pushed up
+- when height of options will overflow screen size.... popup modals SORTA DONE, just need to amke the buttons actualyl do things
+- for the width... when the min width is reached, they start pushing up the viewer, at this point, make pop up modals so viewer never gets pushed up DONE
 
 # bug fixes
 
@@ -41,6 +40,7 @@ refer to SYE final paper section 6 for further explanations (p. 55)
   - cleanup useffects??? ... research
 - seperate state for orbits from pixles (7)
   - would make updates work when in orbit, (weird because some stuff is for orbit)
+- make the chunks of the controls componenets - can pass down setStates (8)
 
 # features
 

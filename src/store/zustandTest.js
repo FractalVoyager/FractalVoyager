@@ -254,6 +254,11 @@ const useCanStyleStore = create((set) => ({
   triggerReCalc: () => set((state) => ({ reCalc: state.reCalc + 1 })),
 }));
 
+const useSetToModalStore = create((set) => ({
+  colors: false,
+  setColors: (bool) => set({ colors: bool }),
+}));
+
 export {
   useCompileStore,
   useTermStore,
