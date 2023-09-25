@@ -49,16 +49,35 @@ const Canvas = ({
   // it doesn't change those values, so the actaul size of the canvas doesn't update,
   // when we reset the axises in control, the xRes and yRes are adjusted for those demensions
   // so the ratio size of the actual canvas changes here
-  let styWidth = maxWidth;
+  let styWidth = document.documentElement.clientWidth - 400;
   let styHeight = maxHeight;
+
+  // console.log("starting w,h ", styWidth, styHeight);
+
+  // console.log("bounding height", styHeight);
+  // console.log("bounding width", styWidth);
+
+  // HERES WHERE THERES SOME REAL DECISIONS TO BE MADE ...
+  /*
+    - rn we are going beyond the bounidng width and then pushing the controls further to the right
+    - want to make this very repsonsive (remember you can set dims of can) - sometimes might want to controls above canvas (not jsut dependent on screen dims because of setting can dims)
+  */
   // TODO the new way of doing this doesn't work if whole page is longer than it is wide
-  // if (styWidth / styHeight > xRes / yRes) {
-  styWidth = (styHeight * xRes) / yRes;
-  // } else if (styWidth / styHeight < xRes / yRes) {
-  //   styHeight = (styWidth * yRes) / xRes;
+  if (styWidth / styHeight >= xRes / yRes) {
+    styWidth = (styHeight * xRes) / yRes;
+  } else if (styWidth / styHeight < xRes / yRes) {
+    styHeight = (styWidth * yRes) / xRes;
+  }
+
+  console.log("ending w,h", styWidth, styHeight);
   // }
   const style = { width: styWidth, height: styHeight };
+
+  // for some random but consistent values for height and width...
+  // the app just imediately crashed, this fixes it for some odd reason
+  // setTimeout(() => {
   setWidth(styWidth);
+  // }, 1);
 
   // the ref will have the drawn fractal
   return (
