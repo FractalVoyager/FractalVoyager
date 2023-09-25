@@ -1,10 +1,38 @@
-#terminal {
-  /* flex-grow: 2; */
-  /* flex-basis: 100%; */
-  /* margin-bottom: 5px; */
-  min-height: 0;
-  flex-basis: 15vh;
+#outer-terminal {
+  min-height: 1.9em;
+  max-height: 7em;
   color: white;
   background-color: black;
+  overflow-y: hidden;
+}
+
+.termMaxed {
+  height: 7em;
+}
+.termMined {
+  height: 1.9em;
+}
+
+#inner-terminal {
+  height: 100% !important;
+  /* width: 100% !important; */
+
   overflow-y: scroll;
+  /* overflow: hidden; */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+#inner-terminal::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+#inner-terminal {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+#termMinMax {
+  float: right;
+  border-top-right-radius: 0rem;
 }

@@ -245,6 +245,20 @@ const useWriteOrbitStore = create((set) => ({
   setWrite: (bool) => set({ write: bool }),
 }));
 
+const useCanStyleStore = create((set) => ({
+  width: null,
+  maxWidth: null,
+  reCalc: 0,
+  setWidth: (width) => set({ width: width }),
+  setMaxWidth: (width) => set({ maxWidth: width }),
+  triggerReCalc: () => set((state) => ({ reCalc: state.reCalc + 1 })),
+}));
+
+const useSetToModalStore = create((set) => ({
+  colors: false,
+  setColors: (bool) => set({ colors: bool }),
+}));
+
 export {
   useCompileStore,
   useTermStore,
@@ -254,4 +268,5 @@ export {
   useFracRefStore,
   useResetType,
   useWriteOrbitStore,
+  useCanStyleStore,
 };

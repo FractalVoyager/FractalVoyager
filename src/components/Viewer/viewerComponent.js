@@ -11,6 +11,7 @@ import {
   useFracRefStore,
   useResetType,
   useWriteOrbitStore,
+  useCanStyleStore,
 } from "../../store/zustandTest.js";
 
 /*
@@ -73,6 +74,17 @@ const Viewer = ({
   const setBackOk = useBackState((state) => state.setAllowed);
   // the value of initial type (the type that the script produces)
   const initType = useCompileStore((state) => state.initialType);
+  const canWidthStore = useCanStyleStore((state) => state.width);
+  const [widthState, setWidthState] = useState(null);
+  useEffect(() => {
+    setWidthState(canWidthStore);
+  }, [canWidthStore]);
+  // see if just having this here works - it does
+  const canWidthReset = useCanStyleStore((state) => state.reCalc);
+  // could use local state here but alreadly have this one so doing global to not have two vars
+  const triggerCanWidthReCalc = useCanStyleStore(
+    (state) => state.triggerReCalc
+  );
   // silly fix to the viewer not reverting back to the initial type when the script changes
   // say you type a param space, switch to julia in viewer, then type another param space,
   // intial type didn't change, so nothing updates, so this is just a number that triggers
@@ -158,6 +170,16 @@ const Viewer = ({
   const [clearFrac, setClearFrac] = useState(false);
 
   // * useEffects * //
+
+  useEffect(() => {
+    window.addEventListener("resize", () => {
+      triggerCanWidthReCalc();
+    });
+
+    return () => {
+      window.removeEventListener("resize", triggerCanWidthReCalc());
+    };
+  }, []);
 
   // when a new script is typed in, reset the type in genPixleParams to the inital type of that script
   useEffect(() => {
@@ -309,7 +331,6 @@ const Viewer = ({
   // when about to draw orbit: write to terminal, set ParamsStack, set genPixles
   // to right stuff, set type in tmpParamsStore, setGenVals in tmpParamsStore
   const interDrawOrbit = (re, im, write) => {
-    // console.log("inter draw orbit");
     if (write) {
       quickWrite("Generating orbit...");
     }
@@ -727,7 +748,13 @@ const Viewer = ({
 
   return (
     <>
-      <div id="viewer">
+      <div
+        id="viewer"
+        // setting width of container based on (possibly new) width of canvas
+        style={{
+          width: widthState ? widthState - 5 + "px" : "",
+        }}
+      >
         <div id="outer-cans" ref={wrapperRef}>
           {wrapperRef.current ? (
             <>
