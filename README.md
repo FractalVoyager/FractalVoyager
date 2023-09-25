@@ -11,8 +11,6 @@ To compile the cgen to wasm, run "make" in the root of the cgen folder.
 
 To run the app, run "npm start" it may not work the first time if cgen was freshly compiled, but will eventually.
 
-## TODO
-
 # bug fixes
 
 refer to SYE final paper section 6 for further explanations (p. 55)
@@ -20,14 +18,14 @@ refer to SYE final paper section 6 for further explanations (p. 55)
 - terminal output consistency (3)
   - log everything
   - log at the correct time
-- stlying (4)
-  - on options overflow (height or width - 50%)... popup modal instead
-  - options and header not expanding with screen size
-  - re render page on screen resize
 - stuff starts to break after lots of actions (6)
   - cleanup useffects??? ... research
 - seperate state for orbits from pixles (7)
   - would make updates work when in orbit, (weird because some stuff is for orbit)
+- make the chunks of the controls componenets - can pass down setStates (8)
+- fix small styling issues, all in the controls componenet (9)
+  - the color displayer updates late or not at all sometimes on resize (ex. terminal minimize), causing a scroll bar
+  - the whole control component container doesn't quite go over far enough sometimes, this is related to above, for both, when you do an action in control component it rerenders and fixes
 
 # features
 
@@ -50,3 +48,15 @@ refer to SYE final paper section 6 for further explanations (p. 55)
   - github pages?
 - once orbit is drawn, cannot pan or anything like that (5)
   - disallow these
+- styling (4)
+  - terminal
+    - minimize option
+    - set a max height
+  - make it so viewer container is the width of the calcuated width of the pixle area
+    - then make it so the controls take the rest of the possible width
+  - on terminal resize (or screen resize)... update sizes of cans
+  - shrink text boxes horizontally
+  - fix error that everything fails if screen is a square "or less" canvcomponent line 54
+  - when extra horizontal space... either max options longer, or keep download button to the left
+  - when height of options will overflow screen size.... popup modals S
+  - for the width... when the min width is reached, they start pushing up the viewer, at this point, make pop up modals so viewer never gets pushed up

@@ -1,21 +1,30 @@
 #controls {
   /* float: right; */
-  flex-basis: 50%;
-  /* flex-grow: 1; */
-  /* flex-shrink: 1; */
+  /* this baiscally sets the width that will start pushing up the pixles... making it really low becuase now, the lixels will start pushing up when the "natural" min width is hit */
+  flex-basis: 10%;
+  flex-grow: 6;
   margin-left: 5px;
+  /* max-width: 1282px; */
+  /* max-height: 806px; */
   display: flex;
   flex-direction: column;
   /* padding: 10px; */
+
   justify-content: space-between;
   align-items: center;
 }
+
+#inner-control-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 #control-viewer {
-  flex-basis: 85vh;
+  flex-basis: 100vh;
   padding-bottom: 10px;
   display: flex;
   flex-direction: row-reverse;
-  justify-content: space-between;
+  justify-content: flex-end;
 }
 
 .control {
@@ -28,9 +37,6 @@
 
 #viewer-form {
   padding: 5px;
-}
-
-#header {
 }
 
 #slider {
