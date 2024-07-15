@@ -35,7 +35,7 @@ refer to SYE final paper section 6 for further explanations (p. 55)
 - multiple colors... stops near 1 vs stops near 2 (11)
 - draw a line across canvas in paramter plane... get julia set fractals out of it (12)
 
-## Done
+# Done
 
 - click and drag outside of fractal registers as click on fractal (1)
 - panning and zooming bug fixes (2)
@@ -60,3 +60,10 @@ refer to SYE final paper section 6 for further explanations (p. 55)
   - when extra horizontal space... either max options longer, or keep download button to the left
   - when height of options will overflow screen size.... popup modals S
   - for the width... when the min width is reached, they start pushing up the viewer, at this point, make pop up modals so viewer never gets pushed up
+
+# Refactor
+
+- create-react-app (the build tool used) is no longer maintained. I have been using next.js (a build tool and framework for react) instead recently. Switching to next.js I beleive is needed.
+- the cgen to generate the c++ is currently written in c++ and needs to be compiled to wasm. I am more comfortable with js, and since we are compiling instead of interpreting, the performance hit of switching to js would be miniscule. I think it would also make changes to the cgen code easier and easier to intergrate, along with simplying the flow of the applicaiton.
+
+In this branch, I plan to refactor the project to next.js and the js runtime for antlr4
